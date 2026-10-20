@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f7f9"><title>Greenspark · Customer readiness</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="rail" aria-label="Navigation">
+    <a class="mark" href="#" aria-label="Greenspark overview"><svg viewBox="0 0 32 32" fill="none"><path d="M25 6C12 5 5 11 7 20c2 9 18 8 18-14Z" fill="currentColor"/><path d="m8 25 12-13" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></a>
+    <nav><button class="rail-button active" data-nav="overview" aria-label="Overview" title="Overview" data-icon="grid"></button><button class="rail-button" data-nav="queue" aria-label="Review queue" title="Review queue" data-icon="layers"></button><button class="rail-button" data-nav="activity" aria-label="Activity" title="Activity" data-icon="history"></button></nav>
+    <div class="rail-bottom"><span class="avatar">GS</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="brand">greenspark<span class="brand-divider"></span><span class="workspace-name">Operations</span></div><div class="topbar-right"><span class="demo-badge"><span></span>Demo scenario</span><span class="snapshot">14 Jan 2025 · 08:30 AWST</span><button class="icon-button" id="export" aria-label="Export filtered cases" title="Export cases" data-icon="download"></button></div></header>
+    <main id="overview">
+      <div class="page-heading"><div class="title-line"><h1>Customer readiness</h1><span class="count-badge" id="total-count"></span></div><div class="filters"><label class="select-wrap"><span data-icon="building"></span><select id="retailer" aria-label="Retailer"><option value="all">All retailers</option><option selected>Horizon Power</option><option>Synergy</option></select></label><label class="select-wrap"><span data-icon="pin"></span><select id="region" aria-label="Region"><option value="all">All regions</option></select></label><label class="select-wrap date-select"><span data-icon="calendar"></span><select id="horizon" aria-label="Forecast window"><option value="7">14–20 Jan</option><option value="3">14–16 Jan</option></select></label></div></div>
+      <section class="metric-grid" id="metrics" aria-label="Extension summaries"></section>
+      <div class="charts-grid">
+        <section class="panel forecast-panel" id="heat-panel"><div class="panel-heading"><h2>Heat & credit</h2><div class="legend"><span><i class="dot orange"></i>Max °C</span><span><i class="dot teal"></i>Credit shortfall</span></div></div><div id="forecast-chart"></div><div class="forecast-bottom"><span id="forecast-peak"></span><button class="text-button" data-extension="heat">Review accounts <span data-icon="arrow"></span></button></div></section>
+        <section class="panel usage-panel" id="usage-panel"><div class="panel-heading"><h2>Usage changes</h2><button class="icon-button small" data-extension="usage" aria-label="Review usage changes" data-icon="arrow"></button></div><div id="usage-chart"></div><div id="usage-legend" class="stacked-legend"></div></section>
+        <section class="panel bill-panel" id="bill-panel"><div class="panel-heading"><h2>Bill outlook</h2><button class="icon-button small" data-extension="bill" aria-label="Review bill outlook" data-icon="arrow"></button></div><div class="bill-headline"><strong id="bill-uplift"></strong><span>median increase · est.</span></div><div id="bill-chart"></div><div class="legend bill-legend"><span><i class="dot muted"></i>Usual</span><span><i class="dot violet"></i>Forecast</span></div></section>
+      </div>
+      <div class="operations-grid">
+        <section class="panel queue-panel" id="queue"><div class="panel-heading queue-heading"><div class="section-title"><h2 id="queue-title">Review queue</h2><span class="small-count" id="queue-count"></span><button class="filter-chip" id="clear-extension" hidden></button><span class="region-filter-chip" id="queue-region" hidden><button id="queue-region-link" data-jump="regions-panel"></button><button id="clear-region" aria-label="Clear region filter" title="Clear region filter">×</button></span></div><div class="queue-tools"><label class="search-wrap"><span data-icon="search"></span><input id="search" placeholder="Find customer" aria-label="Find customer"></label><select id="priority" aria-label="Priority"><option value="all">All priorities</option><option>Urgent</option><option>High</option><option>Review</option></select></div></div><div class="table-scroll"><table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="select-all" aria-label="Select visible contactable cases"></th><th><button class="sort-button" id="sort-customer">Customer <span data-icon="sort"></span></button></th><th>Signal</th><th>Why flagged</th><th>Priority</th><th>Contact</th><th></th></tr></thead><tbody id="queue-body"></tbody></table></div><div class="queue-footer"><div class="pagination"><span id="page-label"></span><button class="icon-button small" id="prev-page" aria-label="Previous page" data-icon="left"></button><button class="icon-button small" id="next-page" aria-label="Next page" data-icon="right"></button></div><button class="primary-button" id="prepare" disabled><span data-icon="send"></span><span id="prepare-label">Prepare outreach</span></button></div></section>
+        <div class="side-panels"><section class="panel outage-panel" id="outage-panel"><div class="panel-heading"><h2>Outage readiness</h2><button class="icon-button small" data-extension="outage" aria-label="Review outage readiness" data-icon="arrow"></button></div><div id="outage-list"></div></section><section class="panel solar-panel" id="solar-panel"><div class="panel-heading"><h2>Solar performance</h2><button class="icon-button small" data-extension="solar" aria-label="Review solar performance" data-icon="arrow"></button></div><div class="solar-top"><strong id="solar-count"></strong><div class="solar-legend"><span><i class="dot gold"></i>Export ↓</span><span><i class="dot blue"></i>Import ↑</span></div></div><div id="solar-chart"></div></section></div>
+      </div>
+      <section class="panel regions-panel" id="regions-panel"><div class="panel-heading"><h2>Regional exposure</h2><div class="legend"><span><i class="dot red"></i>Urgent</span><span><i class="dot amber"></i>High</span><span><i class="dot grey"></i>Review</span></div></div><div id="regions-chart"></div></section>
+      <footer class="page-footer"><span>5 extensions</span><span id="population"></span><span class="footer-dot"></span><span>Scenario · 14 Jan 2025</span></footer>
+    </main>
+  </div>
+  <dialog id="case-dialog" class="drawer"><div id="case-content"></div></dialog>
+  <dialog id="handoff-dialog" class="handoff-dialog"><div id="handoff-content"></div></dialog>
+  <dialog id="activity-dialog" class="drawer"><div class="drawer-heading"><h2>Activity</h2><button class="icon-button" data-close="activity-dialog" aria-label="Close activity" data-icon="close"></button></div><div id="activity-content"></div></dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

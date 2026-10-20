@@ -1,0 +1,4 @@
+# Keep the original team archive outside version control. Prepared demo data is in dist/.
+data/*.zip
+mock-data.zip
+__pycache__/
