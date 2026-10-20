@@ -72,6 +72,26 @@ for ext, people in groups.items():
             r['detail']=f"{r['exportChange']}% export · +{r['importChange']}% import"
             r['fields']=[['Export change',f"{r['exportChange']}%"],['Import change',f"+{r['importChange']}%"],['Solar system',f"{c['solar_kw']} kW"],['Window','7 days']]
         r['history']=[rng.randint(12,70) for _ in range(14)]
+        if ext=='outage':
+            # Premises and event/acknowledgement inputs are simulated, not a live network feed.
+            oindex=sum(x['extension']=='outage' and x['retailer']==r['retailer'] for x in cases)
+            pattern=oindex%10
+            r['assessmentAt']=assessment_at.isoformat()
+            r['premisesId']='DEMO-P-'+r['customer']
+            r['acknowledgementsComplete']=True
+            r['acknowledgementsCheckedAt']=assessment_at.isoformat()
+            r['outageAcknowledgements']=[]
+            r['outage']={'id':'DEMO-O-'+r['customer'],'noticeVersion':2 if pattern==7 else 1,'affectedPremisesIds':[r['premisesId']],'status':'scheduled','startsAt':at_hours(r['dueDay']*24+1.5),'endsAt':at_hours(r['dueDay']*24+1.5+r['duration']),'lastCheckedAt':at_hours(-.25)}
+            if pattern==1:r['outage']['affectedPremisesIds']=['DEMO-P-OTHER']
+            elif pattern==2:r['outage']['status']='cancelled'
+            elif pattern==3:r['outageAcknowledgements']=[{'outageId':r['outage']['id'],'premisesId':r['premisesId'],'noticeVersion':1,'acknowledgedAt':at_hours(-2)}]
+            elif pattern==4:r['outageAcknowledgements']=[{'outageId':'DEMO-O-PREVIOUS','premisesId':r['premisesId'],'noticeVersion':1,'acknowledgedAt':at_hours(-24)}]
+            elif pattern==5:r['outage']['status']='restored'
+            elif pattern==7:r['outageAcknowledgements']=[{'outageId':r['outage']['id'],'premisesId':r['premisesId'],'noticeVersion':1,'acknowledgedAt':at_hours(-12)}]
+            elif pattern==8:r['outage']['affectedPremisesIds']=None
+            r.pop('priority',None)
+            r['fields']=[]  # Displayed evidence comes from the shared browser evaluator.
+            r['detail']='Outage readiness candidate'
         if ext=='heat':
             heat_rng=random.Random('heat-evidence:'+r['customer'])
             pattern=i%7
@@ -154,6 +174,6 @@ for ext, people in groups.items():
             r['fields'] += [['Missed payments · 90d',str(r['missedPayments90d'])],['Failed direct debits · 90d',str(r['failedDirectDebits90d'])],['Arrears · 30 Nov',f"${r['arrearsPrevious']}"],['Arrears · 31 Dec',f"${r['arrearsCurrent']}"]]
         cases.append(r)
 
-payload={'meta':{'classification':'illustrative-ui-scenario','date':'2025-01-14','timezone':'Australia/Perth','source':'mock-data.zip','sourceScope':'Customer IDs, retailer, region, account characteristics and contact preferences. All alerts, forecast weather, meter balances, top-up transactions, heat-period spending estimates, financial estimates, missed payments, failed direct debits, arrears history, usage-context assessments, usage-supporting indicators, solar weather/season assessments, adjusted export baselines, sunny-day shortfalls, queue states and time series are simulated.','notLive':True},'extensions':extensions,'population':[{'retailer':c['retailer'],'region':c['region'],'prepay':c['prepayment_meter']=='True'} for c in customers],'cases':cases,'forecast':forecast}
+payload={'meta':{'classification':'illustrative-ui-scenario','date':'2025-01-14','timezone':'Australia/Perth','source':'mock-data.zip','sourceScope':'Customer IDs, retailer, region, account characteristics and contact preferences. All alerts, forecast weather, meter balances, top-up transactions, heat-period spending estimates, financial estimates, missed payments, failed direct debits, arrears history, usage-context assessments, usage-supporting indicators, solar weather/season assessments, adjusted export baselines, sunny-day shortfalls, premises identifiers, affected-premises lists, outage schedules and status checks, outage notice versions and acknowledgements, queue states and time series are simulated.','notLive':True},'extensions':extensions,'population':[{'retailer':c['retailer'],'region':c['region'],'prepay':c['prepayment_meter']=='True'} for c in customers],'cases':cases,'forecast':forecast}
 (ROOT/'dist'/'data.json').write_text(json.dumps(payload,separators=(',',':')),encoding='utf-8')
 print(json.dumps({'cases':len(cases),'byExtension':{k:len(v) for k,v in groups.items()},'population':len(customers)}))
