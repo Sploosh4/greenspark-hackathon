@@ -174,6 +174,25 @@ for ext, people in groups.items():
             r['fields'] += [['Missed payments · 90d',str(r['missedPayments90d'])],['Failed direct debits · 90d',str(r['failedDirectDebits90d'])],['Arrears · 30 Nov',f"${r['arrearsPrevious']}"],['Arrears · 31 Dec',f"${r['arrearsCurrent']}"]]
         cases.append(r)
 
+# Explicit overlap scenarios make customer-level review demonstrable. Original candidates stay unchanged.
+profile_keys=['customer','retailer','region','locality','postcode','prepay','lifeSupport','interpreter','consent','channel','preferred','smsOptIn','emailOptIn','doNotCall','eligible','status']
+def add_usage_overlap(host,change):
+    r={key:host[key] for key in profile_keys}
+    r.update(id=f'GS-{len(cases)+1001}',extension='usage',dueDay=host['dueDay'],change=change,context='Unexplained',outageExplainsDrop=False,solarExplainsDrop=False,selfDisconnections7d=0,nearZeroUsageDays7d=2,hotDays7d=2,hotDayUsageChange=-40,declineDays=4,detail='Illustrative overlapping usage flag',history=host['history'][:])
+    r['fields']=[['Import change',f'{change}%'],['Window','7 days'],['Context','Unexplained'],['Outage explanation','No match'],['Solar explanation','No match'],['Near-zero use · 7d','2 days'],['Decline duration','4 days'],['Hot days · 7d','2'],['Hot-day usage change','-40%']]
+    cases.append(r)
+
+heat_hosts=[r for i,r in enumerate([x for x in cases if x['extension']=='heat']) if i%7 in [0,3,4,5] and r['eligible']][:2]
+for i,host in enumerate(heat_hosts):add_usage_overlap(host,-72 if i==0 else -48)
+source_customers={c['customer_id']:c for c in customers}
+solar_host=next(r for r in cases if r['extension']=='bill' and r['retailer']=='Synergy' and r['eligible'] and r['missedPayments90d']>0 and source_customers[r['customer']]['has_solar']=='True')
+r={key:solar_host[key] for key in profile_keys}
+r.update(id=f'GS-{len(cases)+1001}',extension='solar',dueDay=solar_host['dueDay'],exportChange=-58,importChange=32,expectedExportChange=-8,sunnyDayShortfalls7d=4,cloudExplainsDrop=False,seasonExplainsDrop=False,detail='Illustrative overlapping solar flag',history=solar_host['history'][:])
+r['fields']=[['Export change · 7d','-58%'],['Import change · 7d','+32%'],['Expected export change · adjusted','-8%'],['Solar system',f"{source_customers[r['customer']]['solar_kw']} kW"],['Cloud explanation','No match'],['Seasonal explanation','No match'],['Sunny-day shortfalls · 7d','4'],['Window','7 days']]
+cases.append(r)
+usage_host=next(r for r in cases if r['extension']=='bill' and r['retailer']=='Synergy' and r['eligible'] and r['missedPayments90d']>0 and r['customer']!=solar_host['customer'])
+add_usage_overlap(usage_host,-54)
+
 payload={'meta':{'classification':'illustrative-ui-scenario','date':'2025-01-14','timezone':'Australia/Perth','source':'mock-data.zip','sourceScope':'Customer IDs, retailer, region, account characteristics and contact preferences. All alerts, forecast weather, meter balances, top-up transactions, heat-period spending estimates, financial estimates, missed payments, failed direct debits, arrears history, usage-context assessments, usage-supporting indicators, solar weather/season assessments, adjusted export baselines, sunny-day shortfalls, premises identifiers, affected-premises lists, outage schedules and status checks, outage notice versions and acknowledgements, queue states and time series are simulated.','notLive':True},'extensions':extensions,'population':[{'retailer':c['retailer'],'region':c['region'],'prepay':c['prepayment_meter']=='True'} for c in customers],'cases':cases,'forecast':forecast}
 (ROOT/'dist'/'data.json').write_text(json.dumps(payload,separators=(',',':')),encoding='utf-8')
-print(json.dumps({'cases':len(cases),'byExtension':{k:len(v) for k,v in groups.items()},'population':len(customers)}))
+print(json.dumps({'cases':len(cases),'byExtension':{k:sum(r['extension']==k for r in cases) for k in groups},'population':len(customers)}))
