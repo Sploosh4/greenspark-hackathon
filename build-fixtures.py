@@ -1,5 +1,5 @@
 """Build a deterministic UI scenario. Alerts and forecasts are illustrative, not analysis."""
-import argparse, csv, io, json, pathlib, random, zipfile
+import argparse, csv, datetime, io, json, pathlib, random, zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent
 parser = argparse.ArgumentParser(description=__doc__)
@@ -29,6 +29,9 @@ for c in prepay:
     if c['customer_id'] not in seen: heat_people.append(c);seen.add(c['customer_id'])
 solar_people = [c for c in solar if c['retailer']=='Synergy'][:17] + [c for c in solar if c['retailer']=='Horizon Power'][:2]
 groups = {'heat':heat_people,'usage':prepay[50:60]+billed[10:64],'bill':billed[100:212],'outage':prepay[70:77]+billed[300:336],'solar':solar_people}
+forecast={'All regions':[39,41,43,42,40,38,36],'Perth metro':[34,36,38,39,37,34,32],'Pilbara':[40,42,43,42,41,39,38],'Kimberley':[36,37,39,40,39,38,37],'Gascoyne':[39,40,42,41,39,38,36]}
+assessment_at=datetime.datetime.fromisoformat('2025-01-14T08:30:00+08:00')
+def at_hours(hours):return (assessment_at+datetime.timedelta(hours=hours)).isoformat()
 cases=[]
 for ext, people in groups.items():
     for i,c in enumerate(people):
@@ -69,6 +72,39 @@ for ext, people in groups.items():
             r['detail']=f"{r['exportChange']}% export · +{r['importChange']}% import"
             r['fields']=[['Export change',f"{r['exportChange']}%"],['Import change',f"+{r['importChange']}%"],['Solar system',f"{c['solar_kw']} kW"],['Window','7 days']]
         r['history']=[rng.randint(12,70) for _ in range(14)]
+        if ext=='heat':
+            heat_rng=random.Random('heat-evidence:'+r['customer'])
+            pattern=i%7
+            temps=forecast.get(r['region'],forecast['All regions'])
+            heat_days=[day for day,temp in enumerate(temps) if temp>=40]
+            starts=heat_days[0]*24;ends=(heat_days[-1]+1)*24
+            r['assessmentAt']=assessment_at.isoformat()
+            r['balanceAt']=at_hours(-4 if pattern==2 else 0)
+            r['topUpsComplete']=True
+            r['topUps']=[]
+            r['temperature']=max(temps)
+            r['heatForecast']={'isHeatEvent':True,'locationMatched':True,'region':r['region'],'startsAt':at_hours(starts),'endsAt':at_hours(ends),'peakTemperature':max(temps),'dailyCost':round(r['dailyCost']*heat_rng.uniform(1.25,1.6),2)}
+            cost=r['dailyCost']*starts/24+r['heatForecast']['dailyCost']*(ends-starts)/24
+            if pattern==1:
+                # Already included in this balance; adding it again would hide a genuine gap in other profiles.
+                r['credit']=round(cost+30,2)
+                r['topUps']=[{'id':r['id']+'-t1','amount':30,'at':at_hours(-3),'status':'posted'}]
+            elif pattern==2:
+                r['topUps']=[{'id':r['id']+'-t1','amount':round(cost+20,2),'at':at_hours(-1),'status':'posted'}]
+            elif pattern==3:
+                r['credit']=round(cost*.65,2)
+                r['topUps']=[{'id':r['id']+'-t1','amount':20,'at':at_hours(-6),'status':'posted'}]
+            elif pattern==4:
+                r['topUps']=[{'id':r['id']+'-t1','amount':80,'at':at_hours(-1),'status':'pending'}]
+            elif pattern==5:
+                r['credit']=round(cost*.8,2)
+                r['topUps']=[{'id':r['id']+'-t1','amount':10,'at':at_hours(-12),'status':'posted'}]
+            elif pattern==6:r['heatForecast']['locationMatched']=None
+            r.pop('priority',None)
+            r['fields']=[]  # Displayed projection fields come from the shared browser evaluator.
+            r.pop('hours',None)
+            r['detail']='Heat credit projection candidate'
+            r['dueDay']=starts//24
         if ext=='solar':
             # Illustrative weather/season baselines; no live weather feed is in the archive.
             solar_rng=random.Random('solar-evidence:'+r['customer'])
@@ -118,6 +154,6 @@ for ext, people in groups.items():
             r['fields'] += [['Missed payments · 90d',str(r['missedPayments90d'])],['Failed direct debits · 90d',str(r['failedDirectDebits90d'])],['Arrears · 30 Nov',f"${r['arrearsPrevious']}"],['Arrears · 31 Dec',f"${r['arrearsCurrent']}"]]
         cases.append(r)
 
-payload={'meta':{'classification':'illustrative-ui-scenario','date':'2025-01-14','timezone':'Australia/Perth','source':'mock-data.zip','sourceScope':'Customer IDs, retailer, region, account characteristics and contact preferences. All alerts, forecast weather, financial estimates, missed payments, failed direct debits, arrears history, usage-context assessments, usage-supporting indicators, solar weather/season assessments, adjusted export baselines, sunny-day shortfalls, queue states and time series are simulated.','notLive':True},'extensions':extensions,'population':[{'retailer':c['retailer'],'region':c['region'],'prepay':c['prepayment_meter']=='True'} for c in customers],'cases':cases,'forecast':{'All regions':[39,41,43,42,40,38,36],'Perth metro':[34,36,38,39,37,34,32],'Pilbara':[40,42,43,42,41,39,38],'Kimberley':[36,37,39,40,39,38,37],'Gascoyne':[39,40,42,41,39,38,36]}}
+payload={'meta':{'classification':'illustrative-ui-scenario','date':'2025-01-14','timezone':'Australia/Perth','source':'mock-data.zip','sourceScope':'Customer IDs, retailer, region, account characteristics and contact preferences. All alerts, forecast weather, meter balances, top-up transactions, heat-period spending estimates, financial estimates, missed payments, failed direct debits, arrears history, usage-context assessments, usage-supporting indicators, solar weather/season assessments, adjusted export baselines, sunny-day shortfalls, queue states and time series are simulated.','notLive':True},'extensions':extensions,'population':[{'retailer':c['retailer'],'region':c['region'],'prepay':c['prepayment_meter']=='True'} for c in customers],'cases':cases,'forecast':forecast}
 (ROOT/'dist'/'data.json').write_text(json.dumps(payload,separators=(',',':')),encoding='utf-8')
 print(json.dumps({'cases':len(cases),'byExtension':{k:len(v) for k,v in groups.items()},'population':len(customers)}))
