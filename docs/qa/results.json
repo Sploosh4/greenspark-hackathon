@@ -1,0 +1,70 @@
+{
+  "passed": 16,
+  "total": 16,
+  "checks": [
+    {
+      "name": "Default review: 448 accounts, 20 rows, single page title and no customer map",
+      "pass": true
+    },
+    {
+      "name": "All seven table columns sort in both directions",
+      "pass": true
+    },
+    {
+      "name": "Customer navigation, repeated tab clicks, browser Back and Back to review retain search/filter/sort",
+      "pass": true
+    },
+    {
+      "name": "Empty results, clear filters and pagination survive detail navigation",
+      "pass": true
+    },
+    {
+      "name": "Prepaid fixture, disclosed needs, dated arrangements and delivery versus resolution are consistent",
+      "pass": true
+    },
+    {
+      "name": "Billed fixture: $184.28 versus $167.89, +9.8%, inspectable calculation",
+      "pass": true
+    },
+    {
+      "name": "Explicit cooling need resurfaces beside issued weather; account view contains no map",
+      "pass": true
+    },
+    {
+      "name": "Area map has no synthetic source/overlay/marker; zoom, community, horizon, resize and workspace switching work",
+      "pass": true
+    },
+    {
+      "name": "All 12 communities \u00d7 4 weather scenarios \u00d7 3 case-date boundaries render without invalid numbers",
+      "pass": true
+    },
+    {
+      "name": "Invalid URL date/filter/sort/page state normalises safely",
+      "pass": true
+    },
+    {
+      "name": "Existing browser checks: 36 / 36",
+      "pass": true
+    },
+    {
+      "name": "390px mobile review, account tabs and planning contain page overflow",
+      "pass": true
+    },
+    {
+      "name": "Accessibility basics: labelled controls, column headers, one h1, landmarks, focus styles and skip link",
+      "pass": true
+    },
+    {
+      "name": "Missing map network/library, WebGL failure and missing data/retry remain usable without fabricated geometry",
+      "pass": true
+    },
+    {
+      "name": "No uncaught browser exceptions or external requests; no credentials used",
+      "pass": true
+    },
+    {
+      "name": "Prepared fixture SHA-256 matches retained provenance",
+      "pass": true
+    }
+  ]
+}

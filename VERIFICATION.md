@@ -1,42 +1,43 @@
-# Verification — 26 October 2026
+# Verification · 26 October 2026
 
-Local checks were performed in real Chrome against the loopback server. They validate this bounded synthetic draft, not production suitability or predictive accuracy.
+The final review uses the recovered `demo` commit `e3c95f2a4b0bed8a24d7c18f36b2808a48edadba` as its base, on local branch `fix/community-map-placeholders`. `main` was older at `b3916880d3bdb19bea84138faf8e0333d9ab2f69`. The original checkout was clean; no worker's changes were reset or overwritten.
+
+## Recovered and reconstructed
+
+Recovered: prepared 2025 fixture and provenance, as-of functions, prepaid and billed calculations, explicit need/arrangement histories, dated support events, issued planning assumptions, Census postcode values, MapLibre assets and loopback server. The scenario payload and hash are unchanged.
+
+Reconstructed from the approved brief: customer-review table, shared account workspace and overview, navigation with retained queue state, separate Community planning layout, concise labels and responsive styling. Figma MCP returned the Starter quota limit on the first design-context read; exact matching to frames 2:2–2:8 is unverified. The implementation uses the supplied 64px header, 240px sidebar, 32px desktop padding, 24px gaps, white cards, #F5F7F7 background and #126A65 teal. Inter is the preferred font; the browser falls back to installed system fonts when Inter is absent.
+
+## Fixed
+
+- Removed the synthetic polygon, customer point and offline sketch. The map draws no boundary without genuine matched geography. Account review stays separate from the area map.
+- Search, combined filters, seven sortable columns, empty results, pagination, account navigation and both Back paths preserve review context in the URL. Repeated navigation does not duplicate handlers or canvases.
+- Current explicit needs, support and preferred contact use effective records at the case date. A review due today is not labelled overdue.
+- Missing contact progression is distinct from an explicit unsuccessful contact; the latest dated decision governs acceptance. Delivery and resolution retain separate states. Campaign cases cannot enlarge the geographic audience denominator.
+- Billed monthly estimates are withheld when elapsed usage days are missing. Missing or invalid tariff evidence does not produce NaN estimates. The existing canonical fixture arithmetic is retained.
+- Replaced the arrangement screen's incorrect claim that billed review was unavailable. Contact flags use readable labels. Closed accounts retain historical context without receiving new financial review signals.
+- Added labelled controls, table column semantics and sort state, keyboard focus cues, a skip link, one page title, mobile layouts, bounded table scrolling and map resize/disposal handling.
 
 ## Passed
 
-- All five views render from the prepared canonical release, with the same selected community/customer/date/scenario. Both prepaid and billed Tool 1 paths render; the billed calculation is inspectable.
-- Community selection (Esperance) and customer selection (South Hedland C101664), date input (1 January), scenario selection, C105011 date checkpoints, billed shortcut, reset and browser back navigation.
-- C105011's concern is current on 17 January; support is accepted but undelivered then, delivered/ongoing on 21 January, and customer-confirmed resolved on 28 January. Arrangement history is absent before 21 January, active on 21 January and completed at resolution.
-- C101664's explicit cooling need appears beside the already-issued heat footprint, without a payment-history filter or inferred diagnosis.
-- Twelve-month planning chart, scenario range, capacity table, real postcode Census context and dated community billing/support history render.
-- MapLibre local polygon and selected point render with attribution; zoom control responds. When the map library is deliberately served as 404, the offline footprint and support journey still work.
-- When scenario JSON is deliberately served as 404, the app shows a retry screen and disables inactive context controls. Retry returns to the same honest error while data remains unavailable.
-- Empty Esperance/January campaign shows zero geographic audience and no invented cases. 1 January shows zero completed prior days, no invented top-ups and no forecast issued yet. Missing comparison/rate evidence is unavailable rather than silently substituted.
-- Expired forecast validity, effective end exclusivity, future disclosure/arrangement/resolution withholding, account-open forecast matching and dated cleared payment allocation rules are checked.
-- **36/36 browser checks passed** in `teamconnect/checks.html`. These cover temporal boundaries, canonical overrides, financial arithmetic and missing data cases.
-- Independent standard-library reconciliation verified **94 release file hashes**, aggregated **613,440 intervals**, and matched **12,780 noon balances plus 12,780 daily charge/delivered-use rows**. Re-run with `scripts/verify-teamconnect.py` and the extracted release.
-- The local server returns 200 for `/` and scenario JSON, and 404 for `/.env.local`, `/../.git`, `/teamconnect/` and `/vendor/`. It binds 127.0.0.1 and serves an explicit asset allowlist without listings. CSP restricts assets/connections to the local origin and permits MapLibre's local blob worker.
-- Python source compiles; repository whitespace check passes. Screenshots are non-sensitive and contain synthetic records only.
+- `node --test test-*.mjs`: **60/60** (52 retained tests and eight new review/data regression tests).
+- Existing `checks.html`: **36/36** against the same core functions as the views.
+- `python3 scripts/qa-teamconnect.py --output /tmp/teamconnect-qa`: **16/16 browser QA groups**, using real Chromium at 1440×900 and 390×844. Groups cover sorting/search/combined filters, no results, clear, pagination, customer references, all tabs, repeated clicks, browser Back, Back to review, reload/deep links, invalid URL state, prepaid/billed values, disclosed cooling, dated arrangement and resolution states, area-only maps, resize, zoom, missing library/WebGL and missing data/retry.
+- All 12 communities × four weather scenarios × three boundary dates rendered without invalid numeric labels.
+- No uncaught browser exceptions or external requests in the browser run. No credentials were used, displayed or added.
+- Prepared fixture SHA-256 still matches `provenance.json`: `08f3bed764f6f3e8aab349338bfd7ce8eec7521cb5e233c4533354eb23f0e756`.
+- JavaScript syntax, Python compilation and `git diff --check`.
+- The server still refuses credential and directory paths. Its CSP is unchanged; only `review.mjs` was added to the asset allowlist.
 
-## Not tested or deliberately outside this build
+## Screenshots
 
-- MapTiler basemap authentication and remote tile/network behaviour: the existing key remains untouched. Local geometry rendering and map-library failure were tested.
-- A calibrated weather-to-demand model, validated affordability prediction, actual future net bills for the 298 retained base billed accounts, production tariffs, production eligibility and live customer systems.
-- Live 2026 weather integration and historical climate observations. The release supplies fixed fictional forecasts and issued annual scenario inputs; these are labelled accordingly.
-- Dedicated mobile-device and non-Chrome browser testing. Responsive CSS is implemented, but a mobile result is not claimed.
-- No shared/server workflow writes, real outreach, production hosting, deployment or containerisation.
+All screenshots contain synthetic records only. The seven main screens and billed example are in [docs/qa](docs/qa/): [Customer review](docs/qa/customer-review.png), [Overview](docs/qa/customer-overview.png), [Financial pressure](docs/qa/financial-pressure.png), [Disclosed needs](docs/qa/disclosed-needs.png), [Existing arrangements](docs/qa/existing-arrangements.png), [Support journey](docs/qa/support-journey.png), [Community planning](docs/qa/community-planning.png) and [Billed calculation](docs/qa/billed-pressure.png). The [browser results](docs/qa/results.json) record each QA group.
 
-## Failure-check run commands
+## Remaining blockers and unrun checks
 
-```sh
-python3 serve-demo.py --port 8788 --missing-data
-python3 serve-demo.py --port 8789 --missing-map
-```
-
-These are isolated QA switches. The ordinary run command remains `python3 serve-demo.py --port 8787`.
-
-## Screenshot evidence
-
-Seven synthetic demo screenshots were checked visually and saved separately: prepaid review, billed review, explicit cooling need, planning chart, arrangement history, resolved journey and verification results. They contain no visible keys, personal contact details, real people or unrelated browser material. Screenshot storage identifiers and local workspace paths are intentionally omitted from this public repository.
-
-The owned local QA servers were stopped after verification. Restart the ordinary server with the README command.
+- **Live basemap:** the recovered code has no MapTiler style/key configuration. Its background-only MapLibre canvas and controls are tested; authenticated basemap/tile networking is not. No API configuration, restriction or service was changed.
+- **Real boundaries and climate:** the release has synthetic forecast footprints and real postcode statistics, but no genuine boundary dataset with a valid join or historical climate observations. No replacement geography or climate history was fabricated.
+- **Figma:** Starter MCP quota prevents source-frame inspection. This is a reconstruction from the approved brief, not a claim that the missing laptop implementation was recovered.
+- **Source reconciliation:** the original extracted release is absent in cloud. The earlier independent 94-file / 613,440-interval reconciliation was not rerun; only the retained prepared payload hash was checked here.
+- **Browser coverage:** Chromium desktop/mobile viewport QA passed. Safari, Firefox and a full accessibility audit were not run.
+- **Teammate access:** the GitHub CLI metadata read returned `Forbidden`; the dependent collaborator lookup did not run. Namash and Audrey's individual permissions are unverified. Repository access was not changed.

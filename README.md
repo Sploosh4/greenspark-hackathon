@@ -1,31 +1,46 @@
 # Team Connect browser demo
 
-A bounded account-review website for a Horizon Power hardship officer. The five views share one community, customer, case date (12:00 AWST) and weather scenario. All account and operational records are synthetic. ABS postcode context is separately identified.
+An account review demo for a Horizon Power hardship officer. Start in **Customer review**, search or filter the table, then select a customer reference. The shared account workspace has Overview, Financial pressure, Disclosed needs, Existing arrangements and Support journey sections. **Community planning** is a separate workspace.
 
-This five-tool demo is a **rough first draft and needs significant work**. The design, workflows and calculations are open to challenge and change. Treat it as a starting point for discussion and further development.
+The account-centred UI was reconstructed from the approved workflow and layout brief. The recovered implementation was `demo` commit `e3c95f2a4b0bed8a24d7c18f36b2808a48edadba`; no newer source was found on the remote branches. Figma access reached its Starter quota, so exact frame fidelity has not been verified.
+
+All customer and operational records are synthetic. The fixed scenario uses 2025 dates at 12:00 AWST. ABS postcode context is separately identified. Records are read only; the demo sends no contact, changes no arrangement and makes no automated eligibility or allocation decision.
 
 ## Run locally
-
-No container, Node, build step or package installation is needed to run the prepared demo. Python 3 serves a fixed allowlist on loopback, without directory listings or credential access.
 
 ```sh
 python3 serve-demo.py --port 8787
 ```
 
-Open **http://127.0.0.1:8787/**. Stop with Ctrl+C. Do not use the earlier `dist/` mockup as the new demo entry point.
+Open **http://127.0.0.1:8787/**. Python 3 is the only runtime requirement. The server binds to loopback and serves an explicit asset allowlist. Stop with Ctrl+C. The earlier `dist/` mockup is not this demo's entry point.
 
-## A short demonstration
+## Review the demo
 
-1. Start with **C105011 / South Hedland / 17 January / January Pilbara heat**. Tool 1, **Anticipate financial struggles**, shows $109.66 credit and seven completed days of delivered energy. Its recent off-supply periods prevent a reliable coverage calculation, so the estimate is withheld. The forecast was issued on 17 January for 20–25 January; later vintages and actual future outcomes are absent.
-2. Open **Disclosed needs**. The budgeting concern was explicitly recorded on 16 January. The current contact preference is displayed as a dated record; it does not authorise the demo to contact anyone.
-3. Open **Community outlook**. Inspect the twelve-month review-volume ranges, regional capacity assumptions, issued seasonal scenario, postcode Census context and dated area billing/support counts. These support a longer-term planning discussion, without prescribing staffing or outreach actions. The release contains no historical climate observations, and the UI says so.
-4. Open **Arrangements**, then select **21 Jan**. The completed support review creates a support check-in arrangement with its review date. It is not an instalment contract or payment transaction.
-5. Open **Support journey**. At 17 January the review is accepted but undelivered; on 21 January delivery is recorded while the concern remains ongoing; on 28 January a customer-confirmed resolution appears. The adjacent community campaign uses its own geographic audience denominator. The customer-initiated case is explicitly separate from that campaign.
-6. Select **Billed example**. C105019 / Halls Creek / 7 March / northern heat shows a $184.28 current-month estimate against the $167.89 February bill issued on 1 March (+9.8%). Inspect the measured-use arithmetic, tariff, dated payments and forecast. The estimate does not establish ability to pay.
+- Search, community/account/context filters, all seven sort columns and pagination work together. Selecting a reference opens that account. Back to review, browser Back and reload retain URL context.
+- **Prepaid example** opens C105011 on 17 January: $109.66 recorded credit. Its off-supply periods leave fewer than three complete on-supply days, so coverage is withheld. On 21 January a support check-in is active and delivered; resolution appears only on 28 January.
+- **Billed example** opens C105019 on 7 March: $184.28 estimated current-month bill against the $167.89 latest issued bill (+9.8%). Expand the calculation to inspect usage, tariff and elapsed/remaining days.
+- Search **C101664**, open Disclosed needs and use 17 January / Pilbara heat to see a current explicit cooling need alongside an already-issued forecast. No diagnosis is inferred and planned outages are not included.
+- Community planning contains the area map frame, six- or twelve-month issued scenario ranges, regional capacity assumptions, dated account/support aggregates and 2021 postcode Census context. Climate observations and genuine boundary geometry are absent from the release.
 
-The C105011 date buttons restore that customer while retaining the selected analytical view. Reset restores the original prepaid example. Community selection picks a valid customer in that community; customer, date and scenario controls update the same shared context. Browser back/forward and reload retain URL state.
+## Maps
 
-For an explicitly disclosed cooling example, choose **South Hedland / C101664 / 17 January / January heat**, then **Disclosed needs**. Its recorded temperature-controlled-space need matches the issued heat footprint. No diagnosis is inferred from usage, and payment history does not gate this view.
+MapLibre GL JS 5.24.0 and its stylesheet are vendored. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The recovered demo has no MapTiler basemap configuration: its style contains only a background layer. This remains clearly labelled; credentials, API restrictions and services were not changed.
+
+The map is confined to Community planning. It adds no customer points, synthetic footprints, fake streets or substitute boundaries, including when MapLibre/WebGL is unavailable. No genuine boundary data joined to the supplied postcode statistics exists in this repository, so no boundary is drawn. MapLibre zoom and attribution controls are retained; real basemap authentication, tiles and provider attribution still need the existing configuration supplied through an authorised follow-up.
+
+## Checks
+
+```sh
+node --test test-*.mjs
+```
+
+The existing deterministic scenario checks remain at **http://127.0.0.1:8787/checks.html**. Optional browser regression QA requires Python Playwright and Chromium; it starts and stops its own loopback server:
+
+```sh
+python3 scripts/qa-teamconnect.py --output /tmp/teamconnect-qa
+```
+
+See [VERIFICATION.md](VERIFICATION.md) for results, screenshots and remaining blockers.
 
 ## Financial scope and assumptions
 
@@ -53,14 +68,8 @@ python3 scripts/prepare-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-D
 python3 scripts/verify-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-Demo-2025Q1-v1
 ```
 
-## Maps, weather and dependencies
+## Scope
 
-MapLibre GL JS 5.24.0 is vendored from its npm distribution with its stylesheet and licence. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for its source and ABS data attribution. It renders the supplied GeoJSON and selected fictional customer locally, with zoom controls and attribution. No customer-like records or geometries are sent to a map/geocoding API. The MapTiler basemap is clearly unconfigured; no key was read, copied, logged or persisted. Missing MapLibre/WebGL leaves the offline SVG footprint visible and the rest of the demo usable. The default server makes no external requests.
+Live weather and the sibling prototype were not edited. There is no daily scheduler, contact sending, account write, deployment or container requirement for this browser demo. The existing CSP and API restrictions remain unchanged.
 
-Current live weather remains separate. The sibling prototype and its weather fetcher were not edited. There is no daily scheduler, live-weather app integration, language tool, eligibility decision, action recommendation, auto-contact, account creation, deployment or container.
-
-## Verification
-
-Open **http://127.0.0.1:8787/checks.html** for the 36 deterministic checks against the same functions used by the views. See [VERIFICATION.md](VERIFICATION.md) for browser interactions, source reconciliation and remaining limits.
-
-The previous mockup files and tests remain untouched under `dist/` and the existing top-level test files. Their original documentation is retained in [README.legacy-mockups.md](README.legacy-mockups.md). They are not loaded by the Team Connect server.
+The earlier mockup and its tests remain under `dist/` and the top-level test files. Its documentation is [README.legacy-mockups.md](README.legacy-mockups.md).

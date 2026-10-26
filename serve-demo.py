@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 import mimetypes
 
 ROOT=Path(__file__).resolve().parent/'teamconnect'
-FILES={'index.html','styles.css','app.mjs','core.mjs','scenario.json','provenance.json','checks.html','checks.mjs','vendor/maplibre-gl.js','vendor/maplibre-gl.css','vendor/maplibre-LICENSE.txt'}
+FILES={'index.html','styles.css','app.mjs','core.mjs','review.mjs','scenario.json','provenance.json','checks.html','checks.mjs','vendor/maplibre-gl.js','vendor/maplibre-gl.css','vendor/maplibre-LICENSE.txt'}
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         name=urlsplit(self.path).path
