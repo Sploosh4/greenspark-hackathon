@@ -1,0 +1,24 @@
+{
+  "source_archive": "TeamConnect-Complete-Synthetic-Demo-2025Q1-v1.zip",
+  "selection_manifest_sha256": "093c4ae316fb57c17122e9b9db1ddd4c366f2af49d7d53c7229b2c4f5bced42e",
+  "release": "complete-scenario-2025Q1-v1",
+  "timezone": "AWST UTC+08:00",
+  "analysis_time": "selected date at 12:00 AWST",
+  "scenario_json_sha256": "08f3bed764f6f3e8aab349338bfd7ce8eec7521cb5e233c4533354eb23f0e756",
+  "bytes": 4862049,
+  "customers": 448,
+  "prepaid_accounts": 142,
+  "noon_credit_rows": 12780,
+  "source": "canonical selection_manifest.json; financial override + OP25 operations; union distinct need/arrangement episodes",
+  "excluded": [
+    "raw intervals",
+    "demand_kwh",
+    "requested_cost_cents",
+    "observed_magnitude",
+    "customer_event_exposure",
+    "full-window case status",
+    "old model outputs",
+    "base financial overrides",
+    "base funnel"
+  ]
+}
