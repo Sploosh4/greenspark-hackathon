@@ -14,7 +14,7 @@ test('every distinct current reason is retained, newest first, without mutating 
   const before=JSON.stringify(d);
   const info=at(d);
   assert.deepEqual(info.reasons,['cooling_access_need','financial_pressure_disclosed']);
-  assert.equal(info.flagged,'2025-01-10');
+  assert.equal(info.recorded,'2025-01-10');
   assert.equal(JSON.stringify(d),before);
 });
 
@@ -79,4 +79,57 @@ test('real scenario preserves mixed reasons under both filters and excludes futu
       if(expected.size)assert.deepEqual(new Set(info.reasons),expected);
     }
   }
+});
+
+test('longstanding needs and an active arrangement do not invent a review trigger',()=>{
+  const d=data([need('registered_life_support',{source_event_date:'2022-06-18'})],{
+    arrangements:[{customer_id:'C1',arrangement_type:'payment_plan',status:'active',effective_from:'2024-12-31',source_event_date:'2024-12-31',review_due_date:'2025-01-30'}]});
+  const info=at(d);
+  assert.deepEqual(info.triggers,[]);
+  assert.deepEqual(info.supportNeeds,['registered_life_support']);
+  assert.equal(info.recorded,'2022-06-18');
+});
+
+test('a current disclosure recorded today supplies a dated trigger without making older needs triggers',()=>{
+  const info=at(data([need('registered_life_support',{source_event_date:'2022-06-18'}),need('cooling_access_need',{source_event_date:'2025-01-17'})]));
+  assert.deepEqual(info.triggers,[{type:'disclosure_recorded',reason:'cooling_access_need',recorded:'2025-01-17'}]);
+  assert.deepEqual(info.supportNeeds,['cooling_access_need','registered_life_support']);
+});
+
+test('case triggers use the exact need link and survive the opening day until resolution is recorded',()=>{
+  const d=data([need('registered_life_support',{need_id:'LIFE'}),need('cooling_access_need',{need_id:'COOL',source_event_date:'2025-01-17'})],{
+    cases:[{case_id:'CASE1',customer_id:'C1',need_id:'COOL',opened_at:'2025-01-17 09:00:00'}]});
+  for(const date of ['2025-01-17','2025-01-18'])assert.deepEqual(at(d,date).triggers,[{type:'case_opened',reason:'cooling_access_need',recorded:'2025-01-17 09:00:00'}]);
+  assert.deepEqual(at(d,'2025-01-16').triggers,[]);
+});
+
+test('unlinked cases are not attributed to a coincident disclosed need',()=>{
+  const info=at(data([need('registered_life_support',{need_id:'LIFE'})],{
+    cases:[{case_id:'CASE1',customer_id:'C1',need_id:'UNMATCHED',opened_at:'2025-01-10'}]}));
+  assert.deepEqual(info.triggers,[{type:'case_opened',reason:'',recorded:'2025-01-10'}]);
+});
+
+test('resolved cases stop supplying a trigger only when the resolution is known',()=>{
+  const d=data([need('registered_life_support',{need_id:'LIFE'})],{
+    cases:[{case_id:'CASE1',customer_id:'C1',need_id:'LIFE',opened_at:'2025-01-10'}],
+    resolutions:[{case_id:'CASE1',resolved_at:'2025-01-18 09:00:00'}]});
+  assert.equal(at(d,'2025-01-17').triggers.length,1);
+  assert.deepEqual(at(d,'2025-01-18').triggers,[]);
+  assert.deepEqual(at(d,'2025-01-18').supportNeeds,['registered_life_support']);
+});
+
+test('future, expired and resolved disclosures cannot supply a current-day trigger',()=>{
+  const info=at(data([need('future',{source_event_date:'2025-01-17 13:00:00'}),need('expired',{source_event_date:'2025-01-17',effective_to:'2025-01-17'}),need('resolved',{source_event_date:'2025-01-17',status:'resolved'}),need('other_customer',{customer_id:'C2',source_event_date:'2025-01-17'})]));
+  assert.deepEqual(info.triggers,[]);
+});
+
+test('actual scenario separates the cooling case from background registration and preserves missing-trigger examples',async()=>{
+  const d=JSON.parse(await readFile(new URL('./teamconnect/scenario.json',import.meta.url),'utf8'));
+  const info=(id,date='2025-01-17')=>reviewInfo(d,d.customers.find(c=>c.customer_id===id),cutoff(date));
+  assert.deepEqual(info('C101366').triggers,[{type:'case_opened',reason:'cooling_access_need',recorded:'2025-01-17 09:00:00'}]);
+  assert.deepEqual(info('C101366').supportNeeds,['cooling_access_need','registered_life_support']);
+  for(const id of ['C100562','C102046'])assert.deepEqual(info(id).triggers,[]);
+  assert.deepEqual(info('C100562').supportNeeds,[]);
+  assert.equal(info('C100562').recorded,'2024-12-31');
+  assert.deepEqual(info('C105011','2025-01-28').triggers,[]);
 });

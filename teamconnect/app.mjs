@@ -24,7 +24,9 @@ function needsAt(c,t){return current(d.needs.filter(r=>r.customer_id===c.custome
 const permissionAt=(c,t)=>current(d.permissions.filter(r=>r.customer_id===c.customer_id),t)[0];
 const supportAt=(c,t)=>current(d.arrangements.filter(r=>r.customer_id===c.customer_id),t).filter(r=>r.status==='active');
 const reviewInfo=(c,t)=>customerReviewInfo(d,c,t);
-const reviewReasonValues=info=>info.reasons.map(reason=>`<div>${pretty(reason)}</div>`).join('');
+const reviewNeedValues=info=>info.supportNeeds.length?info.supportNeeds.map(reason=>`<div>${pretty(reason)}</div>`).join(''):'Not recorded';
+const reviewTriggerValues=info=>info.triggers.length?info.triggers.map(trigger=>`<div>${trigger.type==='case_opened'?`Support case opened${trigger.reason?' for '+pretty(trigger.reason):''}`:pretty(trigger.reason)+' recorded'} · ${dateText(trigger.recorded)}</div>`).join(''):'Not recorded';
+const reviewReasonValues=info=>`<div><small>Review trigger</small>${reviewTriggerValues(info)}</div><div><small>Relevant support needs</small>${reviewNeedValues(info)}</div>`;
 function shortWeather(c,need,t){
   const match=needWeatherMatch(d,c,need,state.event,t);
   if(match.startsWith('Heat-related'))return badge(match.includes('ended')?'Heat · historical forecast':'Heat · matched',match.includes('ended')?'':'warn');
@@ -41,7 +43,7 @@ function weather(c,t){
 }
 function reasonPanel(c,t){
   const info=reviewInfo(c,t);
-  return panel('Reason for review',info.reasons.length?`<div class="record-value">${reviewReasonValues(info)}</div><div class="notice">${info.need?`${info.reasons.length>1?'Latest recorded':'Recorded'} ${dateText(info.flagged)} · ${status(info.need.status)}`:dateText(info.flagged)}</div>`:empty('No review reason recorded'));
+  return panel('Reason for review',`<div class="record-context"><div><h3>Review trigger</h3><div class="record-value">${reviewTriggerValues(info)}</div></div><div><h3>Relevant support needs</h3><div class="record-value">${reviewNeedValues(info)}</div>${info.need?`<div class="notice">${status(info.need.status)}</div>`:''}</div></div>`);
 }
 function supportContextPanel(info){
   if(!info.reasons.length)return '';
@@ -53,19 +55,19 @@ function supportContextPanel(info){
 function review(){return `<div class="filters" role="search" aria-label="Review filters"><input id="review-search" class="search" type="search" aria-label="Search customer reference" placeholder="Search customer reference" value="${esc(filters.search)}"><select id="review-reason" aria-label="Review reason"><option value="">All review reasons</option><option value="financial">Financial disclosure</option><option value="needs">Other disclosed needs</option><option value="support">Support records</option></select><select id="review-type" aria-label="Account type"><option value="">All account types</option><option>Prepaid</option><option>Billed</option></select><select id="review-area" aria-label="Review area"><option value="">All areas</option>${[...new Set(d.customers.map(c=>c.locality))].sort().map(a=>`<option>${esc(a)}</option>`).join('')}</select></div><section class="panel"><div id="review-results"></div></section>`;}
 function renderQueue(){
   const t=cutoff(state.date),items=d.customers.map(c=>({c,i:reviewInfo(c,t)})).filter(({c,i})=>i.reasons.length&&openAt(c,t)&&c.customer_id.toLowerCase().includes(filters.search.trim().toLowerCase())&&(!filters.area||c.locality===filters.area)&&(!filters.type||typeFor(c)===filters.type)&&matchesReviewReason(i,filters.reason))
-    .sort((a,b)=>time(b.i.flagged)-time(a.i.flagged)||a.c.customer_id.localeCompare(b.c.customer_id));
+    .sort((a,b)=>time(b.i.recorded)-time(a.i.recorded)||a.c.customer_id.localeCompare(b.c.customer_id));
   const pages=Math.max(1,Math.ceil(items.length/10));filters.page=Math.min(filters.page,pages-1);
   const rows=items.slice(filters.page*10,filters.page*10+10).map(({c,i})=>[
-    `<button class="reference" data-customer="${esc(c.customer_id)}">${esc(c.customer_id)}</button><small>${esc(c.locality)} · ${typeFor(c)}</small>`,reviewReasonValues(i),dateText(i.flagged),i.arr.length?i.arr.map(r=>pretty(r.arrangement_type)+' '+status(r.status)).join('<br>'):i.stage?status(i.stage):'Not recorded',pretty(i.permission?.preferred_channel)
+    `<button class="reference" data-customer="${esc(c.customer_id)}">${esc(c.customer_id)}</button><small>${esc(c.locality)} · ${typeFor(c)}</small>`,reviewReasonValues(i),dateText(i.recorded),i.arr.length?i.arr.map(r=>pretty(r.arrangement_type)+' '+status(r.status)).join('<br>'):i.stage?status(i.stage):'Not recorded',pretty(i.permission?.preferred_channel)
   ]);
-  $('#review-results').innerHTML=(rows.length?table(['Customer reference','Reason for review','Flagged date','Current support','Contact method'],rows,'review-table'):empty('No matching review records'))+`<div class="pagination"><span>${items.length?`${filters.page*10+1}–${Math.min(items.length,filters.page*10+10)} of ${items.length}`:'0'} records</span><button id="queue-prev" ${filters.page===0?'disabled':''} aria-label="Previous page">Previous</button><span>${filters.page+1} / ${pages}</span><button id="queue-next" ${filters.page>=pages-1?'disabled':''} aria-label="Next page">Next</button></div>`;
+  $('#review-results').innerHTML=(rows.length?table(['Customer reference','Reason for review','Recorded date','Current support','Contact method'],rows,'review-table'):empty('No matching review records'))+`<div class="pagination"><span>${items.length?`${filters.page*10+1}–${Math.min(items.length,filters.page*10+10)} of ${items.length}`:'0'} records</span><button id="queue-prev" ${filters.page===0?'disabled':''} aria-label="Previous page">Previous</button><span>${filters.page+1} / ${pages}</span><button id="queue-next" ${filters.page>=pages-1?'disabled':''} aria-label="Next page">Next</button></div>`;
   document.querySelectorAll('[data-customer]').forEach(el=>el.addEventListener('click',()=>{const c=d.customers.find(c=>c.customer_id===el.dataset.customer);update({customer:c.customer_id,community:c.locality,view:'overview'});}));
   $('#queue-prev').onclick=()=>{filters.page--;renderQueue();};$('#queue-next').onclick=()=>{filters.page++;renderQueue();};
 }
 function overview(c,t){
   const i=reviewInfo(c,t),p=i.permission;
   const support=i.arr.length?i.arr.map(r=>pretty(r.arrangement_type)+' '+status(r.status)).join('<br>'):i.stage?status(i.stage):'Not recorded';
-  return `<div class="stack">${reasonPanel(c,t)}<div class="overview-grid">${panel('Flagged date',`<div class="record-value">${dateText(i.flagged)}</div>`)}${panel('Current support',support)}${panel('Preferred contact',`<div class="record-value">${pretty(p?.preferred_channel)}</div>${p?`<div class="notice">Effective ${dateText(p.effective_from)}</div>`:''}`)}</div>${panel('Supporting context',`<div class="grid">${dataList([['Area',esc(c.locality)],['Region',esc(c.region)],['Postcode',esc(c.postcode)],['Account opened',dateText(c.account_open_date)],['Account status',openAt(c,t)?status('Open'):status('Closed')]])}${dataList([['Proactive support consent',pretty(p?.consent_proactive_support_contact)],['Do not call',pretty(p?.do_not_call)],['Preference review',dateText(p?.review_due_date)],['Current disclosed needs',num(i.needs.filter(r=>r.status==='current').length)],['Known support cases',num(i.cases.length)]])}</div>`)}${supportContextPanel(i)}</div>`;
+  return `<div class="stack">${reasonPanel(c,t)}<div class="overview-grid">${panel('Recorded date',`<div class="record-value">${dateText(i.recorded)}</div>`)}${panel('Current support',support)}${panel('Preferred contact',`<div class="record-value">${pretty(p?.preferred_channel)}</div>${p?`<div class="notice">Effective ${dateText(p.effective_from)}</div>`:''}`)}</div>${panel('Supporting context',`<div class="grid">${dataList([['Area',esc(c.locality)],['Region',esc(c.region)],['Postcode',esc(c.postcode)],['Account opened',dateText(c.account_open_date)],['Account status',openAt(c,t)?status('Open'):status('Closed')]])}${dataList([['Proactive support consent',pretty(p?.consent_proactive_support_contact)],['Do not call',pretty(p?.do_not_call)],['Preference review',dateText(p?.review_due_date)],['Current disclosed needs',num(i.needs.filter(r=>r.status==='current').length)],['Known support cases',num(i.cases.length)]])}</div>`)}${supportContextPanel(i)}</div>`;
 }
 function accountHistory(c,t){
   const f=financeFor(d,c.customer_id,state.date);

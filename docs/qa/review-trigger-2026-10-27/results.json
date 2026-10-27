@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-27",
+  "origin": "http://127.0.0.1:8787",
+  "tests": [
+    {
+      "name": "Overview distinguishes linked case trigger from both relevant needs",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\ncooling access need\nCustomer reported needing a temperature-controlled space; no diagnosis recorded.\nRecorded 17 Jan 2025\nregistered life support\nRegistered life-support requirement.\nRecorded 18 June 2022",
+        "needs": "cooling access need\nregistered life support",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "17 Jan 2025",
+        "trigger": "Support case opened for cooling access need · 17 Jan 2025"
+      }
+    },
+    {
+      "name": "Recorded date label replaces Flagged date",
+      "pass": true,
+      "details": "17 Jan 2025"
+    },
+    {
+      "name": "Paired support contexts remain present",
+      "pass": true,
+      "details": "Recorded support context\ncooling access need\nCustomer reported needing a temperature-controlled space; no diagnosis recorded.\nRecorded 17 Jan 2025\nregistered life support\nRegistered life-support requirement.\nRecorded 18 June 2022"
+    },
+    {
+      "name": "Overview keeps existing width",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "Earlier date shows background registration without inventing a trigger",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\nregistered life support\nRegistered life-support requirement.\nRecorded 18 June 2022",
+        "needs": "registered life support",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "18 June 2022",
+        "trigger": "Not recorded"
+      }
+    },
+    {
+      "name": "Case event persists after opening day while unresolved",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\ncooling access need\nCustomer reported needing a temperature-controlled space; no diagnosis recorded.\nRecorded 17 Jan 2025\nregistered life support\nRegistered life-support requirement.\nRecorded 18 June 2022",
+        "needs": "cooling access need\nregistered life support",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "17 Jan 2025",
+        "trigger": "Support case opened for cooling access need · 17 Jan 2025"
+      }
+    },
+    {
+      "name": "Financial pressure uses the same split",
+      "pass": true,
+      "details": {
+        "needs": "cooling access need\nregistered life support",
+        "oldLabel": false,
+        "overflow": false,
+        "trigger": "Support case opened for cooling access need · 17 Jan 2025"
+      }
+    },
+    {
+      "name": "Table matches overview trigger and needs",
+      "pass": true,
+      "details": [
+        {
+          "id": "C101366",
+          "needs": "cooling access need\nregistered life support",
+          "recorded": "17 Jan 2025",
+          "support": "Offer undecided",
+          "trigger": "Support case opened for cooling access need · 17 Jan 2025"
+        }
+      ]
+    },
+    {
+      "name": "Table date header renamed with unchanged recorded value",
+      "pass": true,
+      "details": [
+        "Customer reference",
+        "Reason for review",
+        "Recorded date",
+        "Current support",
+        "Contact method"
+      ]
+    },
+    {
+      "name": "Table keeps existing width",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "financial filter still matches any need when trigger is not recorded",
+      "pass": true,
+      "details": [
+        {
+          "id": "C102046",
+          "needs": "financial pressure disclosed\ntemperature management need",
+          "recorded": "27 Sept 2024",
+          "support": "Not recorded",
+          "trigger": "Not recorded"
+        }
+      ]
+    },
+    {
+      "name": "needs filter still matches any need when trigger is not recorded",
+      "pass": true,
+      "details": [
+        {
+          "id": "C102046",
+          "needs": "financial pressure disclosed\ntemperature management need",
+          "recorded": "27 Sept 2024",
+          "support": "Not recorded",
+          "trigger": "Not recorded"
+        }
+      ]
+    },
+    {
+      "name": "Arrangement-only account retains current support and does not invent a trigger or need",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100562",
+          "needs": "Not recorded",
+          "recorded": "31 Dec 2024",
+          "support": "payment plan active",
+          "trigger": "Not recorded"
+        }
+      ]
+    },
+    {
+      "name": "Arrangement-only overview has the same missing trigger and needs",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\npayment plan\nNot recorded",
+        "needs": "Not recorded",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "31 Dec 2024",
+        "trigger": "Not recorded"
+      }
+    },
+    {
+      "name": "Resolved case is not presented as an outstanding trigger",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\nsupport review\nNot recorded",
+        "needs": "Not recorded",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "16 Jan 2025",
+        "trigger": "Not recorded"
+      }
+    },
+    {
+      "name": "Reset preserves default 101-record scope and date/reference order",
+      "pass": true,
+      "details": [
+        "C101366",
+        "C105056",
+        "C105149",
+        "C104791",
+        "C105011",
+        "C100311",
+        "C100396",
+        "C101987",
+        "C102328",
+        "C102840"
+      ]
+    },
+    {
+      "name": "Pagination still works",
+      "pass": true,
+      "details": "11–20 of 101 records\nPrevious\n2 / 11\nNext"
+    },
+    {
+      "name": "Browser console has no warnings or errors",
+      "pass": true,
+      "details": []
+    }
+  ]
+}
