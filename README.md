@@ -16,6 +16,10 @@ python3 serve-demo.py --port 8787
 
 Open **http://127.0.0.1:8787/**. Stop with Ctrl+C. Python 3 is the only runtime requirement. The server binds to loopback and serves an explicit asset allowlist.
 
+## Deploy on Vercel
+
+Import the repository with the **Other** framework preset; `vercel.json` serves `teamconnect/` with no build step. `api/maptiler.mjs` replaces the local `/maptiler/` proxy, so add `MAPTILER_API_KEY` under Project Settings → Environment Variables and redeploy. If the key has allowed-origin restrictions in MapTiler, add the Vercel domain. Without a key, every screen works except the Community planning basemap, which shows **Retry map**.
+
 ## Review the seven screens
 
 1. **Customer review** opens first. Search `C105011` and select the customer reference. The Reason for review cell separates Review trigger from Relevant support needs. Every distinct current disclosed need remains visible. Financial disclosure and Other disclosed needs match any current need while preserving the full list in the row. Support records matches known support history among eligible accounts. Active arrangements without current disclosed needs enter the review list only when a review is due or another recorded trigger exists. Due reviews include active arrangements whose review deadline is on or before the selected cutoff. Account details and the full customer selector remain available even when an account is excluded from the list. Resolved, expired and future disclosures are excluded from current needs. Search, review reason, account type, area and pagination operate at the selected date. Default ordering is newest recorded date, then customer reference; there are no clickable sort columns in this local UI. This is a record review list, not a risk prediction or outreach eligibility list.
