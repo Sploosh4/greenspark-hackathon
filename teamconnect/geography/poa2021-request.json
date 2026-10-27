@@ -1,0 +1,128 @@
+{
+  "areas": [
+    {
+      "locality_labels": [
+        "Esperance"
+      ],
+      "source_key": "6450",
+      "statistics_key": "POA6450"
+    },
+    {
+      "locality_labels": [
+        "Carnarvon"
+      ],
+      "source_key": "6701",
+      "statistics_key": "POA6701"
+    },
+    {
+      "locality_labels": [
+        "Exmouth"
+      ],
+      "source_key": "6707",
+      "statistics_key": "POA6707"
+    },
+    {
+      "locality_labels": [
+        "Karratha"
+      ],
+      "source_key": "6714",
+      "statistics_key": "POA6714"
+    },
+    {
+      "locality_labels": [
+        "Roebourne"
+      ],
+      "source_key": "6718",
+      "statistics_key": "POA6718"
+    },
+    {
+      "locality_labels": [
+        "Port Hedland"
+      ],
+      "source_key": "6721",
+      "statistics_key": "POA6721"
+    },
+    {
+      "locality_labels": [
+        "South Hedland"
+      ],
+      "source_key": "6722",
+      "statistics_key": "POA6722"
+    },
+    {
+      "locality_labels": [
+        "Broome"
+      ],
+      "source_key": "6725",
+      "statistics_key": "POA6725"
+    },
+    {
+      "locality_labels": [
+        "Derby"
+      ],
+      "source_key": "6728",
+      "statistics_key": "POA6728"
+    },
+    {
+      "locality_labels": [
+        "Kununurra"
+      ],
+      "source_key": "6743",
+      "statistics_key": "POA6743"
+    },
+    {
+      "locality_labels": [
+        "Fitzroy Crossing"
+      ],
+      "source_key": "6765",
+      "statistics_key": "POA6765"
+    },
+    {
+      "locality_labels": [
+        "Halls Creek"
+      ],
+      "source_key": "6770",
+      "statistics_key": "POA6770"
+    }
+  ],
+  "attribution": "Australian Bureau of Statistics, ASGS Edition 3, Postal Areas 2021. © Commonwealth of Australia. CC BY 4.0.",
+  "download_blocker": "Environment proxy returned Tunnel connection failed: 403 Forbidden; approved network escalation also returned 403. No proxy bypass attempted.",
+  "geography": "POA2021",
+  "geometry_downloaded": false,
+  "join_rule": "Exact four-digit code and 2021 geography/year; no locality-name or spatial interpolation",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "license_evidence_url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/POA/MapServer",
+  "map_configuration_contract": {
+    "csp_external_map_requests": "Not permitted by existing connect-src self; restrictions unchanged",
+    "existing_preview_origin": "http://127.0.0.1:8787",
+    "expected_config_file": null,
+    "expected_key_variable": null,
+    "external_preview_origin": null,
+    "reason": "No configuration reader exists in published source; MapLibre initMap uses an inline background-only style"
+  },
+  "metadata_verified_on": "2026-10-27",
+  "query_parameters": {
+    "f": "geojson",
+    "orderByFields": "poa_code_2021",
+    "outFields": "poa_code_2021,poa_name_2021",
+    "outSR": "4326",
+    "returnGeometry": "true",
+    "where": "poa_code_2021 IN ('6450','6701','6707','6714','6718','6721','6722','6725','6728','6743','6765','6770')"
+  },
+  "reference_year": 2021,
+  "runtime_integration": "Not wired into application or server allowlist; await local Demo AI source and verified boundary export",
+  "scenario_sha256": "08f3bed764f6f3e8aab349338bfd7ce8eec7521cb5e233c4533354eb23f0e756",
+  "source_branch": "fix/community-map-placeholders",
+  "source_code_field": "poa_code_2021",
+  "source_code_format": "four-digit string",
+  "source_commit": "9792da1b0a8092f0025dc4883403b48d837207ef",
+  "source_definition_url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/non-abs-structures/postal-areas",
+  "source_layer": "POA_GEN",
+  "source_query_url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/POA/MapServer/1/query?where=poa_code_2021+IN+%28%276450%27%2C%276701%27%2C%276707%27%2C%276714%27%2C%276718%27%2C%276721%27%2C%276722%27%2C%276725%27%2C%276728%27%2C%276743%27%2C%276765%27%2C%276770%27%29&outFields=poa_code_2021%2Cpoa_name_2021&returnGeometry=true&outSR=4326&orderByFields=poa_code_2021&f=geojson",
+  "source_service": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/POA/MapServer/1",
+  "statistic_code_field": "POA_CODE_2021",
+  "statistic_code_format": "POA followed by four digits",
+  "statistics_file": "teamconnect/scenario.json#context",
+  "statistics_sha256": "7097b7d63b0565eceafbb14d1ab015ae87098b3ef9aaa6c6f715460313e21d53",
+  "status": "awaiting_official_geometry_export"
+}
