@@ -94,3 +94,9 @@ The isolated failure-check servers were stopped after verification. The ordinary
 - The existing Reason for review panel now uses the same reason-list renderer as the review table, including on Financial pressure. Existing layout, current-status label and date metadata are retained; multiple disclosures label the date as Latest recorded.
 - **68 Node tests passed**. **9 browser checks passed**: both current reasons for C101366, unchanged page structure/width, exact table/overview agreement, exclusion/restoration of the dated disclosure on 16/17 January, Financial pressure agreement, support fallback, empty state, and no console warnings/errors.
 - Browser evidence: [results](docs/qa/overview-reasons-2026-10-27/results.json) and [screenshot](docs/qa/overview-reasons-2026-10-27/account-overview.png).
+
+## Recorded support context follow-up · 27 October 2026
+
+- The existing overview context panel now groups current source notes by the matching review reason, in review-list order. Each note keeps its own recorded date; multiple current records for one reason are retained. Missing context is labelled Not recorded, with no disclosure text borrowed for support fallback reasons. Source records, calculations, styles and map code are unchanged.
+- **68 Node tests passed**. **11 browser checks passed**: exact reason/context/date pairing for C101366, heading/list agreement and layout, selected-date exclusion/restoration, review-table agreement and account reopening, all four current notes for C102000 with their dates, resolved-record exclusion, resolved disclosure not attached to a support fallback, no fabricated context for an account without reasons, and no console warnings/errors.
+- Browser evidence: [results](docs/qa/support-context-2026-10-27/results.json) and [screenshot](docs/qa/support-context-2026-10-27/recorded-support-context.png).

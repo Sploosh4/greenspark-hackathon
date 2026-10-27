@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-27",
+  "origin": "http://127.0.0.1:8787",
+  "tests": [
+    {
+      "name": "Each reason is paired with its own recorded context and date",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "Customer reported needing a temperature-controlled space; no diagnosis recorded."
+            ],
+            "dates": [
+              "Recorded 17 Jan 2025"
+            ],
+            "reason": "cooling access need"
+          },
+          {
+            "contexts": [
+              "Registered life-support requirement."
+            ],
+            "dates": [
+              "Recorded 18 June 2022"
+            ],
+            "reason": "registered life support"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ]
+      }
+    },
+    {
+      "name": "Context headings match reasons with no horizontal overflow",
+      "pass": true,
+      "details": [
+        "cooling access need",
+        "registered life support"
+      ]
+    },
+    {
+      "name": "Date cutoff excludes future context",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "Registered life-support requirement."
+            ],
+            "dates": [
+              "Recorded 18 June 2022"
+            ],
+            "reason": "registered life support"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "registered life support"
+        ]
+      }
+    },
+    {
+      "name": "Date change restores both pairs",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "Customer reported needing a temperature-controlled space; no diagnosis recorded."
+            ],
+            "dates": [
+              "Recorded 17 Jan 2025"
+            ],
+            "reason": "cooling access need"
+          },
+          {
+            "contexts": [
+              "Registered life-support requirement."
+            ],
+            "dates": [
+              "Recorded 18 June 2022"
+            ],
+            "reason": "registered life support"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ]
+      }
+    },
+    {
+      "name": "Review table reasons still agree with context headings",
+      "pass": true,
+      "details": [
+        "cooling access need",
+        "registered life support"
+      ]
+    },
+    {
+      "name": "Account reopening preserves context pairs",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "Customer reported needing a temperature-controlled space; no diagnosis recorded."
+            ],
+            "dates": [
+              "Recorded 17 Jan 2025"
+            ],
+            "reason": "cooling access need"
+          },
+          {
+            "contexts": [
+              "Registered life-support requirement."
+            ],
+            "dates": [
+              "Recorded 18 June 2022"
+            ],
+            "reason": "registered life support"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ]
+      }
+    },
+    {
+      "name": "All four current records for one reason retain their own dates",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "I've been off work sick and the payments haven't come through.",
+              "I'm behind on a few bills right now, not just this one.",
+              "I'm behind on a few bills right now, not just this one.",
+              "I honestly don't know how I'm going to pay it."
+            ],
+            "dates": [
+              "Recorded 19 Aug 2024",
+              "Recorded 4 Aug 2024",
+              "Recorded 25 May 2024",
+              "Recorded 10 Feb 2024"
+            ],
+            "reason": "financial pressure disclosed"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "financial pressure disclosed"
+        ]
+      }
+    },
+    {
+      "name": "Resolved source record is excluded from current context",
+      "pass": true,
+      "details": [
+        "Recorded 19 Aug 2024",
+        "Recorded 4 Aug 2024",
+        "Recorded 25 May 2024",
+        "Recorded 10 Feb 2024"
+      ]
+    },
+    {
+      "name": "Resolved disclosure context is not attached to support fallback",
+      "pass": true,
+      "details": {
+        "groups": [
+          {
+            "contexts": [
+              "Not recorded"
+            ],
+            "dates": [],
+            "reason": "support review"
+          }
+        ],
+        "overflow": false,
+        "reasons": [
+          "support review"
+        ]
+      }
+    },
+    {
+      "name": "No-reason account has no fabricated context panel",
+      "pass": true,
+      "details": {
+        "groups": [],
+        "overflow": false,
+        "reasons": []
+      }
+    },
+    {
+      "name": "Browser console has no warnings or errors",
+      "pass": true,
+      "details": []
+    }
+  ]
+}
