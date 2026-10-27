@@ -25,7 +25,7 @@ const permissionAt=(c,t)=>current(d.permissions.filter(r=>r.customer_id===c.cust
 const supportAt=(c,t)=>current(d.arrangements.filter(r=>r.customer_id===c.customer_id),t).filter(r=>r.status==='active');
 const reviewInfo=(c,t)=>customerReviewInfo(d,c,t);
 const reviewNeedValues=info=>info.supportNeeds.length?info.supportNeeds.map(reason=>`<div>${pretty(reason)}</div>`).join(''):'Not recorded';
-const reviewTriggerValues=info=>info.triggers.length?info.triggers.map(trigger=>`<div>${trigger.type==='case_opened'?`Support case opened${trigger.reason?' for '+pretty(trigger.reason):''}`:pretty(trigger.reason)+' recorded'} · ${dateText(trigger.recorded)}</div>`).join(''):'Not recorded';
+const reviewTriggerValues=info=>info.triggers.length?info.triggers.map(trigger=>`<div>${trigger.type==='case_opened'?`Support case opened${trigger.reason?' for '+pretty(trigger.reason):''}`:pretty(trigger.reason)+(trigger.type==='arrangement_review_due'?' review due':' recorded')} · ${dateText(trigger.recorded)}</div>`).join(''):'Not recorded';
 const reviewReasonValues=info=>`<div><small>Review trigger</small>${reviewTriggerValues(info)}</div><div><small>Relevant support needs</small>${reviewNeedValues(info)}</div>`;
 function shortWeather(c,need,t){
   const match=needWeatherMatch(d,c,need,state.event,t);
@@ -54,7 +54,7 @@ function supportContextPanel(info){
 }
 function review(){return `<div class="filters" role="search" aria-label="Review filters"><input id="review-search" class="search" type="search" aria-label="Search customer reference" placeholder="Search customer reference" value="${esc(filters.search)}"><select id="review-reason" aria-label="Review reason"><option value="">All review reasons</option><option value="financial">Financial disclosure</option><option value="needs">Other disclosed needs</option><option value="support">Support records</option></select><select id="review-type" aria-label="Account type"><option value="">All account types</option><option>Prepaid</option><option>Billed</option></select><select id="review-area" aria-label="Review area"><option value="">All areas</option>${[...new Set(d.customers.map(c=>c.locality))].sort().map(a=>`<option>${esc(a)}</option>`).join('')}</select></div><section class="panel"><div id="review-results"></div></section>`;}
 function renderQueue(){
-  const t=cutoff(state.date),items=d.customers.map(c=>({c,i:reviewInfo(c,t)})).filter(({c,i})=>i.reasons.length&&openAt(c,t)&&c.customer_id.toLowerCase().includes(filters.search.trim().toLowerCase())&&(!filters.area||c.locality===filters.area)&&(!filters.type||typeFor(c)===filters.type)&&matchesReviewReason(i,filters.reason))
+  const t=cutoff(state.date),items=d.customers.map(c=>({c,i:reviewInfo(c,t)})).filter(({c,i})=>i.inReview&&openAt(c,t)&&c.customer_id.toLowerCase().includes(filters.search.trim().toLowerCase())&&(!filters.area||c.locality===filters.area)&&(!filters.type||typeFor(c)===filters.type)&&matchesReviewReason(i,filters.reason))
     .sort((a,b)=>time(b.i.recorded)-time(a.i.recorded)||a.c.customer_id.localeCompare(b.c.customer_id));
   const pages=Math.max(1,Math.ceil(items.length/10));filters.page=Math.min(filters.page,pages-1);
   const rows=items.slice(filters.page*10,filters.page*10+10).map(({c,i})=>[

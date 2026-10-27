@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFile} from 'node:fs/promises';
-import {cutoff,time} from './teamconnect/core.mjs';
+import {cutoff,time,openAt} from './teamconnect/core.mjs';
 import {reviewInfo,matchesReviewReason} from './teamconnect/review-reasons.mjs';
 
 const c={customer_id:'C1'};
@@ -132,4 +132,82 @@ test('actual scenario separates the cooling case from background registration an
   assert.deepEqual(info('C100562').supportNeeds,[]);
   assert.equal(info('C100562').recorded,'2024-12-31');
   assert.deepEqual(info('C105011','2025-01-28').triggers,[]);
+});
+
+const plan=(extra={})=>({customer_id:'C1',arrangement_id:'PLAN1',arrangement_type:'payment_plan',status:'active',effective_from:'2024-12-31',effective_to:'',source_event_date:'2024-12-31',review_due_date:'2025-01-30',...extra});
+
+test('future arrangement reviews do not qualify by themselves and support details remain available',()=>{
+  const d=data([],{arrangements:[plan()]}),before=JSON.stringify(d),info=at(d);
+  assert.equal(info.inReview,false);
+  assert.deepEqual(info.triggers,[]);
+  assert.deepEqual(info.reasons,['payment_plan']);
+  assert.equal(info.hasSupport,true);
+  assert.equal(info.arr[0].review_due_date,'2025-01-30');
+  assert.equal(info.recorded,'2024-12-31');
+  assert.equal(JSON.stringify(d),before);
+});
+
+test('arrangement review qualifies on its due date and remains due afterward',()=>{
+  const d=data([],{arrangements:[plan()]});
+  assert.equal(at(d,'2025-01-29').inReview,false);
+  for(const date of ['2025-01-30','2025-01-31']){
+    const info=at(d,date);
+    assert.equal(info.inReview,true);
+    assert.deepEqual(info.triggers,[{type:'arrangement_review_due',reason:'payment_plan',recorded:'2025-01-30'}]);
+    assert.equal(info.supportNeeds.length,0);
+    assert.equal(matchesReviewReason(info,'support'),true);
+  }
+});
+
+test('review deadlines respect the noon cutoff and missing or invalid dates do not qualify',()=>{
+  for(const due of ['2025-01-17 11:59:00','2025-01-17 12:00:00'])assert.equal(at(data([],{arrangements:[plan({review_due_date:due})]})).inReview,true);
+  for(const due of ['2025-01-17 12:01:00','','not-a-date'])assert.equal(at(data([],{arrangements:[plan({review_due_date:due})]})).inReview,false);
+});
+
+test('ended, future, inactive and other-customer arrangements cannot supply due-review triggers',()=>{
+  const rows=[plan({effective_to:'2025-01-17',review_due_date:'2025-01-01'}),plan({effective_from:'2025-01-18',review_due_date:'2025-01-01'}),plan({customer_id:'C2',review_due_date:'2025-01-01'}),...['completed','term_ended','broken','closed_account'].map(status=>plan({status,review_due_date:'2025-01-01'}))];
+  const info=at(data([],{arrangements:rows}));
+  assert.deepEqual(info.triggers,[]);
+  assert.equal(info.inReview,false);
+  assert.deepEqual(info.arr,[]);
+});
+
+test('another recorded trigger qualifies an arrangement account before its review is due',()=>{
+  const d=data([],{arrangements:[plan()],cases:[{case_id:'CASE1',customer_id:'C1',opened_at:'2025-01-16'}],resolutions:[{case_id:'CASE1',resolved_at:'2025-01-18'}]});
+  assert.equal(at(d,'2025-01-17').inReview,true);
+  assert.equal(at(d,'2025-01-17').triggers[0].type,'case_opened');
+  const resolved=at(d,'2025-01-18');
+  assert.equal(resolved.inReview,false);
+  assert.equal(resolved.arr.length,1);
+  assert.equal(resolved.cases.length,1);
+});
+
+test('a current disclosed need keeps its existing eligibility and any-need filter behaviour',()=>{
+  const info=at(data([need('financial_pressure_disclosed'),need('cooling_access_need')],{arrangements:[plan()]}));
+  assert.equal(info.inReview,true);
+  assert.deepEqual(info.triggers,[]);
+  for(const filter of ['financial','needs','support'])assert.equal(matchesReviewReason(info,filter),true);
+});
+
+test('the current effective arrangement history controls whether a review is due',()=>{
+  const d=data([],{arrangements:[plan({effective_to:'2025-01-30'}),plan({status:'completed',effective_from:'2025-01-30',review_due_date:''})]});
+  assert.equal(at(d,'2025-01-29').inReview,false);
+  assert.equal(at(d,'2025-01-30').inReview,false);
+  assert.deepEqual(at(d,'2025-01-30').triggers,[]);
+});
+
+test('actual scenario removes only the two not-yet-due arrangement-only entries at the default date',async()=>{
+  const d=JSON.parse(await readFile(new URL('./teamconnect/scenario.json',import.meta.url),'utf8'));
+  const info=(id,date='2025-01-17')=>reviewInfo(d,d.customers.find(c=>c.customer_id===id),cutoff(date));
+  const rows=d.customers.filter(c=>openAt(c,cutoff('2025-01-17'))).map(c=>({id:c.customer_id,i:info(c.customer_id)}));
+  assert.deepEqual(rows.filter(({i})=>i.reasons.length&&!i.inReview).map(r=>r.id).sort(),['C100562','C104786']);
+  assert.equal(rows.filter(({i})=>i.inReview).length,99);
+  assert.equal(info('C100562').arr[0].arrangement_type,'payment_plan');
+  assert.equal(info('C100562','2025-01-28').inReview,true);
+  assert.ok(info('C100562','2025-01-28').triggers.some(t=>t.type==='case_opened'));
+  assert.ok(info('C100562','2025-01-30').triggers.some(t=>t.type==='arrangement_review_due'));
+  const overdue=info('C100850');
+  assert.equal(overdue.inReview,true);
+  assert.deepEqual(overdue.supportNeeds,[]);
+  assert.ok(overdue.triggers.some(t=>t.type==='arrangement_review_due'&&t.recorded==='2024-12-13'));
 });

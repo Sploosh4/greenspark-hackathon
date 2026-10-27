@@ -2,7 +2,7 @@ import {current,known,time,customerCases} from './core.mjs';
 
 // Case openings remain source events until a resolution is known at the cutoff.
 // A disclosure without such a case supplies an event on its source date only.
-function reviewTriggers(activeNeeds,cases,t){
+function reviewTriggers(activeNeeds,cases,arr,t){
   const openCases=cases.filter(k=>!k.resolutions.length);
   const triggers=openCases.map(k=>({type:'case_opened',
     reason:activeNeeds.find(n=>n.need_id&&n.need_id===k.need_id)?.need_type||'',
@@ -13,13 +13,18 @@ function reviewTriggers(activeNeeds,cases,t){
     if(n.need_type&&!linkedNeeds.has(n.need_id)&&time(n.source_event_date)>=start&&time(n.source_event_date)<=t)
       triggers.push({type:'disclosure_recorded',reason:n.need_type,recorded:n.source_event_date});
   }
+  for(const r of arr){
+    if(r.review_due_date&&time(r.review_due_date)<=t)
+      triggers.push({type:'arrangement_review_due',reason:r.arrangement_type,recorded:r.review_due_date});
+  }
   const unique=new Map();
   for(const trigger of triggers)unique.set(JSON.stringify(trigger),trigger);
   return [...unique.values()].sort((a,b)=>time(b.recorded)-time(a.recorded));
 }
 
 // Review reasons are disclosures that are current at the selected case date.
-// Keep the existing support fallback when there is no current disclosure.
+// Support fallback labels remain available in account details independently of
+// review-list eligibility. Active arrangements alone require a recorded trigger.
 export function reviewInfo(d,c,t){
   const needs=current(d.needs.filter(r=>r.customer_id===c.customer_id),t)
     .sort((a,b)=>time(b.source_event_date)-time(a.source_event_date));
@@ -35,7 +40,9 @@ export function reviewInfo(d,c,t){
     if(latest)reasons.push('support_review');
     else reasons.push(...new Set(arr.map(r=>r.arrangement_type).filter(Boolean)));
   }
-  return {needs,cases,arr,need,reasons,supportNeeds,triggers:reviewTriggers(activeNeeds,cases,t),reason:reasons[0]||'',
+  const triggers=reviewTriggers(activeNeeds,cases,arr,t);
+  const inReview=reasons.length>0&&(!arr.length||supportNeeds.length>0||triggers.length>0);
+  return {needs,cases,arr,need,reasons,supportNeeds,triggers,inReview,reason:reasons[0]||'',
     recorded:need?.source_event_date||latest?.opened_at||arr[0]?.source_event_date,
     stage:latest?.stage,
     hasSupport:cases.length>0||known(d.arrangements.filter(r=>r.customer_id===c.customer_id),'effective_from',t).length>0,

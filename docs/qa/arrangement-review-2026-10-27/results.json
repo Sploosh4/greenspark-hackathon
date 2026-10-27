@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-27",
+  "origin": "http://127.0.0.1:8787",
+  "tests": [
+    {
+      "name": "Excluded account remains directly accessible with active support",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "Arrangement details retain the plan and review due date",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "Customer selector still opens an account excluded from review",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "C100562 excluded at 17 January with all reasons selected",
+      "pass": true,
+      "details": {
+        "headers": [],
+        "overflow": false,
+        "pagination": "0 records\nPrevious\n1 / 1\nNext",
+        "rows": []
+      }
+    },
+    {
+      "name": "Support filter does not reintroduce not-yet-due arrangements",
+      "pass": true,
+      "details": "0 records\nPrevious\n1 / 1\nNext"
+    },
+    {
+      "name": "Second not-yet-due arrangement-only account is excluded",
+      "pass": true,
+      "details": "0 records\nPrevious\n1 / 1\nNext"
+    },
+    {
+      "name": "Overdue arrangement-only account remains with an explicit due-review trigger",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100850",
+          "needs": "Not recorded",
+          "recorded": "13 Nov 2024",
+          "support": "payment plan active",
+          "trigger": "payment plan review due · 13 Dec 2024"
+        }
+      ]
+    },
+    {
+      "name": "Due-review trigger agrees between table and overview",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\npayment plan\nNot recorded",
+        "needs": "Not recorded",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "13 Nov 2024",
+        "trigger": "payment plan review due · 13 Dec 2024"
+      }
+    },
+    {
+      "name": "C100562 remains excluded before its new disclosure and case",
+      "pass": true,
+      "details": "0 records\nPrevious\n1 / 1\nNext"
+    },
+    {
+      "name": "C100562 qualifies when another recorded trigger appears before the plan is due",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100562",
+          "needs": "recovery support need",
+          "recorded": "28 Jan 2025",
+          "support": "payment plan active",
+          "trigger": "Support case opened for recovery support need · 28 Jan 2025"
+        }
+      ]
+    },
+    {
+      "name": "Review due date supplies an additional explicit trigger on the day",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100562",
+          "needs": "recovery support need",
+          "recorded": "28 Jan 2025",
+          "support": "payment plan active",
+          "trigger": "payment plan review due · 30 Jan 2025\nSupport case opened for recovery support need · 28 Jan 2025"
+        }
+      ]
+    },
+    {
+      "name": "An active overdue review continues to qualify",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100562",
+          "needs": "recovery support need",
+          "recorded": "28 Jan 2025",
+          "support": "payment plan active",
+          "trigger": "payment plan review due · 30 Jan 2025\nSupport case opened for recovery support need · 28 Jan 2025"
+        }
+      ]
+    },
+    {
+      "name": "Ended plan no longer supplies a due trigger while another case can remain",
+      "pass": true,
+      "details": [
+        {
+          "id": "C100562",
+          "needs": "recovery support need",
+          "recorded": "28 Jan 2025",
+          "support": "Offer declined",
+          "trigger": "Support case opened for recovery support need · 28 Jan 2025"
+        }
+      ]
+    },
+    {
+      "name": "Default list has 99 accounts and preserves existing date/reference order",
+      "pass": true,
+      "details": "1–10 of 99 records\nPrevious\n1 / 10\nNext"
+    },
+    {
+      "name": "Pagination works with the reduced list",
+      "pass": true,
+      "details": "11–20 of 99 records\nPrevious\n2 / 10\nNext"
+    },
+    {
+      "name": "financial filter retains existing disclosed-need accounts",
+      "pass": true,
+      "details": [
+        {
+          "id": "C102046",
+          "needs": "financial pressure disclosed\ntemperature management need",
+          "recorded": "27 Sept 2024",
+          "support": "Not recorded",
+          "trigger": "Not recorded"
+        }
+      ]
+    },
+    {
+      "name": "needs filter retains existing disclosed-need accounts",
+      "pass": true,
+      "details": [
+        {
+          "id": "C102046",
+          "needs": "financial pressure disclosed\ntemperature management need",
+          "recorded": "27 Sept 2024",
+          "support": "Not recorded",
+          "trigger": "Not recorded"
+        }
+      ]
+    },
+    {
+      "name": "Account layout and existing recorded support value remain intact",
+      "pass": true,
+      "details": {
+        "context": "Recorded support context\npayment plan\nNot recorded",
+        "needs": "Not recorded",
+        "oldLabel": false,
+        "overflow": false,
+        "recorded": "31 Dec 2024",
+        "trigger": "Not recorded"
+      }
+    },
+    {
+      "name": "Browser console has no warnings or errors",
+      "pass": true,
+      "details": []
+    }
+  ]
+}
