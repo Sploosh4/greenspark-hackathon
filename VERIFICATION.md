@@ -88,3 +88,9 @@ The isolated failure-check servers were stopped after verification. The ordinary
 - **68 Node tests passed**, including eight focused reason tests covering mixed categories, duplicates, lifecycle/time boundaries, support overlaps/fallbacks and the actual scenario at three dates. **12 Python tests passed** for the map proxy and boundary importer.
 - **15 browser checks passed** at `http://127.0.0.1:8787`: multiple reasons in one cell, either disclosure filter preserving the full list, support exclusion/overlap, combined account/area filters, account opening, source disclosure records, returning with filters intact, selected-date changes, reset, pagination, search page reset, and no console warnings/errors.
 - Browser evidence: [results](docs/qa/review-reasons-2026-10-27/results.json) and [screenshot](docs/qa/review-reasons-2026-10-27/multiple-review-reasons.png).
+
+## Account overview reasons follow-up · 27 October 2026
+
+- The existing Reason for review panel now uses the same reason-list renderer as the review table, including on Financial pressure. Existing layout, current-status label and date metadata are retained; multiple disclosures label the date as Latest recorded.
+- **68 Node tests passed**. **9 browser checks passed**: both current reasons for C101366, unchanged page structure/width, exact table/overview agreement, exclusion/restoration of the dated disclosure on 16/17 January, Financial pressure agreement, support fallback, empty state, and no console warnings/errors.
+- Browser evidence: [results](docs/qa/overview-reasons-2026-10-27/results.json) and [screenshot](docs/qa/overview-reasons-2026-10-27/account-overview.png).

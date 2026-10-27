@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-27",
+  "origin": "http://127.0.0.1:8787",
+  "tests": [
+    {
+      "name": "Overview shows both current reasons once",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ],
+        "text": "Reason for review\ncooling access need\nregistered life support\nLatest recorded 17 Jan 2025 · current"
+      }
+    },
+    {
+      "name": "Existing page structure and width retained",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ],
+        "text": "Reason for review\ncooling access need\nregistered life support\nLatest recorded 17 Jan 2025 · current"
+      }
+    },
+    {
+      "name": "Review table and overview show exactly the same reasons",
+      "pass": true,
+      "details": [
+        "cooling access need",
+        "registered life support"
+      ]
+    },
+    {
+      "name": "Earlier date excludes the future disclosure",
+      "pass": true,
+      "details": {
+        "date": "2025-01-16",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "registered life support"
+        ],
+        "text": "Reason for review\nregistered life support\nRecorded 18 June 2022 · current"
+      }
+    },
+    {
+      "name": "Date change restores both current reasons",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ],
+        "text": "Reason for review\ncooling access need\nregistered life support\nLatest recorded 17 Jan 2025 · current"
+      }
+    },
+    {
+      "name": "Shared reason panel also matches on Financial pressure",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "cooling access need",
+          "registered life support"
+        ],
+        "text": "Reason for review\ncooling access need\nregistered life support\nLatest recorded 17 Jan 2025 · current"
+      }
+    },
+    {
+      "name": "Support fallback remains visible without a disclosure",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [
+          "payment plan"
+        ],
+        "text": "Reason for review\npayment plan\n31 Dec 2024"
+      }
+    },
+    {
+      "name": "No-reason account retains the existing empty state",
+      "pass": true,
+      "details": {
+        "date": "2025-01-17",
+        "h1": "Customer details",
+        "overflow": false,
+        "reasons": [],
+        "text": "Reason for review\nNo review reason recorded"
+      }
+    },
+    {
+      "name": "No browser console warnings or errors",
+      "pass": true,
+      "details": []
+    }
+  ]
+}
