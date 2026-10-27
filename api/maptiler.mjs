@@ -42,7 +42,8 @@ export async function GET(request) {
   const query = new URLSearchParams();
   for (const name of ['language', 'variant']) if (url.searchParams.has(name)) query.set(name, url.searchParams.get(name));
   query.set('key', key);
-  const upstreamPath = decoded.split('/').map(encodeURIComponent).join('/');
+  // encodeURI keeps '@' (sprite@2x) and ',' (font stacks) literal, as MapTiler expects.
+  const upstreamPath = encodeURI(decoded);
 
   try {
     const response = await fetch(`https://api.maptiler.com/${upstreamPath}?${query}`, {
