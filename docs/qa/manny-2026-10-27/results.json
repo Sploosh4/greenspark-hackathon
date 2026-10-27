@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-27",
+  "browserOrigin": "http://127.0.0.1:8787",
+  "passed": 28,
+  "total": 28,
+  "checks": [
+    {
+      "name": "Customer table: ten rows, one title, no map and descending flagged-date/default reference ordering",
+      "pass": true
+    },
+    {
+      "name": "Current support summaries exclude ended/completed arrangements",
+      "pass": true
+    },
+    {
+      "name": "Open customer account overview",
+      "pass": true
+    },
+    {
+      "name": "Returning to the list preserves stable ordering",
+      "pass": true
+    },
+    {
+      "name": "Customer-reference search",
+      "pass": true
+    },
+    {
+      "name": "Search, review reason, account type and area filters combine",
+      "pass": true
+    },
+    {
+      "name": "Account return retains all review filters",
+      "pass": true
+    },
+    {
+      "name": "Support filter includes an account with both a case and a disclosed need; search trims whitespace",
+      "pass": true
+    },
+    {
+      "name": "Incompatible combined filters produce an honest empty result",
+      "pass": true
+    },
+    {
+      "name": "Pagination shows the next ten records",
+      "pass": true
+    },
+    {
+      "name": "Repeated active-tab click does not create duplicate browser history; Back restores page and rows",
+      "pass": true
+    },
+    {
+      "name": "Prepaid section: 109.66 credit, real recorded usage and withheld insufficient-data coverage",
+      "pass": true
+    },
+    {
+      "name": "Billed section: 184.28 vs 167.89, 9.8 percent and inspectable arithmetic",
+      "pass": true
+    },
+    {
+      "name": "Disclosed needs section shows explicit support context and contact preferences",
+      "pass": true
+    },
+    {
+      "name": "No future arrangement on 17 January",
+      "pass": true
+    },
+    {
+      "name": "Arrangement is active on 21 January",
+      "pass": true
+    },
+    {
+      "name": "Support journey separates delivery from resolution",
+      "pass": true
+    },
+    {
+      "name": "Customer-confirmed resolution appears on 28 January",
+      "pass": true
+    },
+    {
+      "name": "Date-only review deadline is not overdue until the following day",
+      "pass": true
+    },
+    {
+      "name": "Official POA2021 boundary matches postcode, geography and year of the statistics; no fictional layers or markers",
+      "pass": true
+    },
+    {
+      "name": "Real MapTiler roads and labels render with required MapTiler, OpenStreetMap and ABS attribution",
+      "pass": true
+    },
+    {
+      "name": "Postcode map pans with only the real boundary source",
+      "pass": true
+    },
+    {
+      "name": "Postcode map zoom loads detailed roads without losing the code match",
+      "pass": true
+    },
+    {
+      "name": "Carnarvon selects the official POA2021 boundary for postcode 6701 with roads and place labels",
+      "pass": true
+    },
+    {
+      "name": "Planning quarter and climate-hazard filters preserve the UI",
+      "pass": true
+    },
+    {
+      "name": "Matched POA map returns with one canvas sized correctly after changing views",
+      "pass": true
+    },
+    {
+      "name": "Final local UI and map have no browser warnings or errors",
+      "pass": true
+    },
+    {
+      "name": "Explicit cooling disclosure matches already-issued weather without adding a map or eligibility action to the customer workspace",
+      "pass": true
+    }
+  ],
+  "otherChecks": {
+    "scenarioBrowser": 36,
+    "nodeTotal": 60,
+    "nodeLegacy": 52,
+    "boundaryJoin": 8,
+    "mapProxy": 5,
+    "boundaryImporter": 7,
+    "officialPoaMatches": 12,
+    "releaseHashes": 94,
+    "intervals": 613440,
+    "noonBalances": 12780
+  },
+  "boundary": {
+    "geography": "POA2021",
+    "referenceYear": 2021,
+    "features": 12,
+    "join": "Exact POA prefix/code, postcode, geography and year",
+    "cloudSourceCommit": "339a3ef731e83bf3e8927902b9cde97cf10513cc",
+    "acquisition": "direct HTTPS from official ABS service"
+  },
+  "knownLimitations": [
+    "Local table has stable default date/reference sorting; clickable column sorting is only on origin/fix/community-map-placeholders.",
+    "Cloud-only financial-input and campaign-stage edge-case changes are not merged.",
+    "Dedicated mobile/non-Chrome and formal boundary topology auditing remain unverified."
+  ]
+}

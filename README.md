@@ -1,31 +1,34 @@
 # Team Connect browser demo
 
-A bounded account-review website for a Horizon Power hardship officer. The five views share one community, customer, case date (12:00 AWST) and weather scenario. All account and operational records are synthetic. ABS postcode context is separately identified.
+A seven-screen account review demo: Customer review, Customer overview, Financial pressure, Disclosed needs, Arrangements, Support journey and Community planning. Account details stay within Customer review; the map belongs to Community planning. All account and operational records are synthetic. ABS postcode context is separately identified.
 
-This five-tool demo is a **rough first draft and needs significant work**. The design, workflows and calculations are open to challenge and change. Treat it as a starting point for discussion and further development.
+This demo is a **rough first draft and needs significant work**. Its design, workflows and calculations remain open to change.
+
+Meeting preparation and cloud coordination: [27 October handoff](docs/MANNY_HANDOFF_2026-10-27.md).
 
 ## Run locally
 
-No container, Node, build step or package installation is needed to run the prepared demo. Python 3 serves a fixed allowlist on loopback, without directory listings or credential access.
+From this repository directory:
 
 ```sh
 python3 serve-demo.py --port 8787
 ```
 
-Open **http://127.0.0.1:8787/**. Stop with Ctrl+C. Do not use the earlier `dist/` mockup as the new demo entry point.
+Open **http://127.0.0.1:8787/**. Stop with Ctrl+C. Python 3 is the only runtime requirement. The server binds to loopback and serves an explicit asset allowlist.
 
-## A short demonstration
+## Review the seven screens
 
-1. Start with **C105011 / South Hedland / 17 January / January Pilbara heat**. Tool 1, **Anticipate financial struggles**, shows $109.66 credit and seven completed days of delivered energy. Its recent off-supply periods prevent a reliable coverage calculation, so the estimate is withheld. The forecast was issued on 17 January for 20–25 January; later vintages and actual future outcomes are absent.
-2. Open **Disclosed needs**. The budgeting concern was explicitly recorded on 16 January. The current contact preference is displayed as a dated record; it does not authorise the demo to contact anyone.
-3. Open **Community outlook**. Inspect the twelve-month review-volume ranges, regional capacity assumptions, issued seasonal scenario, postcode Census context and dated area billing/support counts. These support a longer-term planning discussion, without prescribing staffing or outreach actions. The release contains no historical climate observations, and the UI says so.
-4. Open **Arrangements**, then select **21 Jan**. The completed support review creates a support check-in arrangement with its review date. It is not an instalment contract or payment transaction.
-5. Open **Support journey**. At 17 January the review is accepted but undelivered; on 21 January delivery is recorded while the concern remains ongoing; on 28 January a customer-confirmed resolution appears. The adjacent community campaign uses its own geographic audience denominator. The customer-initiated case is explicitly separate from that campaign.
-6. Select **Billed example**. C105019 / Halls Creek / 7 March / northern heat shows a $184.28 current-month estimate against the $167.89 February bill issued on 1 March (+9.8%). Inspect the measured-use arithmetic, tariff, dated payments and forecast. The estimate does not establish ability to pay.
+1. **Customer review** opens first. Search `C105011` and select the customer reference. Search, review reason, account type, area and pagination operate on records known at the selected date. Default ordering is newest flagged date, then customer reference; there are no clickable sort columns in this local UI. This is a record review list, not a risk prediction or outreach eligibility list.
+2. **Overview** shows the recorded review reason, flagged date, support, contact preference and account context. The shared customer, area, case date and weather controls apply to every account tab.
+3. **Financial pressure** opens the prepaid path for C105011 on 17 January: $109.66 credit. Coverage remains unavailable because there are too few complete on-supply days. **Billed** selects C105019 / Halls Creek / 7 March: $184.28 estimated month bill against $167.89 previously issued (+9.8%). Open **Calculation** for the existing arithmetic and assumptions. **Prepaid** restores the original prepaid example.
+4. **Disclosed needs** lists explicit records and their dated weather match. For the cooling example, select South Hedland / C101664 / 17 January / January heat. Contact preferences are records, not contact authorisation.
+5. **Arrangements** shows no arrangement for C105011 on 17 January, an active check-in on 21 January, and completion on 28 January. Change **As of** to inspect those states. Missing last-review dates remain Not recorded.
+6. **Support journey** separates contacted, offered, accepted, delivered and customer-confirmed resolution. C105011 is accepted but undelivered on 17 January, delivered with an ongoing concern on 21 January, and resolved on 28 January.
+7. **Community planning** contains the real MapTiler basemap, matching ABS POA2021 postcode boundary/context, seasonal probabilities, monthly review-volume ranges, capacity assumptions, dated area history and the separate community campaign funnel. Planning period and hazard filters are available. All twelve months remain available in annual view.
 
-The C105011 date buttons restore that customer while retaining the selected analytical view. Reset restores the original prepaid example. Community selection picks a valid customer in that community; customer, date and scenario controls update the same shared context. Browser back/forward and reload retain URL state.
+Sidebar navigation keeps the account context. Browser back/forward and reload retain URL state. **Reset** restores Customer review and the original date and filters.
 
-For an explicitly disclosed cooling example, choose **South Hedland / C101664 / 17 January / January heat**, then **Disclosed needs**. Its recorded temperature-controlled-space need matches the issued heat footprint. No diagnosis is inferred from usage, and payment history does not gate this view.
+The interface follows the approved [seven-screen Figma study](https://www.figma.com/design/tTH4TACibo0u2jVE6JxIH3?node-id=2-2), with populated records, one page title, concise labels and explicit status text. The containerised prototype and legacy mockups are separate.
 
 ## Financial scope and assumptions
 
@@ -55,7 +58,19 @@ python3 scripts/verify-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-De
 
 ## Maps, weather and dependencies
 
-MapLibre GL JS 5.24.0 is vendored from its npm distribution with its stylesheet and licence. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for its source and ABS data attribution. It renders the supplied GeoJSON and selected fictional customer locally, with zoom controls and attribution. No customer-like records or geometries are sent to a map/geocoding API. The MapTiler basemap is clearly unconfigured; no key was read, copied, logged or persisted. Missing MapLibre/WebGL leaves the offline SVG footprint visible and the rest of the demo usable. The default server makes no external requests.
+MapLibre GL JS 5.24.0 renders MapTiler Streets v4 inside Community planning. The loopback server reads only `MAPTILER_API_KEY` from the existing `~/Projects/team-connect/.env.local`; it does not serve or copy that file. Use `--maptiler-env /path/to/.env.local` for another explicitly chosen local file. Never put the value in browser code, commands or documentation.
+
+The `/maptiler/` resource proxy attaches the key upstream, rewrites style/TileJSON/sprite/font URLs to the local origin, and omits the key from browser responses and logs. Browser policy stays restricted to same-origin resources. Both `127.0.0.1` and `localhost` were checked; provider origin restrictions still apply to the actual hostname used. No key or account permission was changed. MapTiler requests reveal the viewed tile area; customer IDs and scenario GeoJSON are not transmitted.
+
+The basemap contains real roads, coastline and place labels. The meeting map draws **only a genuine ABS Postal Area 2021 boundary** joined to the selected postcode's 2021 Census/SEIFA context. The exact code, geography and year must match; otherwise no boundary is substituted. Postal Areas are statistical approximations of postcodes, not legal or town boundaries. Community account histories remain at community grain, separately labelled.
+
+The fictional rectangular forecast footprint and synthetic customer point have been removed from the planning renderer. No individual customer markers are added. Scenario geometry remains in the unchanged source fixture solely for existing account/weather calculations. The earlier SAL locality snapshots remain preserved as reference files; they are not the current map layer and must not be paired with postcode statistics.
+
+The cloud boundary handoff's join helper and importer were reused selectively, without replacing the local UI, financial core or server configuration. Official geometry was acquired directly from its exact ABS query and prepared against all twelve context codes. Runtime files and provenance are under `teamconnect/geography/`; the join helper is `teamconnect/area-boundaries.mjs`. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Pan, zoom, Centre area, boundary visibility and area selection remain available. ResizeObserver and map lifecycle cleanup keep the canvas aligned when its container changes or the planning view is reopened. Failure shows a short error and **Retry map**. The MapTiler logo and provider/data attributions remain visible.
+
+Offline checks: `node --test test-*.mjs`, `python3 test-map-proxy.py`, and `python3 test-poa2021-boundaries.py`. Simulate a basemap outage with `python3 serve-demo.py --port 8788 --missing-basemap`. The diagnostic endpoint `/map-health.json` reports request counts/status only, with no credentials or upstream bodies.
 
 Current live weather remains separate. The sibling prototype and its weather fetcher were not edited. There is no daily scheduler, live-weather app integration, language tool, eligibility decision, action recommendation, auto-contact, account creation, deployment or container.
 

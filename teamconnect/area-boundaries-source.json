@@ -1,0 +1,25 @@
+{
+  "source": "Australian Bureau of Statistics, ASGS Edition 3, Suburbs and Localities 2021",
+  "service": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/SAL/MapServer/0/query",
+  "retrieved_utc": "2026-10-26T12:15:09.731692+00:00",
+  "licence": "Creative Commons Attribution 4.0 International",
+  "licence_url": "https://www.abs.gov.au/website-privacy-copyright-and-disclaimer",
+  "classification": "Real statistical areas; approximations, not legal locality or warning boundaries",
+  "crs": "EPSG:4326",
+  "coordinate_precision": 6,
+  "sha256": "306815da6117b4b311129b6fb3f476c38e1be34d2343bca0ea330ba23e1f394a",
+  "localities": [
+    "Broome",
+    "Carnarvon",
+    "Derby",
+    "Esperance",
+    "Exmouth",
+    "Fitzroy Crossing",
+    "Halls Creek",
+    "Karratha",
+    "Kununurra",
+    "Port Hedland",
+    "Roebourne",
+    "South Hedland"
+  ]
+}
