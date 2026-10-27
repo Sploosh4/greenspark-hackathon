@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-27",
+  "origin": "http://127.0.0.1:8787",
+  "tests": [
+    {
+      "name": "Two current reasons in one existing table cell",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": ""
+      }
+    },
+    {
+      "name": "financial matches any reason and retains all reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "financial",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": ""
+      }
+    },
+    {
+      "name": "needs matches any reason and retains all reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "needs",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": ""
+      }
+    },
+    {
+      "name": "Support filter excludes a customer without support records",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "0 records\nPrevious\n1 / 1\nNext",
+        "reason": "support",
+        "rows": [],
+        "search": "C102046",
+        "type": ""
+      }
+    },
+    {
+      "name": "Account-type filter combines with matching reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "0 records\nPrevious\n1 / 1\nNext",
+        "reason": "needs",
+        "rows": [],
+        "search": "C102046",
+        "type": "Prepaid"
+      }
+    },
+    {
+      "name": "Area and account-type filters retain a matching customer",
+      "pass": true,
+      "details": {
+        "area": "Port Hedland",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "needs",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": "Billed"
+      }
+    },
+    {
+      "name": "Account opens from filtered multi-reason row",
+      "pass": true,
+      "details": "Customer details"
+    },
+    {
+      "name": "Disclosed needs retains both source records",
+      "pass": true,
+      "details": null
+    },
+    {
+      "name": "Returning to review preserves all filters and reasons",
+      "pass": true,
+      "details": {
+        "area": "Port Hedland",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "needs",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": "Billed"
+      }
+    },
+    {
+      "name": "Support filter preserves overlapping disclosed reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "support",
+        "rows": [
+          [
+            "C101679\nCarnarvon · Billed",
+            "financial pressure disclosed\nelectricity rationing concern",
+            "22 Nov 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C101679",
+        "type": ""
+      }
+    },
+    {
+      "name": "Changing the case date updates all current reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "",
+        "rows": [
+          [
+            "C101679\nCarnarvon · Billed",
+            "affordability concern\nfinancial pressure disclosed\nelectricity rationing concern",
+            "17 Feb 2025",
+            "Accepted · awaiting delivery",
+            "email"
+          ]
+        ],
+        "search": "C101679",
+        "type": ""
+      }
+    },
+    {
+      "name": "Reset restores the default review list and date",
+      "pass": true,
+      "details": "1–10 of 101 records\nPrevious\n1 / 11\nNext"
+    },
+    {
+      "name": "Pagination works after multi-reason rendering",
+      "pass": true,
+      "details": "11–20 of 101 records\nPrevious\n2 / 11\nNext"
+    },
+    {
+      "name": "Search resets pagination without hiding secondary reasons",
+      "pass": true,
+      "details": {
+        "area": "",
+        "pagination": "1–1 of 1 records\nPrevious\n1 / 1\nNext",
+        "reason": "needs",
+        "rows": [
+          [
+            "C102046\nPort Hedland · Billed",
+            "financial pressure disclosed\ntemperature management need",
+            "27 Sept 2024",
+            "Not recorded",
+            "email"
+          ]
+        ],
+        "search": "C102046",
+        "type": ""
+      }
+    },
+    {
+      "name": "No browser console warnings or errors after review tests",
+      "pass": true,
+      "details": []
+    }
+  ]
+}

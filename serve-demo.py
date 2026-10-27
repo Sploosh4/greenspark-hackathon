@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent / 'teamconnect'
 FILES = {
     'index.html', 'styles.css', 'app.mjs', 'core.mjs', 'scenario.json',
     'provenance.json', 'checks.html', 'checks.mjs', 'area-boundaries.geojson',
-    'area-boundaries-source.json', 'area-boundaries.mjs',
+    'area-boundaries-source.json', 'area-boundaries.mjs', 'review-reasons.mjs',
     'geography/poa2021.geojson', 'geography/poa2021.provenance.json', 'vendor/maplibre-gl.js', 'vendor/maplibre-gl.css',
     'vendor/maplibre-LICENSE.txt', 'vendor/maptiler-logo.svg',
 }

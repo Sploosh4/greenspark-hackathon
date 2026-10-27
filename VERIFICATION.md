@@ -80,3 +80,11 @@ These are isolated QA switches. The ordinary run command remains `python3 serve-
 Seven synthetic demo screenshots were checked visually and saved separately: prepaid review, billed review, explicit cooling need, planning chart, arrangement history, resolved journey and verification results. They contain no visible keys, personal contact details, real people or unrelated browser material. Screenshot storage identifiers and local workspace paths are intentionally omitted from this public repository.
 
 The isolated failure-check servers were stopped after verification. The ordinary loopback server is kept running for local review; restart it with the README command if needed.
+
+## Multiple review reasons follow-up · 27 October 2026
+
+- Preserved the existing table, filter controls and page layout. Each distinct current disclosed reason now has its own line in the existing cell. Financial/other-disclosure filters match any current reason; support-record filtering retains its known-history behaviour and the existing support fallback remains when no current disclosure is present.
+- Current reasons exclude resolved/closed disclosures, expired histories and future histories at the selected 12:00 AWST cutoff. Three resolved-only records no longer enter the 17 January list; 101 accounts remain, including eight with multiple reasons. Source scenario data, calculations and map code are unchanged.
+- **68 Node tests passed**, including eight focused reason tests covering mixed categories, duplicates, lifecycle/time boundaries, support overlaps/fallbacks and the actual scenario at three dates. **12 Python tests passed** for the map proxy and boundary importer.
+- **15 browser checks passed** at `http://127.0.0.1:8787`: multiple reasons in one cell, either disclosure filter preserving the full list, support exclusion/overlap, combined account/area filters, account opening, source disclosure records, returning with filters intact, selected-date changes, reset, pagination, search page reset, and no console warnings/errors.
+- Browser evidence: [results](docs/qa/review-reasons-2026-10-27/results.json) and [screenshot](docs/qa/review-reasons-2026-10-27/multiple-review-reasons.png).
