@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WA ML Outlook</title>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="kicker">TEAM CONNECT / Q3</span><h1>WA community outlook <span class="tag">ML layer · experimental</span></h1></div>
+  <div class="issue-meta" id="issue-meta"></div>
+</header>
+<main class="layout">
+  <section class="map-wrap" aria-label="Map">
+    <div id="map"></div>
+    <div class="map-controls">
+      <label class="ctl">Issue
+        <select id="issue"></select>
+      </label>
+      <div class="seg" role="radiogroup" aria-label="Measure" id="modes"></div>
+      <div class="seg" role="radiogroup" aria-label="View" id="views">
+        <button role="radio" data-view="map" aria-checked="true">Map</button>
+        <button role="radio" data-view="table" aria-checked="false">Table</button>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="months" id="months" role="radiogroup" aria-label="Forecast month"></div>
+    <div class="tooltip" id="tooltip" hidden></div>
+    <div class="table-view" id="table-view" hidden></div>
+  </section>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+<script src="vendor/maplibre-gl.js"></script>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>

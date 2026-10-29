@@ -1,0 +1,7 @@
+# Re-created by the pipeline; see README.md
+data/raw/
+outputs/hindcast_predictions.csv.gz
+outputs_v1/
+*.log
+!backtest.log
+.pytest_cache/

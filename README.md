@@ -28,7 +28,7 @@ Import the repository with the **Other** framework preset; `vercel.json` serves 
 4. **Disclosed needs** lists explicit records and their dated weather match. For the cooling example, select South Hedland / C101664 / 17 January / January heat. Contact preferences are records, not contact authorisation.
 5. **Arrangements** shows no arrangement for C105011 on 17 January, an active check-in on 21 January, and completion on 28 January. Change **As of** to inspect those states. Missing last-review dates remain Not recorded.
 6. **Support journey** separates contacted, offered, accepted, delivered and customer-confirmed resolution. C105011 is accepted but undelivered on 17 January, delivered with an ongoing concern on 21 January, and resolved on 28 January.
-7. **Community planning** contains the real MapTiler basemap, matching ABS POA2021 postcode boundary/context, seasonal probabilities, monthly review-volume ranges, capacity assumptions, dated area history and the separate community campaign funnel. Planning period and hazard filters are available. All twelve months remain available in annual view.
+7. **Community planning** contains the real MapTiler basemap, matching ABS POA2021 postcode boundary/context, seasonal probabilities, monthly review-volume ranges, capacity assumptions, dated area history and the separate community campaign funnel. Planning period and hazard filters are available. All twelve months remain available in annual view. Below the area view, **WA temperature outlook** shows the experimental ML seasonal outlook (see below); **View → Temperature outlook (ML)** jumps to it.
 
 Sidebar navigation keeps the account context. Browser back/forward and reload retain URL state. **Reset** restores Customer review and the original date and filters.
 
@@ -60,6 +60,43 @@ python3 scripts/prepare-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-D
 python3 scripts/verify-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-Demo-2025Q1-v1
 ```
 
+## ML temperature outlook (experimental)
+
+Community planning includes a state-wide **WA temperature outlook** panel built from the Q3 seasonal model in [`q3-seasonal-ml/`](q3-seasonal-ml/) (see its [REPORT.md](q3-seasonal-ml/REPORT.md)).
+
+**What it shows**
+- Monthly mean temperature for 255 one-degree WA cells, from a ridge + LightGBM ensemble trained on NASA POWER (MERRA-2) and NOAA CPC indices.
+- Two forecast issues: October 2026 and November 2026.
+- Three measures, each on a fixed scale:
+  - difference from the 1991–2020 average
+  - calibrated chance of being warmer than average
+  - temperature, on the same 14–36 °C scale as the outlook screen
+- The selected community's cell is pre-selected. Its six months are listed with the 80% range, the 1991–2020 average and the hindcast skill.
+- Clicking another cell shows that cell instead, with a button to return to the community.
+- Cells with little hindcast skill at the selected lead (MSE skill < 0.05) are faded and labelled.
+
+**How it fits the rest of the demo**
+- It uses **real data**, independent of the synthetic 2025 Q1 scenario and the As-of date. The panel says so, and it never links values to customers.
+- It forecasts monthly means only. It does not give heatwave counts, dates or customer-level conclusions.
+- It draws its own map from a Natural Earth WA outline, so it works without `MAPTILER_API_KEY`. The postcode map is unchanged.
+- Issue, measure and month are kept in the URL hash (`mlIssue`, `mlMode`, `mlMonth`). They update without re-rendering the postcode map.
+
+**Files**
+
+| File | Contents |
+|---|---|
+| `teamconnect/ml-outlook-layer.mjs` | Reusable MapLibre layer, copied from `q3-seasonal-ml/map-demo` |
+| `teamconnect/ml-outlook-panel.mjs` | The planning panel |
+| `teamconnect/ml-outlook/` | Data, WA outline and `provenance.json` with SHA-256 hashes |
+
+**Refresh after a new forecast run.** From `q3-seasonal-ml`, run `run_forecast.py`, then `export_map_layer.py`. Then, from this repository:
+
+```sh
+python3 scripts/prepare-ml-outlook.py q3-seasonal-ml/outputs
+```
+
+The script copies the files and rewrites `provenance.json` with fresh hashes. `test-ml-outlook-layer.mjs` fails if the hashes are stale.
+
 ## Maps, weather and dependencies
 
 MapLibre GL JS 5.24.0 renders MapTiler Streets v4 inside Community planning. The loopback server reads only `MAPTILER_API_KEY` from the existing `~/Projects/team-connect/.env.local`; it does not serve or copy that file. Use `--maptiler-env /path/to/.env.local` for another explicitly chosen local file. Never put the value in browser code, commands or documentation.
@@ -74,7 +111,7 @@ The cloud boundary handoff's join helper and importer were reused selectively, w
 
 Pan, zoom, Centre area, boundary visibility and area selection remain available. ResizeObserver and map lifecycle cleanup keep the canvas aligned when its container changes or the planning view is reopened. Failure shows a short error and **Retry map**. The MapTiler logo and provider/data attributions remain visible.
 
-Offline checks: `node --test test-*.mjs`, `python3 test-map-proxy.py`, and `python3 test-poa2021-boundaries.py`. Simulate a basemap outage with `python3 serve-demo.py --port 8788 --missing-basemap`. The diagnostic endpoint `/map-health.json` reports request counts/status only, with no credentials or upstream bodies.
+Offline checks: `node --test test-*.mjs` (includes `test-ml-outlook-layer.mjs`), `python3 test-map-proxy.py`, and `python3 test-poa2021-boundaries.py`. Simulate a basemap outage with `python3 serve-demo.py --port 8788 --missing-basemap`. The diagnostic endpoint `/map-health.json` reports request counts/status only, with no credentials or upstream bodies.
 
 Current live weather remains separate. The sibling prototype and its weather fetcher were not edited. There is no daily scheduler, live-weather app integration, language tool, eligibility decision, action recommendation, auto-contact, account creation, deployment or container.
 

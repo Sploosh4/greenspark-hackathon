@@ -18,6 +18,8 @@ FILES = {
     'area-boundaries-source.json', 'area-boundaries.mjs', 'review-reasons.mjs',
     'geography/poa2021.geojson', 'geography/poa2021.provenance.json', 'vendor/maplibre-gl.js', 'vendor/maplibre-gl.css',
     'vendor/maplibre-LICENSE.txt', 'vendor/maptiler-logo.svg',
+    'ml-outlook-layer.mjs', 'ml-outlook-panel.mjs', 'ml-outlook/ml_outlook_layer.json',
+    'ml-outlook/wa_outline.geojson', 'ml-outlook/provenance.json',
 }
 MAP_ROOTS = {'maps', 'tiles', 'fonts', 'sprites', 'resources'}
 MAX_RESOURCE_BYTES = 16 * 1024 * 1024

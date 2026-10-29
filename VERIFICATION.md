@@ -114,3 +114,28 @@ The isolated failure-check servers were stopped after verification. The ordinary
 - Account records, customer-selector access, support/arrangement history, recorded dates, calculations, styles and map code are preserved. At 17 January the list falls from 101 to 99: only C100562 and C104786 are removed. C100562 returns on 28 January for a new recovery-support disclosure/case, gains a payment-plan review-due trigger on 30 January, and loses that due trigger when the plan ends on 11 March.
 - **83 Node tests passed**, including eight new eligibility tests for future/due/overdue deadlines, timestamp cutoff boundaries, inactive/expired histories, exact customer scope, another recorded trigger, current disclosure scope, support-data preservation and actual scenario membership. **19 browser checks passed** for excluded-account access through URLs and the customer selector, retained arrangement details, both removed accounts, due-review inclusion and matching panels, C100562's date transitions, unchanged ordering/filter behaviour, 99-record pagination, layout and no console warnings/errors.
 - Browser evidence: [results](docs/qa/arrangement-review-2026-10-27/results.json), [list exclusion](docs/qa/arrangement-review-2026-10-27/excluded-from-review.png), and [preserved support details](docs/qa/arrangement-review-2026-10-27/support-details-preserved.png).
+
+## ML temperature outlook panel · 29 October 2026
+
+Local checks were run on Windows with `serve-demo.py --port 8791` and no MapTiler key. The existing postcode map showed its expected **Retry map** state.
+
+**Tests**
+- `node --test test-*.mjs`: 88/88 pass, including 5 new tests:
+  - every scenario community maps to a forecast cell
+  - 1° geometry and values match the export for every lead
+  - range, normal and anomaly are consistent, with skill flags, for all cells and issues
+  - colour scales are fixed
+  - provenance hashes match the shipped files
+- `test-map-proxy.py` and `test-poa2021-boundaries.py` pass.
+
+**In the browser pane**
+- Fitzroy Crossing opens on cell `-18.5_125.5`, Nov 2026 issue: +1.5 °C, 78% chance warmer, 6 table rows.
+- Measure and month buttons update the map, the table highlight and the URL hash, and a reload restores them.
+- A real map click selects another cell (`-31.5_119.5`). **Back to Fitzroy Crossing** restores the community cell.
+- Switching community to Halls Creek selects `-18.5_127.5` and keeps the measure and month. Two maps are present and the previous ML map is removed.
+- Leaving for Customer review leaves no maps, and the review table still lists 10 rows. Browser back restores the panel.
+
+**Limits of this check**
+- The pane was hidden during testing (about 1.3 animation frames per second), so the measured map-ready time (~16 s) is a throttling artefact, not real load time.
+- Not tested with a live MapTiler key, on mobile devices or in non-Chromium browsers.
+- No Vercel deployment.

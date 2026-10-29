@@ -1,0 +1,21 @@
+last complete month: (2026, 9)
+2006 6s rounds=26 clim=1.755 trend=1.746 persistence=1.685 ridge=1.652 lgbm=1.702 ens=1.670
+2007 11s rounds=57 clim=1.339 trend=1.323 persistence=1.362 ridge=1.416 lgbm=1.402 ens=1.402
+2008 13s rounds=51 clim=1.142 trend=1.142 persistence=1.163 ridge=1.169 lgbm=1.177 ens=1.168
+2009 16s rounds=30 clim=1.216 trend=1.212 persistence=1.215 ridge=1.176 lgbm=1.160 ens=1.164
+2010 17s rounds=17 clim=1.587 trend=1.602 persistence=1.553 ridge=1.514 lgbm=1.549 ens=1.526
+2011 15s rounds=25 clim=1.603 trend=1.607 persistence=1.524 ridge=1.451 lgbm=1.476 ens=1.455
+2012 15s rounds=60 clim=1.218 trend=1.177 persistence=1.136 ridge=1.104 lgbm=1.106 ens=1.097
+2013 25s rounds=120 clim=1.126 trend=1.118 persistence=1.089 ridge=1.126 lgbm=1.161 ens=1.138
+2014 23s rounds=122 clim=1.407 trend=1.382 persistence=1.380 ridge=1.395 lgbm=1.384 ens=1.384
+2015 19s rounds=114 clim=1.569 trend=1.580 persistence=1.598 ridge=1.563 lgbm=1.515 ens=1.532
+2016 25s rounds=165 clim=1.417 trend=1.518 persistence=1.431 ridge=1.435 lgbm=1.446 ens=1.430
+2017 14s rounds=37 clim=1.037 trend=1.021 persistence=1.005 ridge=0.994 lgbm=0.989 ens=0.986
+2018 13s rounds=32 clim=1.382 trend=1.375 persistence=1.377 ridge=1.323 lgbm=1.311 ens=1.314
+2019 16s rounds=80 clim=1.767 trend=1.705 persistence=1.607 ridge=1.586 lgbm=1.594 ens=1.585
+2020 17s rounds=76 clim=1.346 trend=1.276 persistence=1.281 ridge=1.246 lgbm=1.230 ens=1.232
+2021 22s rounds=87 clim=1.232 trend=1.230 persistence=1.242 ridge=1.272 lgbm=1.257 ens=1.262
+2022 21s rounds=147 clim=1.322 trend=1.357 persistence=1.331 ridge=1.288 lgbm=1.346 ens=1.309
+2023 20s rounds=133 clim=1.965 trend=1.840 persistence=1.799 ridge=1.749 lgbm=1.722 ens=1.728
+2024 22s rounds=170 clim=1.805 trend=1.588 persistence=1.519 ridge=1.540 lgbm=1.556 ens=1.542
+2025 24s rounds=106 clim=1.266 trend=1.137 persistence=1.100 ridge=1.116 lgbm=1.133 ens=1.118
