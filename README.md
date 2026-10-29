@@ -62,6 +62,8 @@ python3 scripts/verify-teamconnect.py /path/to/TeamConnect-Complete-Synthetic-De
 
 ## ML temperature outlook (experimental)
 
+Run, test, tech stack and ML method guide: **[Q3_ML_OUTLOOK.md](Q3_ML_OUTLOOK.md)**.
+
 Community planning includes a state-wide **WA temperature outlook** panel built from the Q3 seasonal model in [`q3-seasonal-ml/`](q3-seasonal-ml/) (see its [REPORT.md](q3-seasonal-ml/REPORT.md)).
 
 **What it shows**
