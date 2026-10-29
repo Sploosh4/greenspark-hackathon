@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "bundle_version": "q3-local-2026-10-v1",
+  "files": {
+    "mean": {
+      "file": "seasonal-data.json",
+      "sha256": "f51d7977b627bb4b205d12ed63de89dc1f0994672f3a60a09f00cd82e50a1d62"
+    },
+    "anomaly": {
+      "file": "anomaly-data.json",
+      "sha256": "b7af0c2590317bfbf5f81208bcfc4c195fb7ac9ba44e7235c64d13555334d550"
+    },
+    "history": {
+      "file": "historical-context.json",
+      "sha256": "49b18fdf3bfd2a2b13cb6c01dcdf51403d8815e2948f0efce455a02e9965f1b4"
+    },
+    "business": {
+      "file": "q3-area-context.json",
+      "sha256": "02f4d2b9a12fd783bdaeed6c99badd2cf3f65e4dcca1c81fffc4787b8904da5c"
+    }
+  },
+  "classification": "Verified real climate and public area context; historical synthetic account aggregates only",
+  "provenance": {
+    "mean_grib_sha256": "490c6f4118e41008eed3528804265f376a72d2a0355b91d324a19fabce2a33b9",
+    "anomaly_grib_sha256": "5ddc6a8adf1feaca185983895e8160b9b8e989a74fc47145ea257aee4a84d9f5",
+    "business_snapshot": "2025-06-30",
+    "baseline_anomaly": "1993-2016 model hindcast; documented not independently recomputed",
+    "source_audit": "Validated local source handoff and Q3-REDESIGN-VERIFICATION.json in the approved review workspace"
+  }
+}

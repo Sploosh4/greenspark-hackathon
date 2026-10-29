@@ -2,3 +2,25 @@
 data/*.zip
 mock-data.zip
 __pycache__/
+
+# Team Connect private state and generated outputs
+**/__pycache__/
+**/.venv/
+**/.runtime/
+**/runtime/uploads/
+**/runtime/public-weather/
+**/runtime/instance-settings.json
+**/prototype/reports/
+**/exports/
+**/screenshots/
+packaging/team-connect/build/
+**/data/input-pack/
+**/data/history/*.png
+**/data/history/*.gz
+**/*.sqlite*
+**/*.db
+**/*.pem
+**/*.key
+**/.env*
+**/*credentials*
+**/*session-secret*

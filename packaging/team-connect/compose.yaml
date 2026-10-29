@@ -1,0 +1,70 @@
+name: team-connect-local-scaffold
+services:
+  q1:
+    image: team-connect-q1:local-scaffold
+    platform: linux/amd64
+    pull_policy: never
+    build:
+      context: ./build/q1
+    user: "10001:10001"
+    # Both sides use the same port because Q1 verifies Host against server_port.
+    ports: ["127.0.0.1:8891:8891"]
+    environment:
+      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:?Set to 1 only for an isolated local synthetic preview}
+    volumes:
+      - type: volume
+        source: q1_state
+        target: /state
+      - type: bind
+        source: ${Q1_SOURCE_DIR:?Set Q1_SOURCE_DIR to the existing approved synthetic input pack}
+        target: /inputs/q1
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [q1_only]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    init: true
+    cpus: 1.0
+    mem_limit: 1g
+    pids_limit: 96
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+  q3:
+    image: team-connect-q3:local-scaffold
+    pull_policy: never
+    build:
+      context: ./build/q3
+    user: "10002:10002"
+    ports: ["127.0.0.1:8797:8797"]
+    environment:
+      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:?Set to 1 only for an isolated local synthetic preview}
+    volumes:
+      - type: volume
+        source: q3_state
+        target: /state
+    networks: [q3_only]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    init: true
+    cpus: 1.0
+    mem_limit: 768m
+    pids_limit: 64
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "3"}
+volumes:
+  q1_state: {}
+  q3_state: {}
+networks:
+  q1_only: {internal: true}
+  q3_only: {}

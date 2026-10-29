@@ -1,0 +1,668 @@
+{
+  "changed_after_import": [
+    "apps/q1-customer-review/prepare_review.py",
+    "apps/q1-customer-review/prototype/inputs.py",
+    "apps/q1-customer-review/prototype/public_weather.py",
+    "apps/q1-customer-review/tests/make_upload_fixtures.py",
+    "apps/q3-community-planning/BUSINESS-UPLOAD-CONTRACT.json",
+    "apps/q3-community-planning/run.py",
+    "apps/q3-community-planning/server/automatic_refresh.py",
+    "apps/q3-community-planning/server/map_proxy.py",
+    "apps/q3-community-planning/tests/test_climate_refresh.py",
+    "apps/q3-community-planning/tests/test_financial_http.py",
+    "apps/q3-community-planning/tests/test_financial_intake.py"
+  ],
+  "files": {
+    "apps/q1-customer-review/LICENSE": {
+      "owner_sha256": "b6610de7a629350f2cbeed566fd83730b7690b0416829f56c167037168078c26",
+      "published_sha256": "b6610de7a629350f2cbeed566fd83730b7690b0416829f56c167037168078c26"
+    },
+    "apps/q1-customer-review/app.mjs": {
+      "owner_sha256": "f8385931c269526a4c68bc73d9a5c1bbd8ed47f95eabbbc8b3d289c3849f282c",
+      "published_sha256": "f8385931c269526a4c68bc73d9a5c1bbd8ed47f95eabbbc8b3d289c3849f282c"
+    },
+    "apps/q1-customer-review/assets/auth-login.html": {
+      "owner_sha256": "66a6db076428dc354502eea8db0ce6ddb7d1240d4b5c1daa7496686bb34942bd",
+      "published_sha256": "66a6db076428dc354502eea8db0ce6ddb7d1240d4b5c1daa7496686bb34942bd"
+    },
+    "apps/q1-customer-review/assets/auth-login.mjs": {
+      "owner_sha256": "844eed41493025b5ca3a410bd253fbc6f5d3c3dda1c81cecaa20ddeba61eb1ef",
+      "published_sha256": "844eed41493025b5ca3a410bd253fbc6f5d3c3dda1c81cecaa20ddeba61eb1ef"
+    },
+    "apps/q1-customer-review/assets/demo-styles.css": {
+      "owner_sha256": "ba7a41d9cddc2f5a23f203f531d4564c689c1cec53d74862de447605aef82443",
+      "published_sha256": "ba7a41d9cddc2f5a23f203f531d4564c689c1cec53d74862de447605aef82443"
+    },
+    "apps/q1-customer-review/assets/q1.css": {
+      "owner_sha256": "731355d0a8873218078450a657da115f0f74405cb1abdce9a3d3346a6499f992",
+      "published_sha256": "731355d0a8873218078450a657da115f0f74405cb1abdce9a3d3346a6499f992"
+    },
+    "apps/q1-customer-review/assets/review-fixture.json": {
+      "owner_sha256": "9666d5d98ed21946329b36aa04bb951f58743b8320e25d05ee70378d1a9e0bad",
+      "published_sha256": "9666d5d98ed21946329b36aa04bb951f58743b8320e25d05ee70378d1a9e0bad"
+    },
+    "apps/q1-customer-review/checks.html": {
+      "owner_sha256": "ede233133587ec7a1401bf3c8564656699167432bfb5dba40c57f18fe597c880",
+      "published_sha256": "ede233133587ec7a1401bf3c8564656699167432bfb5dba40c57f18fe597c880"
+    },
+    "apps/q1-customer-review/core.mjs": {
+      "owner_sha256": "7bed3d97d62d027bd080efc6a09a6e3c7d2117f0b322816188a60060fe7ef7fa",
+      "published_sha256": "7bed3d97d62d027bd080efc6a09a6e3c7d2117f0b322816188a60060fe7ef7fa"
+    },
+    "apps/q1-customer-review/docs/UPLOAD-VALIDATION-CONTRACT.json": {
+      "owner_sha256": "f6e43c34a1688d183a6811d0d422e7efab58a7c509e559f4878fd50396496d3b",
+      "published_sha256": "f6e43c34a1688d183a6811d0d422e7efab58a7c509e559f4878fd50396496d3b"
+    },
+    "apps/q1-customer-review/index.html": {
+      "owner_sha256": "ab9edfae897793a49a8a8b3129471abcffa946eb2768ad55b16a66bb9779a8d8",
+      "published_sha256": "ab9edfae897793a49a8a8b3129471abcffa946eb2768ad55b16a66bb9779a8d8"
+    },
+    "apps/q1-customer-review/pdf_export.py": {
+      "owner_sha256": "55e3e36f02bb09f066f93ad779cf1e55a494b7e1dcf618a53c5b60b92fc62c9b",
+      "published_sha256": "55e3e36f02bb09f066f93ad779cf1e55a494b7e1dcf618a53c5b60b92fc62c9b"
+    },
+    "apps/q1-customer-review/prepare_review.py": {
+      "owner_sha256": "3752db784d6ce9bcafe1f6b4218c01c3f8f887e0ca57b1cd6b4a9b758ace2527",
+      "published_sha256": "3bd77693fc81c386a6c18f2a911f8f4d16fa48e6c766223573ec0efde93c500b"
+    },
+    "apps/q1-customer-review/prototype/__init__.py": {
+      "owner_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "apps/q1-customer-review/prototype/build.py": {
+      "owner_sha256": "544fbe569c8fc57659c8f8c3cef93664ac00d41c9f7b5302856dd0a5babde85f",
+      "published_sha256": "544fbe569c8fc57659c8f8c3cef93664ac00d41c9f7b5302856dd0a5babde85f"
+    },
+    "apps/q1-customer-review/prototype/exports.py": {
+      "owner_sha256": "a413df00e658c6b1d84f8a6f1ac95d66eb01e7cf2c8390ab1ca52a90d8f87804",
+      "published_sha256": "a413df00e658c6b1d84f8a6f1ac95d66eb01e7cf2c8390ab1ca52a90d8f87804"
+    },
+    "apps/q1-customer-review/prototype/inputs.py": {
+      "owner_sha256": "7d3bd598ef5238b9784e244af24438b12551d60473ecd16bee0e17121f199d81",
+      "published_sha256": "ab721572e9a78c29fe0335ca37da4dfadcd995e5833ac232c8b9790e886ccfbb"
+    },
+    "apps/q1-customer-review/prototype/jobs.py": {
+      "owner_sha256": "8488fd6eb39907041b7fad005b36c8b33a4673ea1e1789c6db044ac3270c860c",
+      "published_sha256": "8488fd6eb39907041b7fad005b36c8b33a4673ea1e1789c6db044ac3270c860c"
+    },
+    "apps/q1-customer-review/prototype/live.py": {
+      "owner_sha256": "b17e1551bbacd2d26a9e20a7064b12e882aa9b344687193470956f9bcb37084c",
+      "published_sha256": "b17e1551bbacd2d26a9e20a7064b12e882aa9b344687193470956f9bcb37084c"
+    },
+    "apps/q1-customer-review/prototype/prediction.py": {
+      "owner_sha256": "facae97e0e57475140304f40d77803dad4f740c3f28335c2336e63175601d057",
+      "published_sha256": "facae97e0e57475140304f40d77803dad4f740c3f28335c2336e63175601d057"
+    },
+    "apps/q1-customer-review/prototype/public_source.py": {
+      "owner_sha256": "ee9f7cd8d24bc3f08fc3cb9cc2853324a9e85a40296c7e4efa236468cd0f63bc",
+      "published_sha256": "ee9f7cd8d24bc3f08fc3cb9cc2853324a9e85a40296c7e4efa236468cd0f63bc"
+    },
+    "apps/q1-customer-review/prototype/public_weather.py": {
+      "owner_sha256": "c2055d1f03ee21c66754a0b7a7f9d51c0db256b7ffc911f32a02a55d0f1bb456",
+      "published_sha256": "511ee0fcfeb71189262a77c7a253ed8b094a8b5edc9085c06ee2396541856cc7"
+    },
+    "apps/q1-customer-review/prototype/review.py": {
+      "owner_sha256": "5c7f6989313b8ca62ba45d9ddc4ac79a9eb9bde9de26449ac68ccb93f3dcb60e",
+      "published_sha256": "5c7f6989313b8ca62ba45d9ddc4ac79a9eb9bde9de26449ac68ccb93f3dcb60e"
+    },
+    "apps/q1-customer-review/prototype/uploads.py": {
+      "owner_sha256": "467d254cdecb9eae6b522aa0965bbd0512a33962ab369549b0f897904dce487f",
+      "published_sha256": "467d254cdecb9eae6b522aa0965bbd0512a33962ab369549b0f897904dce487f"
+    },
+    "apps/q1-customer-review/prototype/vendor/__init__.py": {
+      "owner_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "apps/q1-customer-review/prototype/vendor/auth/__init__.py": {
+      "owner_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "apps/q1-customer-review/prototype/vendor/auth/local_auth.py": {
+      "owner_sha256": "67783c22078f0d79f1c3cdd748566d4489785c9915b49c1d0f7dcdbf50a7fd93",
+      "published_sha256": "67783c22078f0d79f1c3cdd748566d4489785c9915b49c1d0f7dcdbf50a7fd93"
+    },
+    "apps/q1-customer-review/prototype/vendor/ehf/REUSE.md": {
+      "owner_sha256": "25d269350c7a06a5a9bf5849dfa2ed0f9b413d852bd921c789fc4fc98be2fa3e",
+      "published_sha256": "25d269350c7a06a5a9bf5849dfa2ed0f9b413d852bd921c789fc4fc98be2fa3e"
+    },
+    "apps/q1-customer-review/prototype/vendor/ehf/__init__.py": {
+      "owner_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "apps/q1-customer-review/prototype/vendor/ehf/adapters.py": {
+      "owner_sha256": "ce617f14ef0fc9ff4f35c9e5a00e32c06179bbef28d5e5e5003d5d9b5cd03c2c",
+      "published_sha256": "ce617f14ef0fc9ff4f35c9e5a00e32c06179bbef28d5e5e5003d5d9b5cd03c2c"
+    },
+    "apps/q1-customer-review/prototype/vendor/ehf/calibration-v1.json": {
+      "owner_sha256": "7113c1d9fadd0e591338d655819cb31a22d55d9ed261863f93eaad1a27a5f470",
+      "published_sha256": "7113c1d9fadd0e591338d655819cb31a22d55d9ed261863f93eaad1a27a5f470"
+    },
+    "apps/q1-customer-review/prototype/vendor/ehf/core.py": {
+      "owner_sha256": "0d2e478006699a0b5bfd081c00e0abea04fc855a8ad6264609251d1a9e683717",
+      "published_sha256": "0d2e478006699a0b5bfd081c00e0abea04fc855a8ad6264609251d1a9e683717"
+    },
+    "apps/q1-customer-review/prototype/weather.py": {
+      "owner_sha256": "5e90054cfae7879d32f8300ff46363a9e7782c328b48b92e172988d6247aea6c",
+      "published_sha256": "5e90054cfae7879d32f8300ff46363a9e7782c328b48b92e172988d6247aea6c"
+    },
+    "apps/q1-customer-review/prototype/weather_job.py": {
+      "owner_sha256": "517436069fe432467bcb74325cdc6f957c7555f532c2e3d8c5fe66a8b6eadb1e",
+      "published_sha256": "517436069fe432467bcb74325cdc6f957c7555f532c2e3d8c5fe66a8b6eadb1e"
+    },
+    "apps/q1-customer-review/prototype/work.py": {
+      "owner_sha256": "085ef807340636a52a69a389e874495ce47b0817d3c747409b61f00dc594fdd0",
+      "published_sha256": "085ef807340636a52a69a389e874495ce47b0817d3c747409b61f00dc594fdd0"
+    },
+    "apps/q1-customer-review/serve.py": {
+      "owner_sha256": "23d9dbba56755fabdf7b9e6b649c9d5158d7b4e3136da9f8e66d4ef3bd19cb37",
+      "published_sha256": "23d9dbba56755fabdf7b9e6b649c9d5158d7b4e3136da9f8e66d4ef3bd19cb37"
+    },
+    "apps/q1-customer-review/tests/__init__.py": {
+      "owner_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "apps/q1-customer-review/tests/core.test.mjs": {
+      "owner_sha256": "0f228da2514a7851b224ed95f5dc7974db4e6d2438ca9b7593068815aa130d15",
+      "published_sha256": "0f228da2514a7851b224ed95f5dc7974db4e6d2438ca9b7593068815aa130d15"
+    },
+    "apps/q1-customer-review/tests/downloads.test.mjs": {
+      "owner_sha256": "0e09df945357cc9f38b14d78704711bc4967fb3bacb99ee0deb579547b366345",
+      "published_sha256": "0e09df945357cc9f38b14d78704711bc4967fb3bacb99ee0deb579547b366345"
+    },
+    "apps/q1-customer-review/tests/financial-missing.test.mjs": {
+      "owner_sha256": "82d9826f1ae474cccf17f01483a4342527acd26794255efc84736305ec08cc29",
+      "published_sha256": "82d9826f1ae474cccf17f01483a4342527acd26794255efc84736305ec08cc29"
+    },
+    "apps/q1-customer-review/tests/make_upload_fixtures.py": {
+      "owner_sha256": "59a6c5431834cecbaa42f5cb1d80ee1d4ad172fd9215a05b56685114bec97bf4",
+      "published_sha256": "7a3f8994451e49276ed4c1cafd18a215f92d1b222be0977fc223db1426193e00"
+    },
+    "apps/q1-customer-review/tests/pagination.test.mjs": {
+      "owner_sha256": "64b69c04f3a31f6ed4d40410e143ee62e729eab09d798bec34c40f393d5010c7",
+      "published_sha256": "64b69c04f3a31f6ed4d40410e143ee62e729eab09d798bec34c40f393d5010c7"
+    },
+    "apps/q1-customer-review/tests/test_auth_handler.py": {
+      "owner_sha256": "a95f21aabbac5216541f6170e9d2ef26544cabd31e0192f6044b07656795ab14",
+      "published_sha256": "a95f21aabbac5216541f6170e9d2ef26544cabd31e0192f6044b07656795ab14"
+    },
+    "apps/q1-customer-review/tests/test_export_handler.py": {
+      "owner_sha256": "d6c9cba2ebd52c72dafd323a770183577ba0cbfed33f25af8a2736ef22d34912",
+      "published_sha256": "d6c9cba2ebd52c72dafd323a770183577ba0cbfed33f25af8a2736ef22d34912"
+    },
+    "apps/q1-customer-review/tests/test_exports.py": {
+      "owner_sha256": "dbc3a86468502030378b57fff32d710437fb76438ddcbc0a5f48bf17cbbef290",
+      "published_sha256": "dbc3a86468502030378b57fff32d710437fb76438ddcbc0a5f48bf17cbbef290"
+    },
+    "apps/q1-customer-review/tests/test_jobs.py": {
+      "owner_sha256": "8283040922cb864095cecfcb6a3d2c9acaa91b1ebac606843115ded1921497e4",
+      "published_sha256": "8283040922cb864095cecfcb6a3d2c9acaa91b1ebac606843115ded1921497e4"
+    },
+    "apps/q1-customer-review/tests/test_live_handler.py": {
+      "owner_sha256": "68e2a55f80824a501becb9828351c4ac2643f846fd43827293583a2fb3041449",
+      "published_sha256": "68e2a55f80824a501becb9828351c4ac2643f846fd43827293583a2fb3041449"
+    },
+    "apps/q1-customer-review/tests/test_optimisation.py": {
+      "owner_sha256": "b30013fd251734b25ab5a224297ed83b48d5bdb785846b9464c6a11ad9d16735",
+      "published_sha256": "b30013fd251734b25ab5a224297ed83b48d5bdb785846b9464c6a11ad9d16735"
+    },
+    "apps/q1-customer-review/tests/test_pdf.py": {
+      "owner_sha256": "c6418c1237e80bf2d7f3eca354cb095ac11fd3af48a08d1dff70ae86b7254113",
+      "published_sha256": "c6418c1237e80bf2d7f3eca354cb095ac11fd3af48a08d1dff70ae86b7254113"
+    },
+    "apps/q1-customer-review/tests/test_prototype.py": {
+      "owner_sha256": "63ab8e703e9df60ac60ac6f2988b4eb1c2fcd722d80e660b0ea3c120bf9f6326",
+      "published_sha256": "63ab8e703e9df60ac60ac6f2988b4eb1c2fcd722d80e660b0ea3c120bf9f6326"
+    },
+    "apps/q1-customer-review/tests/test_public_source.py": {
+      "owner_sha256": "9653452159e19e8113e79b21273d14464f28dabefb865707850fa2a90dad4565",
+      "published_sha256": "9653452159e19e8113e79b21273d14464f28dabefb865707850fa2a90dad4565"
+    },
+    "apps/q1-customer-review/tests/test_public_weather.py": {
+      "owner_sha256": "6516855c39c3463a52a65e2f3c8f8db325ea815f161a4ddb2fb995eb0fad9c17",
+      "published_sha256": "6516855c39c3463a52a65e2f3c8f8db325ea815f161a4ddb2fb995eb0fad9c17"
+    },
+    "apps/q1-customer-review/tests/test_resource_controls.py": {
+      "owner_sha256": "5857068fd0a6775afe2fa9dda94be72ada7ab42c89f1ced0b1ae98ceb03a73b9",
+      "published_sha256": "5857068fd0a6775afe2fa9dda94be72ada7ab42c89f1ced0b1ae98ceb03a73b9"
+    },
+    "apps/q1-customer-review/tests/test_silo_alignment.py": {
+      "owner_sha256": "778bad6c0b3f0290b42bfec2c1b69243d299abf751f9733a58cc17db24d0534b",
+      "published_sha256": "778bad6c0b3f0290b42bfec2c1b69243d299abf751f9733a58cc17db24d0534b"
+    },
+    "apps/q1-customer-review/tests/test_upload_http.py": {
+      "owner_sha256": "83ff24f6b01ce5d27a6c4df6568c604b4684073fb213476e6724ae2411194a28",
+      "published_sha256": "83ff24f6b01ce5d27a6c4df6568c604b4684073fb213476e6724ae2411194a28"
+    },
+    "apps/q1-customer-review/tests/test_uploads.py": {
+      "owner_sha256": "6b11373cc18aaedc1a872c1db558bf0f8a2112de4436d7ffcc09684c76ae1a05",
+      "published_sha256": "6b11373cc18aaedc1a872c1db558bf0f8a2112de4436d7ffcc09684c76ae1a05"
+    },
+    "apps/q1-customer-review/tests/test_weather_schedule.py": {
+      "owner_sha256": "cb0500af9d6b1e92a209de6343dac1187352db802f769243fbe62fed99fbe3f7",
+      "published_sha256": "cb0500af9d6b1e92a209de6343dac1187352db802f769243fbe62fed99fbe3f7"
+    },
+    "apps/q1-customer-review/tests/upload-job-client.test.mjs": {
+      "owner_sha256": "6a5c4a67e9002c5f8777009549a1b49da969144863e58cb5f1c488dffa170dfe",
+      "published_sha256": "6a5c4a67e9002c5f8777009549a1b49da969144863e58cb5f1c488dffa170dfe"
+    },
+    "apps/q1-customer-review/tests/upload-refresh.test.mjs": {
+      "owner_sha256": "e077573c5f43ba44e69c3f88d7dabc5f9f755e6eb79144d892f0e531ef740d9d",
+      "published_sha256": "e077573c5f43ba44e69c3f88d7dabc5f9f755e6eb79144d892f0e531ef740d9d"
+    },
+    "apps/q1-customer-review/tests/weather-schedule.test.mjs": {
+      "owner_sha256": "ca8ee66e24f31e5894dd104c994546e61a6807a4f3318be38e17b406e8ae72dd",
+      "published_sha256": "ca8ee66e24f31e5894dd104c994546e61a6807a4f3318be38e17b406e8ae72dd"
+    },
+    "apps/q3-community-planning/BUSINESS-UPLOAD-CONTRACT.json": {
+      "owner_sha256": "26f6e4b372689d4fba718cfbe7cc686e7119dd43bfe55a13290fe8410fd0ceb8",
+      "published_sha256": "f7fb4e55978c63135e5ae8c86d555b60b62cdc3c1a654f6fc7ed94697ca38ab5"
+    },
+    "apps/q3-community-planning/automatic-refresh.example.json": {
+      "owner_sha256": "2b7ecf16cc473afc371e5076271a28511251e489493081863eaffa6c1f0aaeef",
+      "published_sha256": "2b7ecf16cc473afc371e5076271a28511251e489493081863eaffa6c1f0aaeef"
+    },
+    "apps/q3-community-planning/data/PROVENANCE.md": {
+      "owner_sha256": "7fd20c77aa559994cc3a14e541bc5e501cc77cd7ae2c1e593f18d5358ba686e5",
+      "published_sha256": "7fd20c77aa559994cc3a14e541bc5e501cc77cd7ae2c1e593f18d5358ba686e5"
+    },
+    "apps/q3-community-planning/data/financial/registry.json": {
+      "owner_sha256": "e0ea0a6d28d0cb154ee8f876601170ff9243fb562e0dcf692e287ce90aaa2fd4",
+      "published_sha256": "e0ea0a6d28d0cb154ee8f876601170ff9243fb562e0dcf692e287ce90aaa2fd4"
+    },
+    "apps/q3-community-planning/data/geography/reference.json": {
+      "owner_sha256": "ecf0e7dc32e73eea517dd3c0a3706f96441fcba1d82c98fa49ecee50276d69de",
+      "published_sha256": "ecf0e7dc32e73eea517dd3c0a3706f96441fcba1d82c98fa49ecee50276d69de"
+    },
+    "apps/q3-community-planning/data/history/metadata.json": {
+      "owner_sha256": "975430c8434f59930c92c0098f5a69ead4284cc134a42248f7a1486c23334ce4",
+      "published_sha256": "975430c8434f59930c92c0098f5a69ead4284cc134a42248f7a1486c23334ce4"
+    },
+    "apps/q3-community-planning/data/inputs/anomaly-data.json": {
+      "owner_sha256": "b7af0c2590317bfbf5f81208bcfc4c195fb7ac9ba44e7235c64d13555334d550",
+      "published_sha256": "b7af0c2590317bfbf5f81208bcfc4c195fb7ac9ba44e7235c64d13555334d550"
+    },
+    "apps/q3-community-planning/data/inputs/historical-context.json": {
+      "owner_sha256": "49b18fdf3bfd2a2b13cb6c01dcdf51403d8815e2948f0efce455a02e9965f1b4",
+      "published_sha256": "49b18fdf3bfd2a2b13cb6c01dcdf51403d8815e2948f0efce455a02e9965f1b4"
+    },
+    "apps/q3-community-planning/data/inputs/manifest.json": {
+      "owner_sha256": "59ca9319a077817ccfbd6aabe16546c8324c6c20a69c622604e2eab29b5db312",
+      "published_sha256": "59ca9319a077817ccfbd6aabe16546c8324c6c20a69c622604e2eab29b5db312"
+    },
+    "apps/q3-community-planning/data/inputs/q3-area-context.json": {
+      "owner_sha256": "02f4d2b9a12fd783bdaeed6c99badd2cf3f65e4dcca1c81fffc4787b8904da5c",
+      "published_sha256": "02f4d2b9a12fd783bdaeed6c99badd2cf3f65e4dcca1c81fffc4787b8904da5c"
+    },
+    "apps/q3-community-planning/data/inputs/seasonal-data.json": {
+      "owner_sha256": "f51d7977b627bb4b205d12ed63de89dc1f0994672f3a60a09f00cd82e50a1d62",
+      "published_sha256": "f51d7977b627bb4b205d12ed63de89dc1f0994672f3a60a09f00cd82e50a1d62"
+    },
+    "apps/q3-community-planning/refresh-config.example.json": {
+      "owner_sha256": "86a7a0ab4e58f79b020836824acfee9f46dcfc61b0d564cd1d40c71f890bf615",
+      "published_sha256": "86a7a0ab4e58f79b020836824acfee9f46dcfc61b0d564cd1d40c71f890bf615"
+    },
+    "apps/q3-community-planning/run.py": {
+      "owner_sha256": "0a511191184112d14849484af63c3cfb0c704c5735d7a0698747ef290b53e91d",
+      "published_sha256": "ee5e303a86fd9232dac4e39a22639f248ca3e398173d827934f49a30f912fcf1"
+    },
+    "apps/q3-community-planning/scripts/automatic_climate_update.py": {
+      "owner_sha256": "380870c5035f41429090c41a3d9b55122f6ad39a2674c4d4de5e265f6d8660db",
+      "published_sha256": "380870c5035f41429090c41a3d9b55122f6ad39a2674c4d4de5e265f6d8660db"
+    },
+    "apps/q3-community-planning/scripts/check_climate_inbox.py": {
+      "owner_sha256": "f9349ff275fe70a38417cfa8211959871ea37dad4773e5908912e5ca143c33cd",
+      "published_sha256": "f9349ff275fe70a38417cfa8211959871ea37dad4773e5908912e5ca143c33cd"
+    },
+    "apps/q3-community-planning/scripts/prepare_business_geography.py": {
+      "owner_sha256": "a680440516cc6f9acf7d56b4bdd4d63d90c2a008197d876bb1cbc2a5a7e609ff",
+      "published_sha256": "a680440516cc6f9acf7d56b4bdd4d63d90c2a008197d876bb1cbc2a5a7e609ff"
+    },
+    "apps/q3-community-planning/scripts/prepare_financial_registry.py": {
+      "owner_sha256": "85e57f93cdef26a9deeef53a045d76f1607eaea5032e9a3ff7791f8c237f2215",
+      "published_sha256": "85e57f93cdef26a9deeef53a045d76f1607eaea5032e9a3ff7791f8c237f2215"
+    },
+    "apps/q3-community-planning/scripts/prepare_history_native.py": {
+      "owner_sha256": "1c874fe1afc275f5de8840eae06aa7e6a5bfe9a5afd41aa9b5a21fe2a73a55e2",
+      "published_sha256": "1c874fe1afc275f5de8840eae06aa7e6a5bfe9a5afd41aa9b5a21fe2a73a55e2"
+    },
+    "apps/q3-community-planning/scripts/prepare_normals_native.py": {
+      "owner_sha256": "e7a5abbb6ea8c4c0483a758968e72c2fa07cc6cf96812bf2a28f3182f46800b6",
+      "published_sha256": "e7a5abbb6ea8c4c0483a758968e72c2fa07cc6cf96812bf2a28f3182f46800b6"
+    },
+    "apps/q3-community-planning/server/account_lookup.py": {
+      "owner_sha256": "fba1e633034c6a89504a4d514c2d9931e2273763b6ba29dabed746420a80a43d",
+      "published_sha256": "fba1e633034c6a89504a4d514c2d9931e2273763b6ba29dabed746420a80a43d"
+    },
+    "apps/q3-community-planning/server/automatic_refresh.py": {
+      "owner_sha256": "dc514c2f24018c1e5da11b599c9fcf11d5d73ab94091d400b7430fcb19b332ee",
+      "published_sha256": "264c082bfb74d3c45dd72ec4bf4e225b9c70f2924c69a09b8f4228bf98d9da66"
+    },
+    "apps/q3-community-planning/server/business_upload.py": {
+      "owner_sha256": "b539ef01a2d58ead4729567129560c6a62301c621f9c4b9e5c19624c08921896",
+      "published_sha256": "b539ef01a2d58ead4729567129560c6a62301c621f9c4b9e5c19624c08921896"
+    },
+    "apps/q3-community-planning/server/climate_pack.py": {
+      "owner_sha256": "ed163d4c2584aadf979e887c69e4e021171e5f4ad208991323c9aafb3ecb08e7",
+      "published_sha256": "ed163d4c2584aadf979e887c69e4e021171e5f4ad208991323c9aafb3ecb08e7"
+    },
+    "apps/q3-community-planning/server/financial_intake.py": {
+      "owner_sha256": "28e252834dbec9318577cc6ff320def70c39540e488de003841cf0ec400202e1",
+      "published_sha256": "28e252834dbec9318577cc6ff320def70c39540e488de003841cf0ec400202e1"
+    },
+    "apps/q3-community-planning/server/financial_reference.py": {
+      "owner_sha256": "b014ef904d8cb9bf5faa5f425fa4b648ece4776574c346ccfb55f56718776212",
+      "published_sha256": "b014ef904d8cb9bf5faa5f425fa4b648ece4776574c346ccfb55f56718776212"
+    },
+    "apps/q3-community-planning/server/financial_support.py": {
+      "owner_sha256": "2368cf4a88dea7e904e50c400b694f52e25cf145f412b84bedc72523352582d2",
+      "published_sha256": "2368cf4a88dea7e904e50c400b694f52e25cf145f412b84bedc72523352582d2"
+    },
+    "apps/q3-community-planning/server/geography_reference.py": {
+      "owner_sha256": "4d84faafd52a2e1f5d4c98723b487888b266a4615b0e591aab44046a02caae29",
+      "published_sha256": "4d84faafd52a2e1f5d4c98723b487888b266a4615b0e591aab44046a02caae29"
+    },
+    "apps/q3-community-planning/server/history_archive.py": {
+      "owner_sha256": "48979b3a8965a558136c41a871b4288335ab539b5e79555ee25a72aac84e57f9",
+      "published_sha256": "48979b3a8965a558136c41a871b4288335ab539b5e79555ee25a72aac84e57f9"
+    },
+    "apps/q3-community-planning/server/local_auth.py": {
+      "owner_sha256": "67783c22078f0d79f1c3cdd748566d4489785c9915b49c1d0f7dcdbf50a7fd93",
+      "published_sha256": "67783c22078f0d79f1c3cdd748566d4489785c9915b49c1d0f7dcdbf50a7fd93"
+    },
+    "apps/q3-community-planning/server/map_proxy.py": {
+      "owner_sha256": "4ab111434c3a2f32eaf6730dcb51d1c64574ab01b9c9a3e9cb89540df3836b54",
+      "published_sha256": "e892d174021c63cbe7231eeb2c86b52f3d69f3cdb8c6a2eb56e93d324611fcf6"
+    },
+    "apps/q3-community-planning/server/refresh_plan.py": {
+      "owner_sha256": "0ce9c53c013be909c0dda3ea003ff266a7a899170112ae9fae49beef97168f53",
+      "published_sha256": "0ce9c53c013be909c0dda3ea003ff266a7a899170112ae9fae49beef97168f53"
+    },
+    "apps/q3-community-planning/server/refresh_scheduler.py": {
+      "owner_sha256": "5baa4e983972326e19d03307750d351c17f5c7f9159f10b16f96c3f08acf4195",
+      "published_sha256": "5baa4e983972326e19d03307750d351c17f5c7f9159f10b16f96c3f08acf4195"
+    },
+    "apps/q3-community-planning/server/source_adapter.py": {
+      "owner_sha256": "3c968f5d9d40c6fbcd0adf02210c9130d262703d5aa227310fcbf0cc4ae131eb",
+      "published_sha256": "3c968f5d9d40c6fbcd0adf02210c9130d262703d5aa227310fcbf0cc4ae131eb"
+    },
+    "apps/q3-community-planning/tests/climate-contract.test.mjs": {
+      "owner_sha256": "fa705387dfafcd1382dfc871bc88e2dae0ba90ed383e4516fda4bbdeb7b12956",
+      "published_sha256": "fa705387dfafcd1382dfc871bc88e2dae0ba90ed383e4516fda4bbdeb7b12956"
+    },
+    "apps/q3-community-planning/tests/financial-controller.test.mjs": {
+      "owner_sha256": "7610482b3ed08362af61ffb67d8b6e5731484b2f245807c9e33661cdfe0b6e6e",
+      "published_sha256": "7610482b3ed08362af61ffb67d8b6e5731484b2f245807c9e33661cdfe0b6e6e"
+    },
+    "apps/q3-community-planning/tests/financial-pending-cohort-change.test.mjs": {
+      "owner_sha256": "1ba9c8d72a38d6a98bc7a585bbc191d898328b8ab423434467f2150ea670ffd2",
+      "published_sha256": "1ba9c8d72a38d6a98bc7a585bbc191d898328b8ab423434467f2150ea670ffd2"
+    },
+    "apps/q3-community-planning/tests/financial-support.test.mjs": {
+      "owner_sha256": "0ff23ec0c3a60bd4f639495d3695f847d8f1bdcdcb74527d0af1eeb1239c30af",
+      "published_sha256": "0ff23ec0c3a60bd4f639495d3695f847d8f1bdcdcb74527d0af1eeb1239c30af"
+    },
+    "apps/q3-community-planning/tests/fixtures/financial-intake-1000-aggregate.json": {
+      "owner_sha256": "5ad78a82fc4821e09c7c48443344c487f10c9e9e5b9c78143ed04aebe97207b5",
+      "published_sha256": "5ad78a82fc4821e09c7c48443344c487f10c9e9e5b9c78143ed04aebe97207b5"
+    },
+    "apps/q3-community-planning/tests/historical-layer.test.mjs": {
+      "owner_sha256": "3eb8ca875647645fcc728d24411f7922046cd4f4c41d5612b521b7682925e119",
+      "published_sha256": "3eb8ca875647645fcc728d24411f7922046cd4f4c41d5612b521b7682925e119"
+    },
+    "apps/q3-community-planning/tests/local-basemap.test.mjs": {
+      "owner_sha256": "425ad776f857be09887204a735e56363367683beb65c913d8c3743ec756df7c6",
+      "published_sha256": "425ad776f857be09887204a735e56363367683beb65c913d8c3743ec756df7c6"
+    },
+    "apps/q3-community-planning/tests/native-history-race.test.mjs": {
+      "owner_sha256": "9bc7c9d5844ad10e8792af46034de44e8ef43b591281cf64fc99d9b31da10956",
+      "published_sha256": "9bc7c9d5844ad10e8792af46034de44e8ef43b591281cf64fc99d9b31da10956"
+    },
+    "apps/q3-community-planning/tests/native-history.test.mjs": {
+      "owner_sha256": "dfcf22de384e68b99ce45e47df39da7450d4aa1ac366435ff18dc3543feaa5a2",
+      "published_sha256": "dfcf22de384e68b99ce45e47df39da7450d4aa1ac366435ff18dc3543feaa5a2"
+    },
+    "apps/q3-community-planning/tests/planning-calculations.test.mjs": {
+      "owner_sha256": "3185fb14601d5865c803380db5072acc8be3665e702b3008350f2e956570e2b7",
+      "published_sha256": "3185fb14601d5865c803380db5072acc8be3665e702b3008350f2e956570e2b7"
+    },
+    "apps/q3-community-planning/tests/session.test.mjs": {
+      "owner_sha256": "8c90276a334bab25e0cb4faf9b605518a3f3c0c3e14a854cfcc035b3f581cd71",
+      "published_sha256": "8c90276a334bab25e0cb4faf9b605518a3f3c0c3e14a854cfcc035b3f581cd71"
+    },
+    "apps/q3-community-planning/tests/source-adapter.test.mjs": {
+      "owner_sha256": "5805783b321be9ee9ce010897e408bf6d328f9691f525baab83d13c61ee8a075",
+      "published_sha256": "5805783b321be9ee9ce010897e408bf6d328f9691f525baab83d13c61ee8a075"
+    },
+    "apps/q3-community-planning/tests/test_account_lookup.py": {
+      "owner_sha256": "b75e09a67b9fee466f537ad071ec8463d3bb1ffd5f6c3eaf3f012102f894fc4c",
+      "published_sha256": "b75e09a67b9fee466f537ad071ec8463d3bb1ffd5f6c3eaf3f012102f894fc4c"
+    },
+    "apps/q3-community-planning/tests/test_application_assets.py": {
+      "owner_sha256": "7e78a664ea1e59582ce785b706f2b046e531b3af36a7372889559e933c83c2af",
+      "published_sha256": "7e78a664ea1e59582ce785b706f2b046e531b3af36a7372889559e933c83c2af"
+    },
+    "apps/q3-community-planning/tests/test_auth_integration.py": {
+      "owner_sha256": "e8cd35f76d8908cffe2d3857066c2ce528c168af43cc600a4796a77adc280ea6",
+      "published_sha256": "e8cd35f76d8908cffe2d3857066c2ce528c168af43cc600a4796a77adc280ea6"
+    },
+    "apps/q3-community-planning/tests/test_automatic_refresh.py": {
+      "owner_sha256": "e25be8d9bf706cc5a9ebee2eae8c2b1708146154d1eaea0b0084129a4e414b14",
+      "published_sha256": "e25be8d9bf706cc5a9ebee2eae8c2b1708146154d1eaea0b0084129a4e414b14"
+    },
+    "apps/q3-community-planning/tests/test_business_upload.py": {
+      "owner_sha256": "5238bfc93fd10055ed8f425bb44c61275c8f9ad0f9f073c742c111dcd4120cd2",
+      "published_sha256": "5238bfc93fd10055ed8f425bb44c61275c8f9ad0f9f073c742c111dcd4120cd2"
+    },
+    "apps/q3-community-planning/tests/test_climate_refresh.py": {
+      "owner_sha256": "d4272fee0415166adbd8109a7397b04b6239ef6f7bd59378bdcbdabce631b0ec",
+      "published_sha256": "9ffb0232ca108b758cf7189553282e6a161608fdd1b6836b1a88a3a749b61bfb"
+    },
+    "apps/q3-community-planning/tests/test_financial_http.py": {
+      "owner_sha256": "8af9b7760f5f97e4288bcaff0ac11cdc000fbf67b4f5a10324624e3030010c17",
+      "published_sha256": "e4c95c60171f565ccf6f8a641cf8575e70ee4d3dfd31c0a2d099600202fe8e6e"
+    },
+    "apps/q3-community-planning/tests/test_financial_intake.py": {
+      "owner_sha256": "736cb9e2308ddc35c1287ada248cebe6b49d4f37799e36fae4f3a5603ec2eb7c",
+      "published_sha256": "1e9be395abf7f19892495e258bc24f49e9d42d96e5a0be345cb9f2166a6d7e0e"
+    },
+    "apps/q3-community-planning/tests/test_financial_support.py": {
+      "owner_sha256": "ce48797fbbf148b0305efc05dea090c84d34947e98ba4e1fc6f923b1ba0569f8",
+      "published_sha256": "ce48797fbbf148b0305efc05dea090c84d34947e98ba4e1fc6f923b1ba0569f8"
+    },
+    "apps/q3-community-planning/tests/test_geography_reference.py": {
+      "owner_sha256": "bc84a4e7fb1b6837caa68736c20b6d625b76dc91d59dd0c6bf67a9d5058b84a8",
+      "published_sha256": "bc84a4e7fb1b6837caa68736c20b6d625b76dc91d59dd0c6bf67a9d5058b84a8"
+    },
+    "apps/q3-community-planning/tests/test_grib_boundary.py": {
+      "owner_sha256": "de137cc116c660c407f815b272b2f17b7cde7cae52c6c742a968a0953d59febe",
+      "published_sha256": "de137cc116c660c407f815b272b2f17b7cde7cae52c6c742a968a0953d59febe"
+    },
+    "apps/q3-community-planning/tests/test_history_archive.py": {
+      "owner_sha256": "580628425771114cff982a34a00ff99f2f98d15ef898845b53d9920d6c17ae72",
+      "published_sha256": "580628425771114cff982a34a00ff99f2f98d15ef898845b53d9920d6c17ae72"
+    },
+    "apps/q3-community-planning/tests/test_refresh_plan.py": {
+      "owner_sha256": "307254a0d6982fe6a0e184079fa46b2d561f26ad0009d0d51df3fccb10d217d4",
+      "published_sha256": "307254a0d6982fe6a0e184079fa46b2d561f26ad0009d0d51df3fccb10d217d4"
+    },
+    "apps/q3-community-planning/tests/test_source_adapter.py": {
+      "owner_sha256": "5ac4cb3a6a486284208f089a10edc3478a1b33e01d7d9ca5e0881327a20c94e1",
+      "published_sha256": "5ac4cb3a6a486284208f089a10edc3478a1b33e01d7d9ca5e0881327a20c94e1"
+    },
+    "apps/q3-community-planning/tests/test_upload_http.py": {
+      "owner_sha256": "aef2d2318d2b756ad63a2dbba8b56ccd9fd9bcd910130741bfba5092430cb7ed",
+      "published_sha256": "aef2d2318d2b756ad63a2dbba8b56ccd9fd9bcd910130741bfba5092430cb7ed"
+    },
+    "apps/q3-community-planning/tests/test_upload_jobs.py": {
+      "owner_sha256": "4c06ae96438a5306af4043b943d90855a3180384759c270fc052fc9b328c1cf5",
+      "published_sha256": "4c06ae96438a5306af4043b943d90855a3180384759c270fc052fc9b328c1cf5"
+    },
+    "apps/q3-community-planning/tests/upload-expiry-recovery.test.mjs": {
+      "owner_sha256": "b894b8ff7a3f10441e634612f1e142dfa1daf17a75af8356e65d280f7b5cf87e",
+      "published_sha256": "b894b8ff7a3f10441e634612f1e142dfa1daf17a75af8356e65d280f7b5cf87e"
+    },
+    "apps/q3-community-planning/tests/upload-validation.test.mjs": {
+      "owner_sha256": "7c6469b87c0c5ffbe5fe0c191cd9fdfd4aaf16219ca9115da0e238945d709671",
+      "published_sha256": "7c6469b87c0c5ffbe5fe0c191cd9fdfd4aaf16219ca9115da0e238945d709671"
+    },
+    "apps/q3-community-planning/tests/warm-filter.test.mjs": {
+      "owner_sha256": "86634416976f716aaf932526e3533013865c7e18d45fc5be5251b84013016d7d",
+      "published_sha256": "86634416976f716aaf932526e3533013865c7e18d45fc5be5251b84013016d7d"
+    },
+    "apps/q3-community-planning/web/business.css": {
+      "owner_sha256": "805a9705161ec8960179fdc955388d41debe00cf0459424ad36f266bc09324db",
+      "published_sha256": "805a9705161ec8960179fdc955388d41debe00cf0459424ad36f266bc09324db"
+    },
+    "apps/q3-community-planning/web/business.html": {
+      "owner_sha256": "59fe8dedccf0c31159a0e538118a1920897406970f8dca072bdc64dff3a8516f",
+      "published_sha256": "59fe8dedccf0c31159a0e538118a1920897406970f8dca072bdc64dff3a8516f"
+    },
+    "apps/q3-community-planning/web/business.mjs": {
+      "owner_sha256": "3276d55b707a99d3980e50e37068b56a9ff5e23f3bf4df1f14aeb358883572a4",
+      "published_sha256": "3276d55b707a99d3980e50e37068b56a9ff5e23f3bf4df1f14aeb358883572a4"
+    },
+    "apps/q3-community-planning/web/financial-intake.mjs": {
+      "owner_sha256": "7adc035ca6314155c9f6f34f5fed9d60febbf9080d451997111bdb112d7810bd",
+      "published_sha256": "7adc035ca6314155c9f6f34f5fed9d60febbf9080d451997111bdb112d7810bd"
+    },
+    "apps/q3-community-planning/web/grid.mjs": {
+      "owner_sha256": "9300902c2aec53ed1c57d45d7a378c1bf34b5a4e560dc093bcc19481f31e96ae",
+      "published_sha256": "9300902c2aec53ed1c57d45d7a378c1bf34b5a4e560dc093bcc19481f31e96ae"
+    },
+    "apps/q3-community-planning/web/index.html": {
+      "owner_sha256": "b5b56e8959efe89d310753dbfa253a870b3550326fb191014a1977ad2597067a",
+      "published_sha256": "b5b56e8959efe89d310753dbfa253a870b3550326fb191014a1977ad2597067a"
+    },
+    "apps/q3-community-planning/web/login.html": {
+      "owner_sha256": "ecd0e4105fa091967a712a2657a29a26eccac11bf4eed0ad94f393f779562f4c",
+      "published_sha256": "ecd0e4105fa091967a712a2657a29a26eccac11bf4eed0ad94f393f779562f4c"
+    },
+    "apps/q3-community-planning/web/modules/climate-contract.mjs": {
+      "owner_sha256": "d268cf939e0c1beb1ce8972944755f3b7ef4ede3cb55428da9ba4e5403ed135e",
+      "published_sha256": "d268cf939e0c1beb1ce8972944755f3b7ef4ede3cb55428da9ba4e5403ed135e"
+    },
+    "apps/q3-community-planning/web/modules/financial-support.mjs": {
+      "owner_sha256": "1c31b2fbefcda5f97783fb919fcedd395d62ad209efc4d0755b6f4da3f3777d5",
+      "published_sha256": "1c31b2fbefcda5f97783fb919fcedd395d62ad209efc4d0755b6f4da3f3777d5"
+    },
+    "apps/q3-community-planning/web/modules/geography-reference.mjs": {
+      "owner_sha256": "1db54d39f2266083bf62606db7fde1d1540b886a15b821eed8700c9340ba7213",
+      "published_sha256": "1db54d39f2266083bf62606db7fde1d1540b886a15b821eed8700c9340ba7213"
+    },
+    "apps/q3-community-planning/web/modules/historical-layer.mjs": {
+      "owner_sha256": "bebd77e68ed83f280dc12f8bdb5d41f72c39d14ec84be416a370a8888f920c6e",
+      "published_sha256": "bebd77e68ed83f280dc12f8bdb5d41f72c39d14ec84be416a370a8888f920c6e"
+    },
+    "apps/q3-community-planning/web/modules/local-basemap.mjs": {
+      "owner_sha256": "ca9b8083921cb0b8497f6d743d5d6ed42b3c498a06eb697a226667468920c6b0",
+      "published_sha256": "ca9b8083921cb0b8497f6d743d5d6ed42b3c498a06eb697a226667468920c6b0"
+    },
+    "apps/q3-community-planning/web/modules/native-history.mjs": {
+      "owner_sha256": "374f7f089da1e524135bfda021563d0dacbe11ef3dc1cf7f95b27aed4a07eafd",
+      "published_sha256": "374f7f089da1e524135bfda021563d0dacbe11ef3dc1cf7f95b27aed4a07eafd"
+    },
+    "apps/q3-community-planning/web/modules/performance.mjs": {
+      "owner_sha256": "6523604411b36a1723d94e78aea2adc941bc26f4ee28afb965d9413e9a33d512",
+      "published_sha256": "6523604411b36a1723d94e78aea2adc941bc26f4ee28afb965d9413e9a33d512"
+    },
+    "apps/q3-community-planning/web/modules/planning-calculations.mjs": {
+      "owner_sha256": "19c7b02aaacb17bab4ce8e49dbb460ec68827b80acc2f5a7661aa22b0cf0bd8c",
+      "published_sha256": "19c7b02aaacb17bab4ce8e49dbb460ec68827b80acc2f5a7661aa22b0cf0bd8c"
+    },
+    "apps/q3-community-planning/web/modules/session.mjs": {
+      "owner_sha256": "a10ce4c7137789fd68dd9d8c2f34b25edb0ee706ecfeaa179c559cd122b10e80",
+      "published_sha256": "a10ce4c7137789fd68dd9d8c2f34b25edb0ee706ecfeaa179c559cd122b10e80"
+    },
+    "apps/q3-community-planning/web/modules/source-adapter.mjs": {
+      "owner_sha256": "ce13302c8edeb510c30add1b9fea771619517bbad8732bf73a7dc61ef59c2d37",
+      "published_sha256": "ce13302c8edeb510c30add1b9fea771619517bbad8732bf73a7dc61ef59c2d37"
+    },
+    "apps/q3-community-planning/web/modules/upload-validation.mjs": {
+      "owner_sha256": "fa604f8a9518e9388aadd89dd60d26dcb9e1376be5214e8e0a4221bf45284670",
+      "published_sha256": "fa604f8a9518e9388aadd89dd60d26dcb9e1376be5214e8e0a4221bf45284670"
+    },
+    "apps/q3-community-planning/web/styles.css": {
+      "owner_sha256": "1be5097bd6bd5e4bfa9acd4074540e16d37598d5f9ae78edc6f6aa61b1a24241",
+      "published_sha256": "1be5097bd6bd5e4bfa9acd4074540e16d37598d5f9ae78edc6f6aa61b1a24241"
+    },
+    "apps/q3-community-planning/web/vendor/maplibre-LICENSE.txt": {
+      "owner_sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2",
+      "published_sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2"
+    },
+    "apps/q3-community-planning/web/vendor/maplibre-gl.css": {
+      "owner_sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732",
+      "published_sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+    },
+    "apps/q3-community-planning/web/vendor/maplibre-gl.js": {
+      "owner_sha256": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb",
+      "published_sha256": "45a9b07a9189ce56054c620a947ccf41e291e58c95e9b61533b740aaa65ee5cb"
+    },
+    "apps/q3-community-planning/web/vendor/maptiler-logo.svg": {
+      "owner_sha256": "c2fef38a1e77e9ff774dc1b21a2e931c81eab12191395be726c594404e4bf332",
+      "published_sha256": "c2fef38a1e77e9ff774dc1b21a2e931c81eab12191395be726c594404e4bf332"
+    },
+    "apps/q3-community-planning/web/view.mjs": {
+      "owner_sha256": "377d8a54ff43458202aa268d99893a2e9815a1476800b781737620d5b6661354",
+      "published_sha256": "377d8a54ff43458202aa268d99893a2e9815a1476800b781737620d5b6661354"
+    },
+    "apps/q3-community-planning/web/wa-boundary.geojson": {
+      "owner_sha256": "b3183583db6307cc4d249b09d429727934b5415d4d1edf24a33bd2259527c1fa",
+      "published_sha256": "b3183583db6307cc4d249b09d429727934b5415d4d1edf24a33bd2259527c1fa"
+    },
+    "apps/q3-community-planning/web/warm-filter.mjs": {
+      "owner_sha256": "2e69cbf184e2323d007460d957b0543b7ea887a237405a771c55863fe4aff701",
+      "published_sha256": "2e69cbf184e2323d007460d957b0543b7ea887a237405a771c55863fe4aff701"
+    },
+    "packaging/team-connect/.dockerignore": {
+      "owner_sha256": "c978e7948de85fa26a18a222fb9bb0004b8ee224eb451334fd9a24dd2a815f65",
+      "published_sha256": "c978e7948de85fa26a18a222fb9bb0004b8ee224eb451334fd9a24dd2a815f65"
+    },
+    "packaging/team-connect/Dockerfile.q1": {
+      "owner_sha256": "bb4c6e46ab1287e58b900c07e7662a3384c1cadade4cade75d0be3fb44de1f35",
+      "published_sha256": "bb4c6e46ab1287e58b900c07e7662a3384c1cadade4cade75d0be3fb44de1f35"
+    },
+    "packaging/team-connect/Dockerfile.q3": {
+      "owner_sha256": "ec56071ffa098185be8b422fd16e2bd96db9837ea925197c80392959724139ce",
+      "published_sha256": "ec56071ffa098185be8b422fd16e2bd96db9837ea925197c80392959724139ce"
+    },
+    "packaging/team-connect/requirements-q1.txt": {
+      "owner_sha256": "6402ce5f212d506600e302606d3eec2f91c97c7b8bfdd5ba08b33c0783b92504",
+      "published_sha256": "6402ce5f212d506600e302606d3eec2f91c97c7b8bfdd5ba08b33c0783b92504"
+    },
+    "packaging/team-connect/runtime/healthcheck.py": {
+      "owner_sha256": "c2f95075f78fb42d6c4f68beaaab33a6613e1b5e7875b08af333bccc77f0775d",
+      "published_sha256": "c2f95075f78fb42d6c4f68beaaab33a6613e1b5e7875b08af333bccc77f0775d"
+    },
+    "packaging/team-connect/runtime/q1_launcher.py": {
+      "owner_sha256": "7dad9659820fac822453120ff18000c3250e3137b0b9b467616732d679480457",
+      "published_sha256": "7dad9659820fac822453120ff18000c3250e3137b0b9b467616732d679480457"
+    },
+    "packaging/team-connect/runtime/q3_launcher.py": {
+      "owner_sha256": "3ccc4f19941fff81376bfdf843c864d5cc573f4ab334154cad02970cd0dcc07d",
+      "published_sha256": "3ccc4f19941fff81376bfdf843c864d5cc573f4ab334154cad02970cd0dcc07d"
+    },
+    "packaging/team-connect/runtime/support.py": {
+      "owner_sha256": "3ed5e1642a1c04269fe4f4e417ef4e4c7eb4228950032950051873c4271628fe",
+      "published_sha256": "3ed5e1642a1c04269fe4f4e417ef4e4c7eb4228950032950051873c4271628fe"
+    },
+    "packaging/team-connect/tests/test_packaging.py": {
+      "owner_sha256": "dde54fbb752613b8ef7adcd00601fa22ae74ef2a52fe49f4bbf250cf17849cdb",
+      "published_sha256": "dde54fbb752613b8ef7adcd00601fa22ae74ef2a52fe49f4bbf250cf17849cdb"
+    }
+  },
+  "formatting_only_changes": [
+    "apps/q3-community-planning/server/map_proxy.py",
+    "apps/q3-community-planning/tests/test_climate_refresh.py",
+    "apps/q3-community-planning/tests/test_financial_http.py",
+    "apps/q3-community-planning/tests/test_financial_intake.py"
+  ],
+  "q1": {
+    "archive_sha256": "4ef515288a6f735aa9d7cee85dae3b75d95419fb344437db8d4f7c4f7250fb82",
+    "version": "291739b9a9cf24845a876d46712331f8714b87281adb87e88b8c76dff599d91a"
+  },
+  "scope": "Selected application source only; see PUBLICATION.md for exclusions and portability edits. New publication documentation and staging configuration are not owner snapshot files.",
+  "season_ahead": {
+    "owner_receipt_sha256": "90875eca1d45acba96d42deab5496eac2def6814991a0517cae581e4148c4cf6",
+    "version": "209bce1ae503d91adaf03a17a1034a6bd72c92e05526cbc82357a8cd86935567"
+  }
+}

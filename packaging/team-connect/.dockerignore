@@ -1,0 +1,11 @@
+**
+!app/
+!app/**
+!runtime/
+!runtime/*.py
+!font/
+!font/DejaVuSans.ttf
+!font/LICENSE
+!requirements-q1.txt
+!Dockerfile
+!.dockerignore

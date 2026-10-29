@@ -1,0 +1,14 @@
+FROM python:3.13.18-slim-bookworm@sha256:281d39ff02e3b389401586134ff9e6572954687822a58055ec07a60ded4e0b7f
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 HOME=/tmp
+WORKDIR /app
+COPY requirements-q1.txt /opt/runtime/requirements.txt
+RUN python -m pip install --no-cache-dir --no-compile --no-index --only-binary=:all: --no-deps --require-hashes -r /opt/runtime/requirements.txt
+COPY font/DejaVuSans.ttf /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+COPY font/LICENSE /usr/share/doc/team-connect-font/LICENSE
+COPY app/ /app/
+COPY runtime/ /opt/runtime/
+RUN mkdir -p /state/uploads && chown -R 10001:10001 /state && chmod 700 /state /state/uploads
+USER 10001:10001
+EXPOSE 8891
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 CMD ["python", "/opt/runtime/healthcheck.py", "8891", "q1"]
+CMD ["python", "/opt/runtime/q1_launcher.py", "--app-root", "/app", "--source-root", "/inputs/q1", "--runtime-dir", "/state/uploads", "--listen", "0.0.0.0", "--port", "8891"]

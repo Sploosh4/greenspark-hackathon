@@ -1,0 +1,95 @@
+{
+  "contract": "q3-business-upload-v2",
+  "endpoint": "POST /api/q3/business/stage",
+  "encoding": "multipart/form-data",
+  "fields": {
+    "customers": {
+      "filename": "customers.csv",
+      "csvHeaders": [
+        "customer_id",
+        "postcode",
+        "locality",
+        "region",
+        "retailer",
+        "climate_zone",
+        "tariff",
+        "meter_type",
+        "prepayment_meter",
+        "payment_method",
+        "has_solar",
+        "solar_kw",
+        "concession_card",
+        "life_support",
+        "life_support_registered_date",
+        "medical_cooling_subsidy",
+        "interpreter_required",
+        "account_open_date",
+        "account_close_date",
+        "opening_position_1jul2023"
+      ]
+    },
+    "usage": {
+      "filenames": [
+        "consumption_daily.csv",
+        "consumption_daily.csv.gz"
+      ],
+      "csvHeaders": [
+        "customer_id",
+        "date",
+        "import_kwh",
+        "import_peak_kwh",
+        "import_offpeak_kwh",
+        "import_superoffpeak_kwh",
+        "export_kwh",
+        "supply_status",
+        "outage_hours"
+      ]
+    },
+    "synthetic": {
+      "value": "true"
+    }
+  },
+  "limits": {
+    "requestBytes": 16777216,
+    "expandedBytesPerCsv": 100663296,
+    "customerRows": 100000,
+    "usageRows": 1500000
+  },
+  "geography": {
+    "registryPath": "data/geography/reference.json",
+    "registrySha256": "ecf0e7dc32e73eea517dd3c0a3706f96441fcba1d82c98fa49ecee50276d69de",
+    "source": {
+      "name": "GeoNames AU postal extract and 12 reviewed Q3 SILO reference points",
+      "url": "https://download.geonames.org/export/zip/AU.zip",
+      "licence": "CC BY 4.0",
+      "retrievedAt": "2026-10-28",
+      "rawSha256": "b26c17893b88e34c682f4bba10748e3d37b003589f3e89636e32c68c8dc14f59",
+      "rawTextSha256": "4f3f536f27176acb6c80510052fd55ba1efd55f9ac77d412131658a105384656",
+      "candidateCsvSha256": "22638f591b169d21018e51ac84bac7ce4a385cd90424b9d25ce03818e017797b"
+    },
+    "boundary": {
+      "source": "ABS ASGS2021 WA state land polygon",
+      "url": "https://geo.abs.gov.au/arcgis/rest/services/ASGS2021/STE/MapServer/0",
+      "licence": "CC BY 4.0",
+      "sha256": "2ac59f08b5c5cf43c70107ba51ee9de37ba4ce560855827dc2ffd6dbdef42fd8",
+      "checkedInside": 386,
+      "legacyOutsideExceptions": [
+        "6701"
+      ]
+    },
+    "supportedReferenceCount": 387,
+    "rule": "Exact (postcode, locality.casefold) join to pinned server-side public registry; no fuzzy matching or client coordinate authority. This registry currently has one locality per postcode.",
+    "normalisedFields": [
+      "geographyRegistrySha256",
+      "geographySource",
+      "geographyMeaning",
+      "areas[].sourceRecordId",
+      "areas[].referencePointSource"
+    ],
+    "newAreaIncome": "null unless independently source-verified; no inferred SAL/POA crosswalk"
+  },
+  "snapshot": "Latest supplied actual usage date; active requires opening evidence, no closure on/before cutoff, and row at cutoff. Missing evidence is unknown. Counts unchanged across forecast months.",
+  "retainedSchema": "Existing normalised q3-area-context plus optional notOpenAtSnapshotAccounts. Raw source headers unchanged.",
+  "stage": "Aggregate-only response; 30 minute lifetime; explicit replace requires stageId/baseGeneration.",
+  "largeFixtureNote": "Sparse quarterly observed daily rows are sufficient for the current Q3 account-as-of calculation. Explicitly label sparse coverage. They are individual observations, never monthly totals relabelled as daily. Full dense50k two-yearhistory requires a separate streamingextension. Header/row/requestboundsstillapply."
+}

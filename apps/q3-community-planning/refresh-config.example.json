@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "scheduleEnabled": false,
+  "releaseDayUTC": 6,
+  "releaseLagDays": null,
+  "checkIntervalHours": 24,
+  "retrievalMode": "existing_local_inbox_only"
+}

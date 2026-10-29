@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Q1 checks · Team Connect</title><link rel="stylesheet" href="assets/demo-styles.css"><body><main><h1>Q1 review checks</h1><p><a href="./">Return to review</a></p><section class="panel pad"><p id="summary">Running checks…</p><ul class="checks-list" id="checks"></ul></section></main><script type="module">
+import {summary,query,days,exportRows} from './core.mjs';
+const d=await (await fetch('assets/review-fixture.json')).json();let passed=0,total=0;
+function check(label,run){total++;const li=document.createElement('li');try{if(!run())throw Error('Check failed');li.textContent='PASS · '+label;li.className='checked';passed++;}catch{li.textContent='FAIL · '+label;li.className='failed';}document.querySelector('#checks').append(li);}
+check('Default order and deduplicated customers',()=>query(d).map(x=>x.customer.customer_id).join(',')==='C105002,C103794,C105013,C102031');
+check('Two estimates remain separate for each customer',()=>query(d).every(x=>x.estimates.length===2));
+check('Equal increase qualifies',()=>query(d).some(x=>x.customer.customer_id==='C105013'));
+check('Any past episode qualifies, not all',()=>query(d).find(x=>x.customer.customer_id==='C103794').threshold===25);
+check('Unlinked help excluded',()=>!query(d).some(x=>x.customer.customer_id==='C102502'));
+check('Insufficient estimates stay unavailable',()=>summary(d.customers[4],d).highest===null);
+check('Stable grid imports stay a real zero',()=>summary(d.customers[6],d).highest===0);
+check('Billed and prepaid filters work',()=>query(d,{type:'Billed'}).length===2&&query(d,{type:'Prepaid'}).length===2);
+check('Empty search result',()=>query(d,{search:'unknown'}).length===0);
+check('Seven-day horizon and three-day event',()=>days(d.horizon_start,d.horizon_end)===7&&summary(d.customers[0],d).estimates[0].duration===3);
+check('Filtered CSV contains two event rows per customer',()=>exportRows(query(d)).split('\r\n').length===9);
+check('Business usage has no observations after review cutoff',()=>d.customers.every(x=>x.usage.every(r=>r.date<=d.history_cutoff)));
+document.querySelector('#summary').textContent=`${passed} / ${total} checks passed. These verify UI fixture rules, not forecast accuracy.`;
+</script></html>

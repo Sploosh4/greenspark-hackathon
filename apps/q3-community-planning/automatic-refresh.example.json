@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "releaseDayUTC": 6,
+  "releaseLagDays": 3,
+  "checkIntervalHours": 24,
+  "checkHourUTC": 12
+}

@@ -1,0 +1,464 @@
+{
+  "version": "q1-upload-contract-v1",
+  "status": "Implemented and tested for one local synthetic instance; fixed Fitzroy Crossing historical replay",
+  "source": "Existing ordered columns and keys from source-audit.json and prototype/inputs.py",
+  "scope": {
+    "batch": "all twelve existing business CSV/gzip files together",
+    "business_schemas": "unchanged",
+    "locality": "Fitzroy Crossing 6765",
+    "review_date": "2024-11-02",
+    "weather": "retained historical SILO/EHF inputs, unchanged",
+    "allowed_data": "synthetic prototype data only"
+  },
+  "files": [
+    {
+      "table": "customers",
+      "filename": "customers.csv",
+      "ordered_headers": [
+        "customer_id",
+        "postcode",
+        "locality",
+        "region",
+        "retailer",
+        "climate_zone",
+        "tariff",
+        "meter_type",
+        "prepayment_meter",
+        "payment_method",
+        "has_solar",
+        "solar_kw",
+        "concession_card",
+        "life_support",
+        "life_support_registered_date",
+        "medical_cooling_subsidy",
+        "interpreter_required",
+        "account_open_date",
+        "account_close_date",
+        "opening_position_1jul2023"
+      ],
+      "primary_key": [
+        "customer_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [],
+      "date_columns_checked_today": [
+        "life_support_registered_date",
+        "account_open_date",
+        "account_close_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "023b83dbb62aa9853120f71735512c5a64810bb6ff31007a9c63811804211011",
+        "rows": 448
+      }
+    },
+    {
+      "table": "customer_locations",
+      "filename": "customer_locations.csv",
+      "ordered_headers": [
+        "customer_id",
+        "address_line_1",
+        "locality",
+        "state",
+        "postcode",
+        "latitude",
+        "longitude",
+        "sal_code21",
+        "poa_code21"
+      ],
+      "primary_key": [
+        "customer_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [],
+      "date_columns_checked_today": [],
+      "retained_demo_reference_only": {
+        "sha256": "f8c2fb5a583b00bb18cf8c7b5da6d33d53bb97cced836fab2a0cb701fbd348cc",
+        "rows": 448
+      }
+    },
+    {
+      "table": "consumption_daily",
+      "filename": "consumption_daily.csv.gz",
+      "ordered_headers": [
+        "customer_id",
+        "date",
+        "import_kwh",
+        "import_peak_kwh",
+        "import_offpeak_kwh",
+        "import_superoffpeak_kwh",
+        "export_kwh",
+        "supply_status",
+        "outage_hours"
+      ],
+      "primary_key": [
+        "customer_id",
+        "date"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "import_kwh",
+        "import_peak_kwh",
+        "import_offpeak_kwh",
+        "import_superoffpeak_kwh",
+        "export_kwh",
+        "outage_hours"
+      ],
+      "date_columns_checked_today": [
+        "date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "5fac04fbf1a8fce1361a2545373dde02012a814361634dc7e3745c9eb60fbae6",
+        "rows": 310427
+      }
+    },
+    {
+      "table": "prepay_daily",
+      "filename": "prepay_daily.csv",
+      "ordered_headers": [
+        "customer_id",
+        "date",
+        "opening_credit",
+        "topup_amount",
+        "usage_cost",
+        "closing_credit",
+        "unfunded_recorded_cost"
+      ],
+      "primary_key": [
+        "customer_id",
+        "date"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "opening_credit",
+        "topup_amount",
+        "usage_cost",
+        "closing_credit",
+        "unfunded_recorded_cost"
+      ],
+      "date_columns_checked_today": [
+        "date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "aa5e5649f41180c666b92bdd15b1409484c58c0d088767da7c3604827196655c",
+        "rows": 103802
+      }
+    },
+    {
+      "table": "prepay_topups",
+      "filename": "prepay_topups.csv",
+      "ordered_headers": [
+        "customer_id",
+        "amount",
+        "datetime"
+      ],
+      "primary_key": [
+        "customer_id",
+        "datetime"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "amount"
+      ],
+      "date_columns_checked_today": [],
+      "retained_demo_reference_only": {
+        "sha256": "0cbada4df7573c8dbd2d8a25cd90dafdab243bb7942470d74714a402ef4d52ed",
+        "rows": 14578
+      }
+    },
+    {
+      "table": "bills",
+      "filename": "bills.csv",
+      "ordered_headers": [
+        "bill_id",
+        "customer_id",
+        "issue_date",
+        "period_start_date",
+        "period_end_date",
+        "kwh",
+        "usage_charge",
+        "supply_charge",
+        "feed_in_credit",
+        "concession_credit",
+        "govt_bill_credit",
+        "amount_due",
+        "original_due_date",
+        "due_date",
+        "paid_in_full_date",
+        "due_date_extended",
+        "final_bill",
+        "opening_balance",
+        "paid_on_time",
+        "is_opening_debt"
+      ],
+      "primary_key": [
+        "bill_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "kwh",
+        "usage_charge",
+        "supply_charge",
+        "feed_in_credit",
+        "concession_credit",
+        "govt_bill_credit",
+        "amount_due"
+      ],
+      "date_columns_checked_today": [
+        "issue_date",
+        "period_start_date",
+        "period_end_date",
+        "original_due_date",
+        "due_date",
+        "paid_in_full_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "a269e7997146318d80effc53cea676e701b3130366b62375a86f565894b1569c",
+        "rows": 3356
+      }
+    },
+    {
+      "table": "payments",
+      "filename": "payments.csv",
+      "ordered_headers": [
+        "payment_id",
+        "customer_id",
+        "date",
+        "amount",
+        "method",
+        "kind",
+        "status"
+      ],
+      "primary_key": [
+        "payment_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "amount"
+      ],
+      "date_columns_checked_today": [
+        "date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "f24427c31e908dd465a772134a0f077edfe55a8f34e0986a61f90b265bf2eba3",
+        "rows": 3367
+      }
+    },
+    {
+      "table": "support_needs_history",
+      "filename": "support_needs_history.csv",
+      "ordered_headers": [
+        "history_id",
+        "need_id",
+        "customer_id",
+        "need_type",
+        "status",
+        "effective_from",
+        "effective_to",
+        "review_due_date",
+        "last_review_date",
+        "source_event_date",
+        "contact_id",
+        "support_summary"
+      ],
+      "primary_key": [
+        "history_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [],
+      "date_columns_checked_today": [
+        "effective_from",
+        "effective_to",
+        "review_due_date",
+        "last_review_date",
+        "source_event_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "3ee8f6824da2d8b1f13085c439794d37f960d2b836c9bbcc34a4c98472c92e30",
+        "rows": 168
+      }
+    },
+    {
+      "table": "support_arrangement_history",
+      "filename": "support_arrangement_history.csv",
+      "ordered_headers": [
+        "history_id",
+        "arrangement_id",
+        "customer_id",
+        "arrangement_type",
+        "status",
+        "effective_from",
+        "effective_to",
+        "review_due_date",
+        "source_event_date",
+        "source_table"
+      ],
+      "primary_key": [
+        "history_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [],
+      "date_columns_checked_today": [
+        "effective_from",
+        "effective_to",
+        "review_due_date",
+        "source_event_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "556fe90f4ed6bab7461f2292f1f23fb55ae9ff90b92ba4c8b297bfe3ca603f2d",
+        "rows": 431
+      }
+    },
+    {
+      "table": "hardship_programs",
+      "filename": "hardship_programs.csv",
+      "ordered_headers": [
+        "hardship_id",
+        "customer_id",
+        "assessment_date",
+        "trigger",
+        "assessment_outcome",
+        "debt_at_entry",
+        "start_date",
+        "instalment",
+        "exit_date",
+        "exit_reason",
+        "debt_at_exit",
+        "write_off",
+        "financial_counselling_referral",
+        "energy_efficiency_advice"
+      ],
+      "primary_key": [
+        "hardship_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "debt_at_entry",
+        "instalment",
+        "debt_at_exit",
+        "write_off"
+      ],
+      "date_columns_checked_today": [
+        "assessment_date",
+        "start_date",
+        "exit_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "ba288665dcaa710f7d506541f1d057143ca651c9ffe78d9e93d677936795db58",
+        "rows": 45
+      }
+    },
+    {
+      "table": "hugs_grants",
+      "filename": "hugs_grants.csv",
+      "ordered_headers": [
+        "hugs_id",
+        "customer_id",
+        "application_date",
+        "payment_date",
+        "debt_at_application",
+        "grant_amount",
+        "outcome",
+        "region_cap",
+        "hardship_id"
+      ],
+      "primary_key": [
+        "hugs_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "debt_at_application",
+        "grant_amount",
+        "region_cap"
+      ],
+      "date_columns_checked_today": [
+        "application_date",
+        "payment_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "a2c74062c20a7b132d05ec13eb6b22fafd9b5e6915168270c133be781abd5432",
+        "rows": 34
+      }
+    },
+    {
+      "table": "payment_arrangements",
+      "filename": "payment_arrangements.csv",
+      "ordered_headers": [
+        "arrangement_id",
+        "customer_id",
+        "type",
+        "start_date",
+        "amount",
+        "instalment",
+        "n_instalments",
+        "end_date",
+        "status",
+        "trigger"
+      ],
+      "primary_key": [
+        "arrangement_id"
+      ],
+      "customer_foreign_key": "customers.customer_id",
+      "numeric_columns_checked_today": [
+        "amount",
+        "instalment",
+        "n_instalments"
+      ],
+      "date_columns_checked_today": [
+        "start_date",
+        "end_date"
+      ],
+      "retained_demo_reference_only": {
+        "sha256": "c90344c7471d24e9b27731d557896aa16948a03f9fc85ae04841c0df9ca97b5b",
+        "rows": 174
+      }
+    }
+  ],
+  "retained_demo_integrity": "Keep current exact hashes and row-count verification enabled for preloaded demo",
+  "uploaded_batch_policy": "Use server-owned schema allowlist; measure each new batch own hashes, counts and coverage. Do not require demo hashes or counts and do not trust an uploaded manifest.",
+  "existing_checks": [
+    "exact ordered headers",
+    "required primary keys nonblank and unique",
+    "all customer foreign keys resolve",
+    "consumption/prepay numbers present, finite and nonnegative",
+    "connected or disconnected_non_payment supply status",
+    "outage_hours within 0..24",
+    "import components reconcile to import_kwh within0.0031",
+    "prepay credit and unfunded-cost reconciliation within0.021",
+    "canonical ISO date fields when supplied",
+    "account closure does not precede opening",
+    "retained Fitzroy support-arrangement parent/customer links resolve"
+  ],
+  "additional_upload_requirements": [
+    "complete file set; reject missing or duplicate filenames",
+    "reject unknown filename, path components and unsupported compression",
+    "bounded bytes and decoded size; valid gzip CRC, UTF-8 and CSV structure",
+    "validate prepay_topups.datetime explicitly; current generic date check does not inspect it",
+    "check declared source boolean/domain fields without coercing blanks to false",
+    "validate date/interval ordering where source semantics establish it; effective_to is exclusive",
+    "validate parent-record references across the submitted batch before locality selection",
+    "measure partial usage coverage as warning/no-estimate reason, never zero-fill",
+    "preserve optional financial blanks and no-record states",
+    "future business rows may be retained but must remain excluded by unchanged review cutoff",
+    "run unchanged review calculation and verify output before activation"
+  ],
+  "prohibited_inference": [
+    "opening_balance and is_opening_debt are not money amounts",
+    "payments have no bill-allocation foreign key",
+    "an application/assessment does not establish delivered assistance",
+    "timely payment under an extension does not erase assistance",
+    "source dates do not establish availability timestamps or a timezone"
+  ],
+  "activation": "One complete validated snapshot and its derived review become active together; failure before activation leaves last-good unchanged",
+  "implementation": {
+    "validation": "prototype/uploads.py",
+    "transport": "serve.py",
+    "limits_mib": {
+      "body": 64,
+      "file": 32,
+      "decoded_file": 128,
+      "decoded_batch": 256
+    },
+    "max_rows_per_file": 1000000,
+    "credentials": "none persistent; ephemeral same-origin request protection only"
+  }
+}
