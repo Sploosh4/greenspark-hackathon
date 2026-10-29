@@ -1,0 +1,32 @@
+# Explicit enforced mode. Supply separate pre-provisioned private identity volumes.
+# No actual laptop identity store is mounted by this template.
+services:
+  q1:
+    image: team-connect-q1:authenticated-local
+    build:
+      context: ./build/q1
+    environment: !reset {}
+    command: [python, /opt/runtime/q1_launcher.py, --app-root, /app, --source-root, /inputs/q1, --runtime-dir, /state/uploads, --listen, 0.0.0.0, --port, '8891', --auth-store, /identity/auth.sqlite3, --session-idle-seconds, '${TC_SESSION_IDLE_SECONDS:-1800}', --session-absolute-seconds, '${TC_SESSION_ABSOLUTE_SECONDS:-28800}']
+    volumes:
+      - type: volume
+        source: q1_identity
+        target: /identity
+        read_only: true
+  q3:
+    image: team-connect-q3:authenticated-local
+    build:
+      context: ./build/q3
+    environment: !reset {}
+    command: [python, /opt/runtime/q3_launcher.py, --app-root, /app, --inputs-dir, /app/data/inputs, --runtime-dir, /state, --maptiler-env, /run/secrets/maptiler_env, --listen, 0.0.0.0, --port, '8797', --auth-store, /identity/auth.sqlite3, --session-idle-seconds, '${TC_SESSION_IDLE_SECONDS:-1800}', --session-absolute-seconds, '${TC_SESSION_ABSOLUTE_SECONDS:-28800}']
+    volumes:
+      - type: volume
+        source: q3_identity
+        target: /identity
+        read_only: true
+volumes:
+  q1_identity:
+    external: true
+    name: ${Q1_IDENTITY_VOLUME:?Supply the separate approved Q1 identity volume}
+  q3_identity:
+    external: true
+    name: ${Q3_IDENTITY_VOLUME:?Supply the separate approved Q3 identity volume}

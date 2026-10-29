@@ -10,7 +10,7 @@ services:
     # Both sides use the same port because Q1 verifies Host against server_port.
     ports: ["127.0.0.1:8891:8891"]
     environment:
-      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:?Set to 1 only for an isolated local synthetic preview}
+      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:-0}
     volumes:
       - type: volume
         source: q1_state
@@ -43,7 +43,7 @@ services:
     user: "10002:10002"
     ports: ["127.0.0.1:8797:8797"]
     environment:
-      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:?Set to 1 only for an isolated local synthetic preview}
+      TEAM_CONNECT_UNAUTHENTICATED_DEMO: ${TEAM_CONNECT_UNAUTHENTICATED_DEMO:-0}
     volumes:
       - type: volume
         source: q3_state

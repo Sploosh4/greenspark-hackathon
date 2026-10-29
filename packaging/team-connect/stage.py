@@ -54,7 +54,7 @@ def stage_q1(q1, output):
     try:
         for relative in selected_q1_files(q1):
             copy_file(q1 / relative, temp / 'app' / relative, manifest)
-        for name in ['support.py', 'healthcheck.py', 'q1_launcher.py']:
+        for name in ['support.py', 'healthcheck.py', 'q1_launcher.py', 'private_identity.py']:
             copy_file(HERE / 'runtime' / name, temp / 'runtime' / name, manifest)
         copy_file(HERE / 'Dockerfile.q1', temp / 'Dockerfile', manifest)
         copy_file(HERE / '.dockerignore', temp / '.dockerignore', manifest)
@@ -104,7 +104,7 @@ def stage_q3_receipt(receipt_path, output):
             selected.append(p)
         for relative in selected:
             copy_file(source / relative, temp / 'app' / relative, manifest)
-        for name in ['support.py', 'healthcheck.py', 'q3_launcher.py']:
+        for name in ['support.py', 'healthcheck.py', 'q3_launcher.py', 'private_identity.py']:
             copy_file(HERE / 'runtime' / name, temp / 'runtime' / name, manifest)
         copy_file(HERE / 'Dockerfile.q3', temp / 'Dockerfile', manifest)
         copy_file(HERE / '.dockerignore', temp / '.dockerignore', manifest)
@@ -136,7 +136,7 @@ def stage(q1=Q1, q3=Q3, output=HERE / 'build'):
             context = temp / name
             for relative in selected:
                 copy_file(root / relative, context / 'app' / relative, manifest)
-            for file in ('support.py', 'healthcheck.py', f'{name}_launcher.py'):
+            for file in ('support.py', 'healthcheck.py', f'{name}_launcher.py', 'private_identity.py'):
                 copy_file(HERE / 'runtime' / file, context / 'runtime' / file, manifest)
             copy_file(HERE / f'Dockerfile.{name}', context / 'Dockerfile', manifest)
             copy_file(HERE / '.dockerignore', context / '.dockerignore', manifest)

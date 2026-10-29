@@ -68,4 +68,4 @@ Regional contributing signals are independent keyboard-accessible buttons. Selec
 
 ## Team Connect applications
 
-The verified Q1 customer-review and Season Ahead planning sources are now available in [apps/q1-customer-review](apps/q1-customer-review/README.md) and [apps/q3-community-planning](apps/q3-community-planning/README.md). See the [publication scope and limits](docs/team-connect/PUBLICATION.md) and [local container recipes](packaging/team-connect/README.md). The private identity adapters, unfinished ML work and live datasets are excluded.
+The verified Q1 customer-review and Season Ahead planning sources are now available in [apps/q1-customer-review](apps/q1-customer-review/README.md) and [apps/q3-community-planning](apps/q3-community-planning/README.md). See the [publication scope and limits](docs/team-connect/PUBLICATION.md) and [local container recipes](packaging/team-connect/README.md). The reviewed Sign out patch and explicit authenticated-container mode are included. Private account stores, native service wrappers, provisioning, unfinished ML work and live datasets are excluded.

@@ -3,7 +3,7 @@ const source=readFileSync(new URL('../app.mjs',import.meta.url),'utf8');
 const functions=source.slice(source.indexOf('async function waitForUploadJob'),source.indexOf('function showReplaceDialog'));
 function setup(fetch){
  const ctx={uploadBusy:false,uploadOperation:'known-operation',uploadJobPending:true,uploadAttemptGeneration:0,uploadAbort:null,uploadError:'',pendingUpload:null,view:'upload',renderUpload:()=>{},fetch,encodeURIComponent,Error,DOMException,AbortController,AbortSignal,performance:{now:()=>0},setTimeout:fn=>{fn();}};
- vm.createContext(ctx);vm.runInContext(functions,ctx);return ctx;
+ ctx.authSession={isBlocked:()=>false,request:(...args)=>ctx.fetch(...args)};vm.createContext(ctx);vm.runInContext(functions,ctx);return ctx;
 }
 test('known operation can resume its ready receipt without resubmitting files',async()=>{
  const calls=[],receipt={stage_id:'known-operation'},ctx=setup(async path=>{calls.push(path);return {ok:true,json:async()=>({state:'ready',receipt})};});

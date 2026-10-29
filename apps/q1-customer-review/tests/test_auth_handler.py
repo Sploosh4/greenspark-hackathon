@@ -84,3 +84,16 @@ class AuthHandlerTests(unittest.TestCase):
         self.server.auth=None
         self.assertEqual(self.request('/api/review')['status'],200);self.assertFalse(self.request('/api/session')['body']['login_enabled'])
         self.assertEqual(self.request('/api/auth/challenge')['status'],503);self.assertEqual(self.request('/api/settings')['status'],403)
+
+    def test_logout_cookie_revocation_uses_session_csrf_without_Q1_request_token(self):
+        for role in ['officer','manager']:
+            headers=self.login(role)
+            invalid=self.request('/api/auth/logout','POST',{},dict(headers,**{'X-Team-Connect-CSRF':'wrong'}))
+            self.assertEqual(invalid['status'],403)
+            self.assertEqual(self.request('/api/review',headers=headers)['status'],200)
+            result=self.request('/api/auth/logout','POST',{},dict(headers,**{'X-Q1-Request-Token':'not-the-app-token'}))
+            self.assertEqual(result['status'],200);self.assertFalse(result['body']['authenticated'])
+            cookie=next(value for key,value in result['headers'] if key=='Set-Cookie')
+            for part in ['Max-Age=0','HttpOnly','SameSite=Strict']:self.assertIn(part,cookie)
+            self.assertEqual(self.request('/api/review',headers=headers)['status'],401)
+            self.assertEqual(self.request('/api/auth/logout','POST',{},headers)['status'],401)

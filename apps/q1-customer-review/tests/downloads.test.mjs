@@ -9,7 +9,7 @@ function setup(){
  let resolve;const pending=new Promise(r=>resolve=r),saved=[],messages=[];
  const d={batch_revision:'demo-version',customers:[]};
  const ctx={mode:'demo',sessionCsrf:'',requestToken:'test',filters:{},snapshot:d,data:()=>ctx.snapshot,query:()=>[{customer:{customer_id:'C103794'}}],fetch:()=>pending,download:(...args)=>saved.push(args),toast:x=>messages.push(x),TextDecoder,Uint8Array,Error};
- vm.createContext(ctx);vm.runInContext(pdf+'\n'+csv,ctx);
+ ctx.authSession={isBlocked:()=>false,request:(...args)=>ctx.fetch(...args)};vm.createContext(ctx);vm.runInContext(pdf+'\n'+csv,ctx);
  const response={ok:true,headers:{get:()=> 'application/pdf'},arrayBuffer:async()=>new TextEncoder().encode('%PDF-1.4').buffer};
  return {ctx,d,saved,messages,release:()=>resolve(response)};
 }

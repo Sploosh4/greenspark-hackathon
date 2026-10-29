@@ -1,3 +1,4 @@
+import {createAuthSession} from './assets/auth-session.mjs';
 import {DEFAULT_FILTERS,esc,dateLabel,pct,summary,query,prepareQuery,pageRows,explanation,exportRows,days,windowLabel} from './core.mjs';
 const $=s=>document.querySelector(s);
 const fmt=n=>n===null?'Unavailable':Number(n.toFixed(1)).toLocaleString('en-AU');
@@ -11,10 +12,26 @@ let liveWeather=null,liveWeatherError='',liveWeatherGeneration=0;
 let sessionCsrf='',realSession=null;
 let managerSettings=null,settingsError='';
 let uploadJobPending=false,uploadAttemptGeneration=0;
-const preparedSummaries=new WeakMap();let queuePage=0;
+let preparedSummaries=new WeakMap();let queuePage=0;
 const performanceMode=new URLSearchParams(location.search).get('performance_fixture')==='50000',performanceSamples=[];
 let performanceDetailTemplate=null;
 let customerOpenGeneration=0;
+const authSession=createAuthSession({button:$('#sign-out'),fetchImpl:fetch,lifecycle:window,
+  clearData:clearProtectedState,navigate:path=>location.replace(path),reload:()=>location.reload(),
+  onError:message=>{$('#notice').innerHTML=`<div class="toast" role="alert">${esc(message)}</div>`;$('#content').innerHTML='<section class="panel empty">Protected data is hidden. Retry Sign out or reload to check your session.</section>';}
+});
+function clearProtectedState(){
+  customerOpenGeneration++;uploadRefreshGeneration++;liveWeatherGeneration++;uploadAttemptGeneration++;
+  uploadAbort?.abort();uploadAbort=null;uploadOperation=null;uploadBusy=false;uploadJobPending=false;pendingUpload=null;
+  demo=undefined;uploaded=null;selected=null;selectedCustomers.clear();preparedSummaries=new WeakMap();performanceDetailTemplate=null;performanceSamples.length=0;
+  liveWeather=null;liveWeatherError='';managerSettings=null;settingsError='';uploadError='';
+  uploadState={revision:'none',active_batch:null};requestToken='';sessionCsrf='';realSession=null;
+  filters={...DEFAULT_FILTERS};mode='demo';view='review';queuePage=0;
+  const dialog=$('#dialog');if(dialog.open)dialog.close();dialog.innerHTML='';
+  $('#content').setAttribute('aria-busy','false');$('#content').innerHTML='<section class="panel empty">Protected data is hidden.</section>';
+  $('#notice').innerHTML='';$('#performance-metrics').textContent='';$('#mode-description').textContent='';$('#fixture-note').textContent='';$('#mode-controls').hidden=true;
+  document.querySelectorAll('.sidebar nav button').forEach(button=>button.disabled=true);$('#role').disabled=true;document.querySelector('.sidebar-bottom .sub').textContent='Session view closed';
+}
 function measureUI(name,action){
   const start=performance.now();action();
   if(performanceMode)requestAnimationFrame(()=>requestAnimationFrame(()=>{performanceSamples.push({name,seconds:(performance.now()-start)/1000});$('#performance-metrics').textContent=JSON.stringify(performanceSamples);}));
@@ -23,7 +40,7 @@ async function openCustomer(id){
   const start=performance.now(),generation=++customerOpenGeneration,d=data(),row=d.customers.find(r=>r.customer.customer_id===id);
   if(!row){toast('Customer unavailable in this data version');return;}
   if(performanceMode&&!row.detail_loaded){
-    if(!performanceDetailTemplate){const response=await fetch('tests/performance-detail-template.json');if(!response.ok){toast('Performance history fixture unavailable');return;}performanceDetailTemplate=await response.json();}
+    if(!performanceDetailTemplate){const response=await authSession.request('tests/performance-detail-template.json');if(!response.ok){toast('Performance history fixture unavailable');return;}const template=await response.json();if(authSession.isBlocked())return;performanceDetailTemplate=template;}
     row.usage=performanceDetailTemplate.usage;row.records=performanceDetailTemplate.records;
     const expected=days(d.history_window_start,d.history_cutoff);row.history_coverage={available_days:row.usage.length,expected_days:expected,missing_days:expected-row.usage.length,status:'partial'};
     row.financial=Number(id.slice(-2))%3?[]:[{kind:'Bill issued',date:'2024-10-30',amount:42.5,source:'performance_fixture'}];row.detail_loaded=true;
@@ -33,9 +50,10 @@ async function openCustomer(id){
   if(performanceMode)requestAnimationFrame(()=>requestAnimationFrame(()=>{performanceSamples.push({name:'detail',seconds:(performance.now()-start)/1000});$('#performance-metrics').textContent=JSON.stringify(performanceSamples);}));
 }
 const data=()=>mode==='demo'?demo:uploaded;
-function toast(s){$('#notice').innerHTML=s?`<div class="toast">${esc(s)}</div>`:'';}
+function toast(s){if(authSession.isBlocked())return;$('#notice').innerHTML=s?`<div class="toast">${esc(s)}</div>`:'';}
 function setView(v){customerOpenGeneration++;view=v;selected=null;toast('');render();}
 function render(){
+  if(authSession.isBlocked())return;
   const d=data();
   for(const id of ['nav-review','nav-live','nav-upload'])$('#'+id).disabled=false;
   $('#role').disabled=!!realSession;
@@ -68,6 +86,7 @@ function renderQueue(d){
   renderResults(d);
 }
 function renderResults(d){
+  if(authSession.isBlocked())return;
   if(!preparedSummaries.has(d))preparedSummaries.set(d,prepareQuery(d));
   const rows=previewState==='normal'?query(d,filters,preparedSummaries.get(d)):[];
   const page=pageRows(rows,queuePage);queuePage=page.page;const visible=page.rows;
@@ -90,7 +109,7 @@ function reset(){queuePage=0;selectedCustomers.clear();filters={...DEFAULT_FILTE
 async function loadLiveWeather(){
   const generation=++liveWeatherGeneration;liveWeatherError='';
   try{
-    const r=await fetch('api/live-weather?mode='+encodeURIComponent(mode));const value=await r.json();
+    const r=await authSession.request('api/live-weather?mode='+encodeURIComponent(mode));const value=await r.json();
     if(generation!==liveWeatherGeneration)return;
     if(!r.ok)throw Error(value.error||'Current weather unavailable');liveWeather=value;
   }catch(error){if(generation!==liveWeatherGeneration)return;liveWeatherError=error.message;liveWeather=null;}
@@ -107,6 +126,7 @@ function weatherScheduleMarkup(schedule={}){
   return `<section class="panel pad" aria-label="Automatic weather updates"><div class="event-head"><h2>Automatic weather updates</h2>${badge(state,enabled?'good':'')}</div>${dl([['Daily check',esc(schedule.daily_time||'06:00')+' · Australia/Perth (UTC+08:00)'],['Next check',esc(weatherTimeLabel(schedule.next_run_at))+' Perth'],['Last check',esc(weatherTimeLabel(schedule.last_attempt_at))],['Last result',esc(outcome)]])}${schedule.configuration_sync_warning?'<p class="notice">Settings were saved, but their disk sync could not be confirmed.</p>':''}${schedule.state_persisted===false?'<p class="notice">Schedule status could not be saved. This running service retains the next check.</p>':''}<p class="sub">Runs while the local service is running. Failed downloads retry after 15 minutes. Business files are replaced separately through Upload data.</p></section>`;
 }
 function renderLiveWeather(){
+  if(authSession.isBlocked())return;
   const d=liveWeather;
   $('#mode-description').textContent=d?`${dateLabel(d.review_date)} review · ${windowLabel(d.horizon_start,d.horizon_end)} · Fitzroy Crossing 6765`:'Fitzroy Crossing 6765';
   $('#fixture-note').textContent='Current forecast context · historical demonstration kept separately';
@@ -119,6 +139,7 @@ function weatherFor(d,e){const w=d.weather.filter(w=>w.date>=e.start&&w.date<=e.
 const dl=rows=>`<dl class="data-list">${rows.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 function recordLabel(r){return r.kind==='Payment recorded'?'<span class="payment-record"><span aria-hidden="true">✓</span> Payment recorded</span>':esc(r.kind);}
 function renderDetail(d){
+  if(authSession.isBlocked())return;
   const x=summary(d.customers.find(r=>r.customer.customer_id===selected),d),c=x.customer;
   const missingFinancial=!x.row.financial.length;
   const missingText=c.prepayment_meter==='True'?'No prepaid balance records were supplied. The current credit cannot be checked from this data.':'No bill records were supplied. The amount owed cannot be checked from this data.';
@@ -134,7 +155,7 @@ async function downloadSummary(ids,button,format='detailed'){
   const snapshot=data(),exportMode=mode,revision=snapshot.batch_revision;
   const label=button.textContent;button.disabled=true;button.textContent='Creating PDF…';
   try{
-    const response=await fetch('api/customer-summary.pdf',{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify({customer_ids:ids,mode:exportMode,batch_revision:revision,format})});
+    const response=await authSession.request('api/customer-summary.pdf',{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify({customer_ids:ids,mode:exportMode,batch_revision:revision,format})});
     if(!response.ok)throw Error((await response.json()).error||'PDF unavailable');
     if(response.headers.get('Content-Type')!=='application/pdf')throw Error('PDF unavailable');
     const body=new Uint8Array(await response.arrayBuffer());
@@ -166,20 +187,20 @@ function timeline(x,d){
   return `<div class="timeline-layout"><div class="recorded-timeline"><div class="timeline-scroll" tabindex="0" aria-label="Recorded timeline; scroll horizontally on small screens"><svg class="timeline-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Recorded daily electricity use and highest and lowest temperature through ${dateLabel(end)}. Numbered markers identify the account dates listed below."><text x="${left}" y="15">Electricity from the grid · kWh each day</text>${shades}${[0,.5,1].map(f=>`<line x1="${left}" x2="${W-right}" y1="${yval(max*f)}" y2="${yval(max*f)}" stroke="#e2e9e9"/><text x="${left-8}" y="${yval(max*f)+4}" text-anchor="end">${fmt(max*f)}</text>`).join('')}<path d="${path(u,r=>+r.import_kwh,yval)}" stroke="#317b76" stroke-width="2" fill="none"/><text x="${left}" y="162">Account dates</text><line x1="${left}" x2="${W-right}" y1="180" y2="180" stroke="#edf0ed"/>${marks}<text x="${left}" y="227">Recorded temperature · °C</text>${[20,30,40].map(n=>`<line x1="${left}" x2="${W-right}" y1="${320-(n-10)*2.5}" y2="${320-(n-10)*2.5}" stroke="#e2e9e9"/><text x="${left-8}" y="${324-(n-10)*2.5}" text-anchor="end">${n}</text>`).join('')}<path d="${path(w,r=>+r.max_temp,n=>320-(n-10)*2.5)}" stroke="#b58d48" stroke-width="1.5" fill="none"/><path d="${path(w,r=>+r.min_temp,n=>320-(n-10)*2.5)}" stroke="#91aaa6" stroke-width="1.5" fill="none"/>${episodes.map(e=>{const hw=w.filter(r=>r.date>=e.start&&r.date<=e.end);return `<path d="${path(hw,r=>+r.max_temp,n=>320-(n-10)*2.5)}" stroke="#b63732" stroke-width="2.5" stroke-dasharray="5 2" fill="none"/><path d="${path(hw,r=>+r.min_temp,n=>320-(n-10)*2.5)}" stroke="#b63732" stroke-width="2.5" stroke-dasharray="5 2" fill="none"/>`;}).join('')}${tickDates.map((s,i)=>`<text x="${xpos(s)}" y="340" text-anchor="${i===0?'start':i===3?'end':'middle'}">${dateLabel(s)}</text>`).join('')}</svg></div>${useLegend}${records.length>3?`<details class="chart-records"><summary>${records.length} account dates on the chart</summary>${recordKey}</details>`:recordKey}</div><aside class="upcoming-preview" aria-label="Next seven days demo estimates"><h3>Next 7 days</h3><p>${windowLabel(d.horizon_start,d.horizon_end)} · ${x.calculated?'estimated grid use':'demo estimates'}</p>${upcoming||'<div class="sub">No heat period detected in this replay window.</div>'}</aside></div>`;
 }
 async function postJson(path,body){
-  const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify(body)});
-  const value=await r.json();if(!r.ok)throw Error(value.error||'The local operation failed');return value;
+  const r=await authSession.request(path,{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify(body)});
+  const value=await r.json();if(authSession.isBlocked())throw Error('Session view is closed');if(!r.ok)throw Error(value.error||'The local operation failed');return value;
 }
 async function refreshUploaded(){
   const generation=++uploadRefreshGeneration;
   try{
-    const response=await fetch('api/state');if(generation!==uploadRefreshGeneration)return;
+    const response=await authSession.request('api/state');if(generation!==uploadRefreshGeneration)return;
     if(!response.ok)throw Error('Could not reload upload status');
     const state=await response.json();if(generation!==uploadRefreshGeneration)return;
     uploadState=state;requestToken=state.request_token;
     if(state.active_batch&&uploaded?.batch_id===state.active_batch&&uploaded.batch_revision===state.revision)return;
     uploaded=null;
     if(state.active_batch){
-      const r=await fetch('api/review?mode=upload&revision='+encodeURIComponent(state.revision));
+      const r=await authSession.request('api/review?mode=upload&revision='+encodeURIComponent(state.revision));
       const value=await r.json();if(generation!==uploadRefreshGeneration)return;
       if(!r.ok)throw Error(value.error||'Uploaded data changed');
       if(value.batch_id!==state.active_batch||value.batch_revision!==state.revision)throw Error('Uploaded data changed. Reload the current batch.');
@@ -190,7 +211,7 @@ async function refreshUploaded(){
 async function downloadFiltered(d,button){
   const exportMode=mode,revision=d.batch_revision;button.disabled=true;
   try{
-    const r=await fetch('api/export.csv',{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify({mode:exportMode,batch_revision:revision,customer_ids:query(d,filters).map(x=>x.customer.customer_id)})});
+    const r=await authSession.request('api/export.csv',{method:'POST',headers:{'Content-Type':'application/json','X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:JSON.stringify({mode:exportMode,batch_revision:revision,customer_ids:query(d,filters).map(x=>x.customer.customer_id)})});
     if(!r.ok)throw Error((await r.json()).error||'CSV unavailable');
     const body=new Uint8Array(await r.arrayBuffer());
     if(mode!==exportMode||data()?.batch_revision!==revision)throw Error('The data mode or version changed while the CSV was created. Download again from the current review.');
@@ -198,6 +219,7 @@ async function downloadFiltered(d,button){
   }catch(error){toast(error.message);}finally{button.disabled=false;}
 }
 function renderUpload(){
+  if(authSession.isBlocked())return;
   const active=uploadState.summary;
   $('#content').innerHTML=`<section class="panel pad flow"><h2>Replace uploaded data</h2><p>Choose the complete twelve-file batch of synthetic business data. Files are checked and the review is calculated before you confirm replacement. The preloaded demonstration stays available.</p>${uploadState.recovery?`<div class="missing-data" role="status">${esc(uploadState.recovery)}</div>`:''}<div class="upload-current"><strong>${active?'Current uploaded batch · '+uploadState.revision.slice(0,8):'No uploaded batch yet'}</strong><span class="sub">${active?active.review_customers+' review customer'+(active.review_customers===1?'':'s')+' · '+active.total_rows.toLocaleString()+' source rows':'Fitzroy Crossing 6765 · historical review on 2 Nov 2024'}</span></div><div class="upload-box"><label for="upload-files"><strong>Choose twelve business files</strong></label><input id="upload-files" type="file" multiple accept=".csv,.gz" ${uploadBusy||uploadJobPending?'disabled':''}><span id="file-count" class="sub">CSV and the existing consumption CSV.GZ · 64 MiB total limit</span><div class="upload-actions"><button class="primary" id="check-upload" disabled>${uploadBusy?'Uploading, checking and calculating…':'Check selected files'}</button>${uploadBusy||uploadJobPending?'<button class="secondary" id="cancel-upload">Cancel upload</button>':''}${uploadJobPending&&!uploadBusy?'<button class="secondary" id="resume-upload">Resume file checks</button>':''}</div></div>${uploadError?`<div class="upload-error" role="alert">${esc(uploadError)}</div>`:''}${pendingUpload?`<div class="upload-state"><h3>Checked and ready for confirmation</h3><div>${pendingUpload.summary.review_customers} customer${pendingUpload.summary.review_customers===1?'':'s'} in the review · ${pendingUpload.summary.events} heat period${pendingUpload.summary.events===1?'':'s'}</div><div class="sub">${pendingUpload.summary.total_rows.toLocaleString()} source rows · 2 Nov 2024 · the current estimate method and historical weather are retained</div><details class="checked-files"><summary>Twelve checked files</summary><ul>${pendingUpload.summary.files.map(f=>`<li>${esc(f.file.split('/').pop())} · ${f.rows.toLocaleString()} rows</li>`).join('')}</ul></details><div class="upload-actions"><button class="primary" id="replace">Review replacement</button><button class="secondary" id="discard-upload">Discard checked files</button></div></div>`:''}<div class="upload-actions recovery-actions"><button class="secondary" id="reload-upload" ${uploadBusy||uploadJobPending?'disabled':''}>Reload upload status</button>${uploadState.previous_available?'<button class="secondary" id="restore-upload">Restore previous uploaded batch</button>':''}</div><details class="checked-files"><summary>Required filenames</summary><ul>${(uploadState.filenames??[]).map(n=>`<li>${esc(n)}</li>`).join('')}</ul></details><p class="sub">${realSession?'Signed-in Q1 instance; server permissions apply.':'One local synthetic-data instance. Role controls remain a visual preview.'}</p></section>`;
   $('#upload-files').onchange=()=>{const count=$('#upload-files').files.length;$('#file-count').textContent=count+' files selected';$('#check-upload').disabled=uploadBusy||uploadJobPending||count!==12;};
@@ -225,7 +247,7 @@ async function stageUpload(){
   try{
     if(previous)await postJson('api/uploads/cancel',{request_id:previous.stage_id});
     if(uploadOperation!==operation)return;
-    const r=await fetch('api/uploads/stage',{method:'POST',headers:{'X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:form,signal:controller.signal});
+    const r=await authSession.request('api/uploads/stage',{method:'POST',headers:{'X-Q1-Request-Token':requestToken,'X-Team-Connect-CSRF':sessionCsrf},body:form,signal:controller.signal});
     const result=await r.json();if(uploadOperation!==operation||uploadAttemptGeneration!==attempt)return;
     if(!r.ok){if(r.status<500)uploadJobPending=false;throw Error(result.error||'Files could not be checked');}
     const receipt=r.status===202?await waitForUploadJob(result,controller.signal):result;
@@ -239,7 +261,7 @@ async function waitForUploadJob(initial,signal){
     if(signal.aborted)throw new DOMException('Upload cancelled','AbortError');
     if(performance.now()>=deadline)throw Error('Checking timed out. The current batch was kept; resume file checks or cancel before retrying.');
     await new Promise(resolve=>setTimeout(resolve,250));
-    const response=await fetch('api/uploads/status?request_id='+encodeURIComponent(job.request_id),{signal:AbortSignal.any([signal,AbortSignal.timeout(5000)])});
+    const response=await authSession.request('api/uploads/status?request_id='+encodeURIComponent(job.request_id),{signal:AbortSignal.any([signal,AbortSignal.timeout(5000)])});
     const value=await response.json();if(!response.ok)throw Error(value.error||'Upload status unavailable');job=value;
   }
   if(job.state!=='ready'){const error=Error(job.error||'Upload '+job.state);error.uploadJobState=job.state;throw error;}
@@ -249,7 +271,7 @@ async function resumeUploadJob(){
   if(uploadBusy||!uploadOperation)return;
   const operation=uploadOperation,attempt=++uploadAttemptGeneration,controller=new AbortController();uploadAbort=controller;uploadBusy=true;uploadError='';renderUpload();
   try{
-    const response=await fetch('api/uploads/status?request_id='+encodeURIComponent(operation),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(5000)])});
+    const response=await authSession.request('api/uploads/status?request_id='+encodeURIComponent(operation),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(5000)])});
     const job=await response.json();
     if(uploadOperation!==operation||uploadAttemptGeneration!==attempt)return;
     if(!response.ok){if(response.status===404){uploadOperation=null;uploadJobPending=false;}throw Error(job.error||'Upload status unavailable');}
@@ -260,6 +282,7 @@ async function resumeUploadJob(){
   finally{if(uploadAttemptGeneration===attempt){uploadBusy=false;if(view==='upload')renderUpload();}}
 }
 function showReplaceDialog(restore=false){
+  if(authSession.isBlocked())return;
   const dialog=$('#dialog');
   dialog.innerHTML=`<h2 id="dialog-title">${restore?'Restore the previous uploaded batch?':'Replace uploaded data?'}</h2><p>${restore?'The previous validated batch will become the uploaded review.':'The twelve checked files and their calculated review will replace the current uploaded batch.'} The preloaded demonstration stays available.</p><p>${restore?'The current batch will remain recoverable.':(pendingUpload?.summary.review_customers??0)+' customer'+(pendingUpload?.summary.review_customers===1?'':'s')+' · historical review on 2 Nov 2024. '+(uploadState.active_batch?'The previous uploaded batch remains recoverable.':'This is the first uploaded batch.')}</p><div class="dialog-actions"><button class="secondary" id="cancel-replace">Cancel</button><button class="primary" id="confirm-replace">${restore?'Restore previous batch':'Replace uploaded data'}</button></div>`;
   dialog.showModal();$('#cancel-replace').onclick=()=>dialog.close();
@@ -272,31 +295,32 @@ function showReplaceDialog(restore=false){
   };
 }
 function renderSettings(){
+  if(authSession.isBlocked())return;
   if(role!=='Manager'){view='review';render();return;}
   if(realSession){
     if(!managerSettings){$('#content').innerHTML=`<section class="panel empty">${esc(settingsError||'Loading instance settings…')}</section>`;return;}
     $('#content').innerHTML=`<section class="panel pad flow"><h2>Instance settings</h2><label class="form-field">Default opening mode<select id="opening"><option value="demo">Preloaded demonstration</option><option value="upload">Uploaded data</option></select></label><label class="form-field">Daily public-weather check<input id="weather-time" type="time" value="${esc(managerSettings.weather_time)}" required></label><p class="sub">Australia/Perth (UTC+08:00). Current saved weather is reused; otherwise the app downloads a fresh public forecast. Business uploads stay manual.</p><button id="save-settings" class="primary">Save settings</button></section>`;
     $('#opening').value=managerSettings.opening_mode;
-    $('#save-settings').onclick=async()=>{const button=$('#save-settings');button.disabled=true;try{managerSettings=await postJson('api/settings',{opening_mode:$('#opening').value,weather_time:$('#weather-time').value});toast('Instance settings saved.');}catch(error){toast(error.message);}finally{button.disabled=false;}};return;
+    $('#save-settings').onclick=async()=>{const button=$('#save-settings');button.disabled=true;try{const next=await postJson('api/settings',{opening_mode:$('#opening').value,weather_time:$('#weather-time').value});if(authSession.isBlocked())return;managerSettings=next;toast('Instance settings saved.');}catch(error){toast(error.message);}finally{button.disabled=false;}};return;
   }
   $('#content').innerHTML=`<section class="panel pad flow"><div class="role-info">${badge('Manager','good')}<span class="sub">Instance settings preview</span></div><h2>Access and data</h2><div class="table-wrap"><table class="role-table"><thead><tr><th>Capability</th><th>Officer</th><th>Manager</th></tr></thead><tbody><tr><td>Review customers and download review data</td><td>Available</td><td>Available</td></tr><tr><td>Upload and replace this instance’s data</td><td>Available</td><td>Available</td></tr><tr><td>Manage settings</td><td>Unavailable</td><td>Available</td></tr></tbody></table></div><label class="form-field">Default opening mode<select id="opening"><option>Preloaded demonstration</option><option>Uploaded data preview</option></select></label><button class="primary" id="save-settings">Preview save</button><hr class="divider"><p>Each instance is intended to keep its data isolated. Roles and settings here are visual previews held in this page only. Authentication and multi-user permissions are not connected. This milestone runs one local synthetic instance.</p></section>`;
   $('#save-settings').onclick=()=>toast('Settings interaction previewed. No account or permission changes were made.');
 }
 async function loadSettings(){
   settingsError='';
-  try{const response=await fetch('api/settings'),value=await response.json();if(!response.ok)throw Error(value.error||'Settings unavailable');managerSettings=value;}
+  try{const response=await authSession.request('api/settings'),value=await response.json();if(authSession.isBlocked())return;if(!response.ok)throw Error(value.error||'Settings unavailable');managerSettings=value;}
   catch(error){managerSettings=null;settingsError=error.message;}
   if(view==='settings')render();
 }
-function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function download(name,body,type){if(authSession.isBlocked())return;const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('#nav-review').onclick=()=>setView('review');$('#nav-upload').onclick=()=>setView('upload');$('#nav-settings').onclick=()=>{setView('settings');if(realSession)loadSettings();};
 $('#nav-live').onclick=()=>{liveWeather=null;liveWeatherError='';setView('live');loadLiveWeather();};
 $('#role').onchange=e=>{toast('');role=e.target.value;if(role==='Officer'&&view==='settings')view='review';render();};
 $('#mode').onchange=async e=>{selectedCustomers.clear();mode=e.target.value;view='review';selected=null;toast('');try{if(mode==='upload')await refreshUploaded();render();}catch(error){toast(error.message);}};
 try{
- const session=await fetch('api/session');
- if(session.status===401){location.assign('/auth/login');throw Error('Sign-in required');}
- if(!session.ok)throw Error('Local session unavailable');const account=await session.json();
- if(account.authenticated){realSession=account;sessionCsrf=account.csrf_token;role=account.role==='manager'?'Manager':'Officer';$('#role').value=role;$('#role').disabled=true;document.querySelector('.sidebar-bottom .sub').textContent='Signed in · '+role;}
- const response=await fetch(performanceMode?'tests/performance-review-50k.json':'api/review');if(!response.ok)throw Error('Review inputs unavailable');demo=await response.json();if(performanceMode)demo.performance_fixture=true;await refreshUploaded();if(realSession&&uploadState.opening_mode==='upload'&&!performanceMode)mode='upload';render();requestAnimationFrame(()=>requestAnimationFrame(()=>{$('#content').dataset.readyMs=String(performance.now());}));
-}catch(error){ $('#content').setAttribute('aria-busy','false');$('#content').innerHTML='<div class="panel empty" role="alert"><strong>Couldn’t load the calculated review</strong><p>'+esc(error.message)+'</p><button class="secondary" id="reload">Retry</button></div>';$('#reload').onclick=()=>location.reload();}
+ const session=await authSession.request('api/session');
+ if(session.status===401){location.replace('/auth/login');throw Error('Sign-in required');}
+ if(!session.ok)throw Error('Local session unavailable');const account=await session.json();if(authSession.isBlocked())throw Error('Session view is closed');
+ if(account.authenticated){authSession.activate(account.csrf_token);realSession=account;sessionCsrf=account.csrf_token;role=account.role==='manager'?'Manager':'Officer';$('#role').value=role;$('#role').disabled=true;document.querySelector('.sidebar-bottom .sub').textContent='Signed in · '+role;}
+ const response=await authSession.request(performanceMode?'tests/performance-review-50k.json':'api/review');if(!response.ok)throw Error('Review inputs unavailable');const initialReview=await response.json();if(authSession.isBlocked())throw Error('Session view is closed');demo=initialReview;if(performanceMode)demo.performance_fixture=true;await refreshUploaded();if(authSession.isBlocked())throw Error('Session view is closed');if(realSession&&uploadState.opening_mode==='upload'&&!performanceMode)mode='upload';render();requestAnimationFrame(()=>requestAnimationFrame(()=>{$('#content').dataset.readyMs=String(performance.now());}));
+}catch(error){ if(!authSession.isBlocked()){ $('#content').setAttribute('aria-busy','false');$('#content').innerHTML='<div class="panel empty" role="alert"><strong>Couldn’t load the calculated review</strong><p>'+esc(error.message)+'</p><button class="secondary" id="reload">Retry</button></div>';$('#reload').onclick=()=>location.reload();}}

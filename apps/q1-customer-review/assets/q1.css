@@ -44,3 +44,4 @@
 .review-table{table-layout:fixed}.review-table td,.review-table td small,.event-cell span,.detail-top .sub{overflow-wrap:anywhere}.event-cell span{min-width:0}
 
 .upload-current{display:grid;gap:5px;margin:18px 0}.upload-box input{display:block;margin:18px auto;width:100%;max-width:500px}.upload-box #file-count{display:block}.upload-error{border:1px solid #d8abab;background:#fbefef;color:#7c2929;padding:15px;border-radius:4px;overflow-wrap:anywhere}.checked-files{margin:18px 0;font-size:12px;line-height:1.7}.checked-files summary{cursor:pointer;color:var(--teal)}.checked-files ul{padding-left:22px}.recovery-actions{justify-content:flex-start;flex-wrap:wrap}
+@media(max-width:820px){.sidebar-bottom{flex-wrap:wrap}}

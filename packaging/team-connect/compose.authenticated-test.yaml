@@ -1,0 +1,8 @@
+# Own test names only; never bind native ports on the host.
+services:
+  q1:
+    container_name: tc-q1-authenticated-check
+    ports: !reset []
+  q3:
+    container_name: tc-q3-authenticated-check
+    ports: !reset []

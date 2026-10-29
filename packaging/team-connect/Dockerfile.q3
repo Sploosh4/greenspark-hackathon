@@ -3,7 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 HOME=/tmp
 WORKDIR /app
 COPY app/ /app/
 COPY runtime/ /opt/runtime/
-RUN mkdir -p /state && chown 10002:10002 /state && chmod 700 /state
+RUN mkdir -p /state && chown 10002:10002 /state && chmod 700 /state && mkdir /identity && chown 10002:10002 /identity && chmod 700 /identity
 USER 10002:10002
 EXPOSE 8797
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD ["python", "/opt/runtime/healthcheck.py", "8797", "q3"]

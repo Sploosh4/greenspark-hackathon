@@ -1,4 +1,11 @@
 {
+  "authenticated_packaging": {
+    "auth_overlay_contexts": "build/q1 and build/q3; base preview flag defaults closed, authenticated overlay resets preview environment",
+    "native_service_wrappers_or_provisioning_included": false,
+    "private_identity_matches_independent_review": true,
+    "running_containers_or_live_accounts_tested_by_publication_worker": false,
+    "runtime_source_unchanged_during_capture": true
+  },
   "changed_after_import": [
     "apps/q1-customer-review/prepare_review.py",
     "apps/q1-customer-review/prototype/inputs.py",
@@ -10,7 +17,9 @@
     "apps/q3-community-planning/server/map_proxy.py",
     "apps/q3-community-planning/tests/test_climate_refresh.py",
     "apps/q3-community-planning/tests/test_financial_http.py",
-    "apps/q3-community-planning/tests/test_financial_intake.py"
+    "apps/q3-community-planning/tests/test_financial_intake.py",
+    "packaging/team-connect/compose.authenticated.yaml",
+    "packaging/team-connect/tests/test_private_identity.py"
   ],
   "files": {
     "apps/q1-customer-review/LICENSE": {
@@ -18,8 +27,10 @@
       "published_sha256": "b6610de7a629350f2cbeed566fd83730b7690b0416829f56c167037168078c26"
     },
     "apps/q1-customer-review/app.mjs": {
-      "owner_sha256": "f8385931c269526a4c68bc73d9a5c1bbd8ed47f95eabbbc8b3d289c3849f282c",
-      "published_sha256": "f8385931c269526a4c68bc73d9a5c1bbd8ed47f95eabbbc8b3d289c3849f282c"
+      "base_291_sha256": "f8385931c269526a4c68bc73d9a5c1bbd8ed47f95eabbbc8b3d289c3849f282c",
+      "owner_sha256": "a441bd21b3ca8fc7b52d924b2c939c576d45965a578f68f702293a5d20033000",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "a441bd21b3ca8fc7b52d924b2c939c576d45965a578f68f702293a5d20033000"
     },
     "apps/q1-customer-review/assets/auth-login.html": {
       "owner_sha256": "66a6db076428dc354502eea8db0ce6ddb7d1240d4b5c1daa7496686bb34942bd",
@@ -29,13 +40,20 @@
       "owner_sha256": "844eed41493025b5ca3a410bd253fbc6f5d3c3dda1c81cecaa20ddeba61eb1ef",
       "published_sha256": "844eed41493025b5ca3a410bd253fbc6f5d3c3dda1c81cecaa20ddeba61eb1ef"
     },
+    "apps/q1-customer-review/assets/auth-session.mjs": {
+      "owner_sha256": "f93b371c57b6f6fb86ecdc6e5ed811cee1e4647ded4511f5ac2a5aa7eefd83f0",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "f93b371c57b6f6fb86ecdc6e5ed811cee1e4647ded4511f5ac2a5aa7eefd83f0"
+    },
     "apps/q1-customer-review/assets/demo-styles.css": {
       "owner_sha256": "ba7a41d9cddc2f5a23f203f531d4564c689c1cec53d74862de447605aef82443",
       "published_sha256": "ba7a41d9cddc2f5a23f203f531d4564c689c1cec53d74862de447605aef82443"
     },
     "apps/q1-customer-review/assets/q1.css": {
-      "owner_sha256": "731355d0a8873218078450a657da115f0f74405cb1abdce9a3d3346a6499f992",
-      "published_sha256": "731355d0a8873218078450a657da115f0f74405cb1abdce9a3d3346a6499f992"
+      "base_291_sha256": "731355d0a8873218078450a657da115f0f74405cb1abdce9a3d3346a6499f992",
+      "owner_sha256": "688221949754f45dabcd72eb56c11114bdc47c5dc6a0a925e04ca518e6ec7a2f",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "688221949754f45dabcd72eb56c11114bdc47c5dc6a0a925e04ca518e6ec7a2f"
     },
     "apps/q1-customer-review/assets/review-fixture.json": {
       "owner_sha256": "9666d5d98ed21946329b36aa04bb951f58743b8320e25d05ee70378d1a9e0bad",
@@ -54,8 +72,10 @@
       "published_sha256": "f6e43c34a1688d183a6811d0d422e7efab58a7c509e559f4878fd50396496d3b"
     },
     "apps/q1-customer-review/index.html": {
-      "owner_sha256": "ab9edfae897793a49a8a8b3129471abcffa946eb2768ad55b16a66bb9779a8d8",
-      "published_sha256": "ab9edfae897793a49a8a8b3129471abcffa946eb2768ad55b16a66bb9779a8d8"
+      "base_291_sha256": "ab9edfae897793a49a8a8b3129471abcffa946eb2768ad55b16a66bb9779a8d8",
+      "owner_sha256": "70d2c0d9dfe75cdabcc89d8ac7a09867c62e348ce63f7e89db6e6a726e07c40d",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "70d2c0d9dfe75cdabcc89d8ac7a09867c62e348ce63f7e89db6e6a726e07c40d"
     },
     "apps/q1-customer-review/pdf_export.py": {
       "owner_sha256": "55e3e36f02bb09f066f93ad779cf1e55a494b7e1dcf618a53c5b60b92fc62c9b",
@@ -102,8 +122,10 @@
       "published_sha256": "511ee0fcfeb71189262a77c7a253ed8b094a8b5edc9085c06ee2396541856cc7"
     },
     "apps/q1-customer-review/prototype/review.py": {
-      "owner_sha256": "5c7f6989313b8ca62ba45d9ddc4ac79a9eb9bde9de26449ac68ccb93f3dcb60e",
-      "published_sha256": "5c7f6989313b8ca62ba45d9ddc4ac79a9eb9bde9de26449ac68ccb93f3dcb60e"
+      "base_291_sha256": "5c7f6989313b8ca62ba45d9ddc4ac79a9eb9bde9de26449ac68ccb93f3dcb60e",
+      "owner_sha256": "db10ed1f986f86c916de75696618c032a3ae4cc7e96e0d0b66fc1b4f3e45ab5d",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "db10ed1f986f86c916de75696618c032a3ae4cc7e96e0d0b66fc1b4f3e45ab5d"
     },
     "apps/q1-customer-review/prototype/uploads.py": {
       "owner_sha256": "467d254cdecb9eae6b522aa0965bbd0512a33962ab369549b0f897904dce487f",
@@ -166,8 +188,10 @@
       "published_sha256": "0f228da2514a7851b224ed95f5dc7974db4e6d2438ca9b7593068815aa130d15"
     },
     "apps/q1-customer-review/tests/downloads.test.mjs": {
-      "owner_sha256": "0e09df945357cc9f38b14d78704711bc4967fb3bacb99ee0deb579547b366345",
-      "published_sha256": "0e09df945357cc9f38b14d78704711bc4967fb3bacb99ee0deb579547b366345"
+      "base_291_sha256": "0e09df945357cc9f38b14d78704711bc4967fb3bacb99ee0deb579547b366345",
+      "owner_sha256": "f6bbf2ad1dc6514a567093c6daed20210000853eaf0b88f79561c3001f6ee3a4",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "f6bbf2ad1dc6514a567093c6daed20210000853eaf0b88f79561c3001f6ee3a4"
     },
     "apps/q1-customer-review/tests/financial-missing.test.mjs": {
       "owner_sha256": "82d9826f1ae474cccf17f01483a4342527acd26794255efc84736305ec08cc29",
@@ -181,9 +205,16 @@
       "owner_sha256": "64b69c04f3a31f6ed4d40410e143ee62e729eab09d798bec34c40f393d5010c7",
       "published_sha256": "64b69c04f3a31f6ed4d40410e143ee62e729eab09d798bec34c40f393d5010c7"
     },
+    "apps/q1-customer-review/tests/signout.test.mjs": {
+      "owner_sha256": "4145f2d34c7010e9a3e110d09db8736d8f0a5e07bb8f2f18441829b8c07de706",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "4145f2d34c7010e9a3e110d09db8736d8f0a5e07bb8f2f18441829b8c07de706"
+    },
     "apps/q1-customer-review/tests/test_auth_handler.py": {
-      "owner_sha256": "a95f21aabbac5216541f6170e9d2ef26544cabd31e0192f6044b07656795ab14",
-      "published_sha256": "a95f21aabbac5216541f6170e9d2ef26544cabd31e0192f6044b07656795ab14"
+      "base_291_sha256": "a95f21aabbac5216541f6170e9d2ef26544cabd31e0192f6044b07656795ab14",
+      "owner_sha256": "193d9f9315f95b61aee76ebbf4be173a04120dca2aeaabd9db61dad79d06bdd6",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "193d9f9315f95b61aee76ebbf4be173a04120dca2aeaabd9db61dad79d06bdd6"
     },
     "apps/q1-customer-review/tests/test_export_handler.py": {
       "owner_sha256": "d6c9cba2ebd52c72dafd323a770183577ba0cbfed33f25af8a2736ef22d34912",
@@ -242,12 +273,16 @@
       "published_sha256": "cb0500af9d6b1e92a209de6343dac1187352db802f769243fbe62fed99fbe3f7"
     },
     "apps/q1-customer-review/tests/upload-job-client.test.mjs": {
-      "owner_sha256": "6a5c4a67e9002c5f8777009549a1b49da969144863e58cb5f1c488dffa170dfe",
-      "published_sha256": "6a5c4a67e9002c5f8777009549a1b49da969144863e58cb5f1c488dffa170dfe"
+      "base_291_sha256": "6a5c4a67e9002c5f8777009549a1b49da969144863e58cb5f1c488dffa170dfe",
+      "owner_sha256": "2230c51806bbf7bc6bf042a87f760662b3b525f3caa9dfd1b2bd67b827359a46",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "2230c51806bbf7bc6bf042a87f760662b3b525f3caa9dfd1b2bd67b827359a46"
     },
     "apps/q1-customer-review/tests/upload-refresh.test.mjs": {
-      "owner_sha256": "e077573c5f43ba44e69c3f88d7dabc5f9f755e6eb79144d892f0e531ef740d9d",
-      "published_sha256": "e077573c5f43ba44e69c3f88d7dabc5f9f755e6eb79144d892f0e531ef740d9d"
+      "base_291_sha256": "e077573c5f43ba44e69c3f88d7dabc5f9f755e6eb79144d892f0e531ef740d9d",
+      "owner_sha256": "49133435f4176d569dc4792902001a6ea04fdc890268bf828c2582651200869a",
+      "owner_source": "Reviewed Q1 Sign out patch d83e19778fc51ebd",
+      "published_sha256": "49133435f4176d569dc4792902001a6ea04fdc890268bf828c2582651200869a"
     },
     "apps/q1-customer-review/tests/weather-schedule.test.mjs": {
       "owner_sha256": "ca8ee66e24f31e5894dd104c994546e61a6807a4f3318be38e17b406e8ae72dd",
@@ -618,12 +653,24 @@
       "published_sha256": "c978e7948de85fa26a18a222fb9bb0004b8ee224eb451334fd9a24dd2a815f65"
     },
     "packaging/team-connect/Dockerfile.q1": {
-      "owner_sha256": "bb4c6e46ab1287e58b900c07e7662a3384c1cadade4cade75d0be3fb44de1f35",
-      "published_sha256": "bb4c6e46ab1287e58b900c07e7662a3384c1cadade4cade75d0be3fb44de1f35"
+      "owner_sha256": "809f9ac65179c22b0467d5455d4eb2a722a8034f1a42a3bd2ce06e4092664e3a",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "809f9ac65179c22b0467d5455d4eb2a722a8034f1a42a3bd2ce06e4092664e3a"
     },
     "packaging/team-connect/Dockerfile.q3": {
-      "owner_sha256": "ec56071ffa098185be8b422fd16e2bd96db9837ea925197c80392959724139ce",
-      "published_sha256": "ec56071ffa098185be8b422fd16e2bd96db9837ea925197c80392959724139ce"
+      "owner_sha256": "33c1c402f818b136f255feffaa5b83e819915567c8704133616d0bc60cda72d7",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "33c1c402f818b136f255feffaa5b83e819915567c8704133616d0bc60cda72d7"
+    },
+    "packaging/team-connect/compose.authenticated-test.yaml": {
+      "owner_sha256": "d2c440217d4e5d52c7562280abf78539082ebfb384e79bbff6769953b8cf06fb",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "d2c440217d4e5d52c7562280abf78539082ebfb384e79bbff6769953b8cf06fb"
+    },
+    "packaging/team-connect/compose.authenticated.yaml": {
+      "owner_sha256": "af404dcc87f795318a00e86aedd2a5e2c68337dab3cb029d10b0475cfba7fda9",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "67609df16936d9746dccd13b2086717a247039387f0e5f08399e0f2a0de22a9a"
     },
     "packaging/team-connect/requirements-q1.txt": {
       "owner_sha256": "6402ce5f212d506600e302606d3eec2f91c97c7b8bfdd5ba08b33c0783b92504",
@@ -633,13 +680,20 @@
       "owner_sha256": "c2f95075f78fb42d6c4f68beaaab33a6613e1b5e7875b08af333bccc77f0775d",
       "published_sha256": "c2f95075f78fb42d6c4f68beaaab33a6613e1b5e7875b08af333bccc77f0775d"
     },
+    "packaging/team-connect/runtime/private_identity.py": {
+      "owner_sha256": "9553d4e92053613403199c33a3890f290d88520da8f881314cf57a32831cd7e1",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "9553d4e92053613403199c33a3890f290d88520da8f881314cf57a32831cd7e1"
+    },
     "packaging/team-connect/runtime/q1_launcher.py": {
-      "owner_sha256": "7dad9659820fac822453120ff18000c3250e3137b0b9b467616732d679480457",
-      "published_sha256": "7dad9659820fac822453120ff18000c3250e3137b0b9b467616732d679480457"
+      "owner_sha256": "2151076dbdff76e4877cbb02063f16adcf2b7ff0b520859c1ed64ea6a6606911",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "2151076dbdff76e4877cbb02063f16adcf2b7ff0b520859c1ed64ea6a6606911"
     },
     "packaging/team-connect/runtime/q3_launcher.py": {
-      "owner_sha256": "3ccc4f19941fff81376bfdf843c864d5cc573f4ab334154cad02970cd0dcc07d",
-      "published_sha256": "3ccc4f19941fff81376bfdf843c864d5cc573f4ab334154cad02970cd0dcc07d"
+      "owner_sha256": "c7c5990ea8ea27ecc6341da794275bedf8acfb77d4ff10996bbf31138847cb84",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "c7c5990ea8ea27ecc6341da794275bedf8acfb77d4ff10996bbf31138847cb84"
     },
     "packaging/team-connect/runtime/support.py": {
       "owner_sha256": "3ed5e1642a1c04269fe4f4e417ef4e4c7eb4228950032950051873c4271628fe",
@@ -648,6 +702,11 @@
     "packaging/team-connect/tests/test_packaging.py": {
       "owner_sha256": "dde54fbb752613b8ef7adcd00601fa22ae74ef2a52fe49f4bbf250cf17849cdb",
       "published_sha256": "dde54fbb752613b8ef7adcd00601fa22ae74ef2a52fe49f4bbf250cf17849cdb"
+    },
+    "packaging/team-connect/tests/test_private_identity.py": {
+      "owner_sha256": "416b4a7a1c09ff25237b36e993073228933f97c092689b0366c31f8a41b9138e",
+      "owner_source": "Checked stable authenticated-container implementation snapshot",
+      "published_sha256": "a5a3c59419db0db83dd2f779998db97261f0a16780febc847179f410f58cefde"
     }
   },
   "formatting_only_changes": [
@@ -658,9 +717,15 @@
   ],
   "q1": {
     "archive_sha256": "4ef515288a6f735aa9d7cee85dae3b75d95419fb344437db8d4f7c4f7250fb82",
+    "published_build": "q1-m1-f993c7564d96bb41",
+    "published_build_note": "Includes the documented portable source/cache defaults; the published fingerprint differs from the owner snapshot.",
+    "published_code_sha256": "f993c7564d96bb412edc2b2fce5dca3b500fa5dd739c26ef308fa53542a04f67",
+    "signout_archive_sha256": "c853623a4f9669d52ef6f0d08332f68ed1e70bf739df25022606062abf140fce",
+    "signout_owner_build": "d83e19778fc51ebd65d2e2eff929d84bd71e322eb67828722b59732d03ca5faf",
+    "signout_patch_sha256": "defa1a6d7c4b783f09a9639d73cf3e5a4f44f1a3734f4b150b9344be210e705a",
     "version": "291739b9a9cf24845a876d46712331f8714b87281adb87e88b8c76dff599d91a"
   },
-  "scope": "Selected application source only; see PUBLICATION.md for exclusions and portability edits. New publication documentation and staging configuration are not owner snapshot files.",
+  "scope": "Selected frozen application and checked runtime source. See PUBLICATION.md for portable defaults and mode configuration. No account stores, secrets, live runtime state or in-flight ML/replay code.",
   "season_ahead": {
     "owner_receipt_sha256": "90875eca1d45acba96d42deab5496eac2def6814991a0517cae581e4148c4cf6",
     "version": "209bce1ae503d91adaf03a17a1034a6bd72c92e05526cbc82357a8cd86935567"
