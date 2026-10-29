@@ -8,7 +8,7 @@ from tests.test_public_weather import NOW,window,normalise,cache
 
 class LiveHandlerTests(unittest.TestCase):
     def test_concurrent_modes_retain_request_local_coverage(self):
-        server=SimpleNamespace(server_port=8891,auth=None,clock=lambda:NOW,public_weather=SimpleNamespace(view=lambda now:window(normalise(cache()),now)),weather_job=SimpleNamespace(status=lambda:{'daily_time':'06:00','timezone':'Australia/Perth'}),live_coverage={},live_coverage_lock=threading.RLock())
+        server=SimpleNamespace(server_port=8891,auth=None,clock=lambda:NOW,public_weather=SimpleNamespace(context_source=lambda:{'snapshot':normalise(cache()),'adapter_loaded_at':NOW.isoformat(),'last_error':None,'snapshot_sha256':'f'*64}),weather_job=SimpleNamespace(status=lambda:{'daily_time':'06:00','timezone':'Australia/Perth'}),live_coverage={},live_coverage_lock=threading.RLock())
         responses={};errors=[]
         def handle(mode):
             try:

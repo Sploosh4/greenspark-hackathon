@@ -24,3 +24,9 @@ packaging/team-connect/build/
 **/.env*
 **/*credentials*
 **/*session-secret*
+**/replay-data/
+handover-assets/
+apps/q1-customer-review/tests/fixtures/
+apps/q1-customer-review/prototype/vendor/frozen_v3/
+**/*.joblib
+**/*.whl

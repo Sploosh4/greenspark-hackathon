@@ -1,0 +1,11 @@
+# Local historical synthetic replay. Supply the separate verified JSON asset.
+# Combine with compose.yaml and compose.authenticated.yaml for authenticated use.
+services:
+  q1:
+    command: [python, /opt/runtime/q1_launcher.py, --app-root, /app, --source-root, /inputs/q1, --runtime-dir, /state/uploads, --listen, 0.0.0.0, --port, '8891', --auth-store, /identity/auth.sqlite3, --replay-snapshot, /replay/cohort.json, --replay-mode, simulated_historical_replay]
+    volumes:
+      - type: bind
+        source: ${Q1_REPLAY_SNAPSHOT:?Set the separately verified historical synthetic replay JSON}
+        target: /replay/cohort.json
+        read_only: true
+        bind: {create_host_path: false}

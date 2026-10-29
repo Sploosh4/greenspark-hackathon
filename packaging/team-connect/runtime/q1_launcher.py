@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 from support import bind_server, health_handler, load_module, require_demo_opt_in
 
 
-def create_server(app_root, source_root, runtime_dir, listen='127.0.0.1', port=8891, weather_source='cache', auth_store=None, session_idle_seconds=1800, session_absolute_seconds=28800):
+def create_server(app_root, source_root, runtime_dir, listen='127.0.0.1', port=8891, weather_source='cache', auth_store=None, session_idle_seconds=1800, session_absolute_seconds=28800, replay_snapshot=None, replay_mode='strict', current_uploads=False, current_python=None):
     app_root, source_root = Path(app_root).resolve(), Path(source_root).resolve()
     sys.path.insert(0, str(app_root))
     module = load_module('q1_container_app', app_root / 'serve.py')
@@ -25,7 +25,26 @@ def create_server(app_root, source_root, runtime_dir, listen='127.0.0.1', port=8
         from private_identity import ReadOnlyIdentity,session_service_class
         from prototype.vendor.auth import local_auth
         auth=session_service_class(local_auth)('q1',ReadOnlyIdentity(auth_store,'q1',local_auth),idle_seconds=session_idle_seconds,absolute_seconds=session_absolute_seconds)
-    return module.make_server(port=port, store_root=Path(runtime_dir), weather_source=weather_source, auth=auth)
+    options=dict(port=port,store_root=Path(runtime_dir),weather_source=weather_source,auth=auth)
+    if replay_snapshot is not None:options.update(replay_snapshot=Path(replay_snapshot),replay_mode=replay_mode,replay_source=source_root)
+    if current_uploads:
+        if auth is None:raise ValueError('Current synthetic uploads require authenticated mode')
+        options.update(current_uploads=True,current_python=Path(current_python or sys.executable))
+    elif current_python is not None:raise ValueError('Current interpreter requires current uploads')
+    server=module.make_server(**options)
+    if replay_snapshot is not None:
+        # Preserve the immutable snapshot's original source metadata, while
+        # current coverage reads use the hash-validated runtime input bind.
+        recorded=server.review['input_validation']['source_root']
+        module.business_coverage=runtime_coverage_reader(module.business_coverage,recorded,source_root)
+    return server
+
+
+def runtime_coverage_reader(reader, recorded_source, runtime_source):
+    recorded=Path(recorded_source).resolve();runtime=Path(runtime_source).resolve()
+    def mapped(source,now):
+        return reader(runtime if Path(source).resolve()==recorded else source,now)
+    return mapped
 
 
 def main():
@@ -39,6 +58,10 @@ def main():
     parser.add_argument('--auth-store', type=Path)
     parser.add_argument('--session-idle-seconds', type=int, default=1800)
     parser.add_argument('--session-absolute-seconds', type=int, default=28800)
+    parser.add_argument('--replay-snapshot', type=Path)
+    parser.add_argument('--replay-mode', choices=['strict','live','simulated_historical_replay'], default='strict')
+    parser.add_argument('--current-uploads', action='store_true')
+    parser.add_argument('--current-python', type=Path)
     args = parser.parse_args()
     if args.auth_store is None:require_demo_opt_in()
     elif os.environ.get('TEAM_CONNECT_UNAUTHENTICATED_DEMO')=='1':raise SystemExit('Choose authenticated mode or explicit preview, not both')

@@ -312,7 +312,7 @@ class UploadStore:
             if revision!=self.state['revision']:raise UploadError('Uploaded data changed. Reload the review before exporting.',409)
             if not self.state['active']:raise UploadError('No uploaded data is active',404)
 
-    def stage(self,parts,operation,expected_revision):
+    def stage(self,parts,operation,expected_revision,*,received_at=None):
         operation=safe_id(operation)
         fingerprint=digest(encoded([(n,digest(b)) for n,b in parts]))
         with self.lock:
@@ -335,7 +335,10 @@ class UploadStore:
             folder.mkdir();created=True
             with work_scope(control):
                 summary=validate_files(parts,folder,event.is_set)
-                control.calculation();review=self.builder(folder);checkpoint()
+                control.calculation()
+                contextual=getattr(self.builder,'build_with_context',None)
+                review=contextual(folder,received_at=received_at if received_at is not None else self.clock()) if contextual else self.builder(folder)
+                checkpoint()
                 review['input_validation']['source_root']=str(self.batches/operation)
                 encoder=json.JSONEncoder(sort_keys=True,separators=(',',':'),allow_nan=False)
                 size=0;sha=hashlib.sha256()
@@ -345,7 +348,7 @@ class UploadStore:
                         if size>self.limits.review_bytes:raise UploadError('Calculated review exceeds the 64 MiB snapshot limit',413)
                         out.write(raw);sha.update(raw)
                     out.flush();os.fsync(out.fileno())
-                receipt={'stage_id':operation,'expected_revision':expected_revision,'summary':{**summary,'review_customers':len(review['customers']),'events':len(review['events']),'review_date':review['review_date'],'method_id':review['method']['id']},'warnings':['Historical synthetic replay for Fitzroy Crossing; the review date and weather are unchanged.']}
+                receipt={'stage_id':operation,'expected_revision':expected_revision,'summary':{**summary,'review_customers':len(review['customers']),'events':len(review['events']),'review_date':review['review_date'],'method_id':review['method']['id'],'calculation_mode':review.get('current_demo',{}).get('mode','historical'),'reporting_lag_days':review.get('current_demo',{}).get('reporting_lag_days',[])},'warnings':['Current-date synthetic usage scenario; frozen M5/S1 with unvalidated current-weather inputs.'] if review.get('current_demo') else ['Historical synthetic replay for Fitzroy Crossing; the review date and weather are unchanged.']}
                 info={'complete':True,'review_sha256':sha.hexdigest(),'file_sha256':{Path(s['file']).name:s['sha256'] for s in summary['files']},'summary':receipt['summary'],'receipt':receipt}
                 if len(encoded(info))>METADATA_RESERVATION:raise UploadError('Calculated snapshot metadata exceeds its size limit',413)
                 write_json(folder/'snapshot.json',info);checkpoint()

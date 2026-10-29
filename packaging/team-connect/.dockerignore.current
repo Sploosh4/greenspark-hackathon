@@ -1,0 +1,13 @@
+**
+!app/
+!app/**
+!runtime/
+!runtime/*.py
+!font/
+!font/DejaVuSans.ttf
+!font/LICENSE
+!requirements-q1-current.txt
+!wheels/
+!wheels/*.whl
+!Dockerfile
+!.dockerignore

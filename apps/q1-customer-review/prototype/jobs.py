@@ -24,7 +24,7 @@ class UploadJobs:
                 return self.status(operation)
             if len(self.inflight)>=2:raise UploadError('Two uploads are still finishing. Wait before checking another batch.',429)
             if expected_revision!=self.store.status()['revision']:raise UploadError('Uploaded data changed. Reload before checking another batch.',409)
-            self.jobs[operation]={'request_id':operation,'expected_revision':expected_revision,'state':'queued','fingerprint':fingerprint}
+            self.jobs[operation]={'request_id':operation,'expected_revision':expected_revision,'state':'queued','fingerprint':fingerprint,'received_at':self.store.clock()}
             while len(self.jobs)>128:
                 expired=next((key for key,value in self.jobs.items() if key not in self.inflight and value['state'] not in ('queued','running') and self.store.retire(key)),None)
                 if expired is None:break
@@ -41,7 +41,7 @@ class UploadJobs:
             if self.jobs[operation]['state']=='cancelled':return
             self.jobs[operation]['state']='running'
         try:
-            receipt=self.store.stage(parts,operation,revision)
+            receipt=self.store.stage(parts,operation,revision,received_at=self.jobs[operation]['received_at'])
             with self.lock:
                 if self.jobs[operation]['state']!='cancelled':self.jobs[operation].update(state='ready',receipt=receipt)
         except Exception as error:

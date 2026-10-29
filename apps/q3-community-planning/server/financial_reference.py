@@ -5,7 +5,7 @@ import copy
 from source_adapter import parse,require,digest
 
 REGISTRY_PATH=Path(__file__).resolve().parents[1]/'data/financial/registry.json'
-REGISTRY_SHA='e0ea0a6d28d0cb154ee8f876601170ff9243fb562e0dcf692e287ce90aaa2fd4'
+REGISTRY_SHA='703f6ebc72953c6992add1eb39afb25c3699350144fb8a52fa642489132490f4'
 
 @lru_cache(maxsize=1)
 def _registry():

@@ -34,14 +34,14 @@ class UploadJobTests(unittest.TestCase):
     def test_failed_validation_and_bounded_worker_queue_preserve_active_data(self):
         bad=mutate(self.parts,'customers.csv',lambda h,r:h.reverse());operation=uuid.uuid4().hex;self.jobs.submit(bad,operation,'none');self.assertEqual(self.wait(operation)['state'],'failed');self.assertIsNone(self.store.status()['active_batch'])
         entered=threading.Event();release=threading.Event()
-        def hold(*args):entered.set();release.wait(3);raise UploadError('Stopped test job')
+        def hold(*args,**kwargs):entered.set();release.wait(3);raise UploadError('Stopped test job')
         with patch.object(self.store,'stage',hold):
             a,b=uuid.uuid4().hex,uuid.uuid4().hex;self.jobs.submit(self.parts,a,'none');self.jobs.submit(self.parts,b,'none');self.assertTrue(entered.wait(2))
             with self.assertRaises(UploadError) as error:self.jobs.submit(self.parts,uuid.uuid4().hex,'none')
             self.assertEqual(error.exception.status,429);release.set();self.wait(a);self.wait(b)
     def test_cancelled_running_work_still_counts_until_it_releases_parts(self):
         entered=threading.Barrier(3);release=threading.Event()
-        def hold(*args):entered.wait(3);release.wait(3);raise UploadError('Stopped test job')
+        def hold(*args,**kwargs):entered.wait(3);release.wait(3);raise UploadError('Stopped test job')
         with patch.object(self.store,'stage',hold):
             a,b=uuid.uuid4().hex,uuid.uuid4().hex;self.jobs.submit(self.parts,a,'none');self.jobs.submit(self.parts,b,'none');entered.wait(3)
             self.jobs.cancel(a);self.jobs.cancel(b)

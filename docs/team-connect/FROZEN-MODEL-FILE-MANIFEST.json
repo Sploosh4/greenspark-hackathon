@@ -1,0 +1,69 @@
+{
+  "files": {
+    "INFERENCE_RELEASE.json": {
+      "bytes": 3689,
+      "sha256": "911e92145c280edb7d04f08aa7912e893d7a11304849a68a8d7920933e44ad9f"
+    },
+    "PREFIT_ADDENDUM.md": {
+      "bytes": 5884,
+      "sha256": "03032d332ae1c7ad31c0a39b955415a2d89269f04e3c51d104c01b1344d520a1"
+    },
+    "PREFIT_RELEASE.json": {
+      "bytes": 2544,
+      "sha256": "b6a7ae23d8c24bba2020cd28a5316fd8d92fb7a9b00c706a491a2be741cef9c0"
+    },
+    "README.txt": {
+      "bytes": 2270,
+      "sha256": "6cda087356984085414a8df99411e436518fec4f30a38f19f73a299ac9e4300d"
+    },
+    "RUNTIME_METADATA.json": {
+      "bytes": 371,
+      "sha256": "b2083ef72d1d3d01568c9c9942011bd3430ea8edeee7a84f7d125065ecf5030c"
+    },
+    "SELECTIONS_FROZEN.json": {
+      "bytes": 26423,
+      "sha256": "02d88926658659b7463fdf9b349efe79faf67e912a8ea62f024e066f22a6ef65"
+    },
+    "V3_CANDIDATE_SPEC.json": {
+      "bytes": 26534,
+      "sha256": "2490fa05706abd0bef592e0850e2068bf45c4ea5d518cc10eecd6b6c962c38be"
+    },
+    "features/loader_rows.py": {
+      "bytes": 8950,
+      "sha256": "7e8fcc53bb4ef6cbf43524a1fb6b01b5a2d6412c61ccafdcff3a7ebf0b471bc0"
+    },
+    "oracle_historical_weather__central.joblib": {
+      "bytes": 202070,
+      "sha256": "c210e9914541e7e5225e7304fd6a89c6abd4e93dad88b33083612171ff778dbb"
+    },
+    "oracle_historical_weather__review_uncalibrated.joblib": {
+      "bytes": 217047,
+      "sha256": "b26924c30a5a9466da9fd04ac1f19a9f4b7e3c9c01442f4d40fe5341b61e842d"
+    },
+    "predict_v3.py": {
+      "bytes": 6673,
+      "sha256": "cc2bf15a3bc873b23669c01e82f01d905c583be16f702e6715895873117a5db6"
+    },
+    "released_features.py": {
+      "bytes": 3218,
+      "sha256": "761baf9ba6a35e4a66275406e71bf214fd67f89c9519b101bd5e65e501e8e829"
+    },
+    "synthetic_noisy_forecast__central.joblib": {
+      "bytes": 212149,
+      "sha256": "064378a6b1f560879db3fc8d72c3afc5c90cf9943e49e40969906d3d7f4a6ce3"
+    },
+    "synthetic_noisy_forecast__review_uncalibrated.joblib": {
+      "bytes": 216310,
+      "sha256": "abd71ea3a2e6b911876ab3b442086bcf1d6a71e2245e83af6ff51ade31f50656"
+    },
+    "training_priors.json": {
+      "bytes": 2979290,
+      "sha256": "b2e087386a1b9e7e7f956f59154f628f793b34e971865e939f794028fd79f76b"
+    },
+    "v3_core.py": {
+      "bytes": 14305,
+      "sha256": "85a2c923d73ae5d72a77dd6dce8e6f0422a84c8f597b23e3b1b079284dcc2cb2"
+    }
+  },
+  "trusted_own_model_artifacts_only": true
+}

@@ -91,7 +91,7 @@ class PublicWeatherTests(unittest.TestCase):
             store=PublicWeatherStore(Path(root)/'own',source);result=DailyCacheJob(store).tick(NOW)
             self.assertFalse(result['last_attempt_succeeded']);self.assertEqual(result['next_run_at'],'2026-10-28T12:15:00Z')
     def test_historical_usage_dates_do_not_move_to_current_review(self):
-        tables={'customers':[{'customer_id':'A'}],'consumption_daily':[{'customer_id':'A','date':'2025-06-30','supply_status':'connected','outage_hours':'0'}]}
+        tables={'customers':[{'customer_id':'C1','locality':'Fitzroy Crossing','postcode':'6765'}],'consumption_daily':[{'customer_id':'C1','import_kwh':'10','date':'2025-06-30','supply_status':'connected','outage_hours':'0'}]}
         with patch('prototype.live.load_business',return_value=(tables,{'files':[]})):result=business_coverage('unused',NOW)
         customer=result['customers'][0];self.assertEqual(customer['latest_usage_date'],'2025-06-30');self.assertEqual(customer['complete_recent_days'],0);self.assertEqual(customer['history_status'],'stale');self.assertIsNone(customer['estimate'])
 

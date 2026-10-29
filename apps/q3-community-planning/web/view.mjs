@@ -179,7 +179,7 @@ const perthReference=document.createElement('div');perthReference.className='pla
 // Perth remains a provider city label; selected locations have the dedicated marker.
 $('#wa').onclick=()=>fitWA();$('#reset').onclick=()=>fitWA();
 $('#fitzroy').onclick=()=>selectArea('6765');
-$('#perth').onclick=()=>{cameraMode='area';overview=false;selectedAreaCode='';selectedHistoryCoordinate=[115.861,-31.952];selectedHistoryName='Perth';updateCell(nearestCell(115.861,-31.952),'Near Perth');map.easeTo({center:[115.8,-31.9],zoom:5.4,duration:500});};
+$('#perth').onclick=()=>selectArea('6000');
 $('#history-overlay').onchange=e=>{
  setHistoricalVisibility(map,e.target.checked&&!nativeHistory?.metadata);if(nativeHistory?.metadata)nativeHistory.visibility();else $('#history-overlay-state').textContent=e.target.checked?'12 purple sample locations':'Historical layer hidden';
 };

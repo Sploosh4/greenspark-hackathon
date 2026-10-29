@@ -1,0 +1,9 @@
+# Optional verified SILO history directory, including its matching metadata.json.
+services:
+  q3:
+    volumes:
+      - type: bind
+        source: ${Q3_HISTORY_DIR:?Set the separately verified history directory}
+        target: /app/data/history
+        read_only: true
+        bind: {create_host_path: false}

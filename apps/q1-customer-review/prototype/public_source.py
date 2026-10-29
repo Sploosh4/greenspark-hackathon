@@ -63,7 +63,7 @@ class PublicSourceStore(PublicWeatherStore):
     network_fetch=True
     operation='refresh_bounded_public_model_context'
     def __init__(self,root,*,fetch=download,clock=None,**kwargs):
-        super().__init__(root,**kwargs);self.refresh_lock=threading.Lock();self.fetch=fetch;self.clock=clock or (lambda:datetime.now(timezone.utc))
+        super().__init__(root,clock=clock,**kwargs);self.refresh_lock=threading.Lock();self.fetch=fetch;self.clock=clock or (lambda:datetime.now(timezone.utc));self.context_clock=lambda:self.clock()
         if self.snapshot is None:super().refresh() # Existing authorised cache is the first fallback.
     def refresh(self):
         # Network latency must never hold the lock used by read-only views.

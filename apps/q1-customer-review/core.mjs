@@ -17,7 +17,7 @@ export function summary(row,d){
   });
   const nums=estimates.map(e=>e.increase).filter(x=>x!==null);
   const comparable=episodes.filter(e=>Number.isFinite(e.increase_percent));
-  return {row,customer:row.customer,episodes,estimates,baseline,calculated,method:d.method,version:d.version,highest:nums.length?Math.max(...nums):null,threshold:comparable.length?Math.min(...comparable.map(e=>e.increase_percent)):null};
+  return {row,customer:row.customer,episodes,estimates,baseline,calculated,replay:d.replay??null,current_demo:d.current_demo??null,snapshot_id:d.snapshot_id,batch_revision:d.batch_revision,batch_id:d.batch_id,data_mode:d.data_mode,method:d.method,version:d.version,highest:nums.length?Math.max(...nums):null,threshold:comparable.length?Math.min(...comparable.map(e=>e.increase_percent)):null};
 }
 export const prepareQuery=d=>d.customers.map(r=>summary(r,d));
 export function pageRows(rows,page=0,size=100){
@@ -26,7 +26,7 @@ export function pageRows(rows,page=0,size=100){
   return {rows:rows.slice(index*size,(index+1)*size),page:index,pages,total:rows.length,first:rows.length?index*size+1:0,last:Math.min(rows.length,(index+1)*size)};
 }
 export function query(d,filters={},prepared=null){
-  const f={...DEFAULT_FILTERS,...filters};
+  const f={...DEFAULT_FILTERS,...(d.current_demo?{history:'all',increase:'all'}:{}),...filters};
   const rows=(prepared??prepareQuery(d)).filter(x=>{
     const c=x.customer;
     if(c.account_open_date>d.review_date||(c.account_close_date&&c.account_close_date<=d.review_date))return false;
@@ -50,14 +50,21 @@ export function query(d,filters={},prepared=null){
 export function explanation(x){
   const high=x.highest;
   if(!x.estimates.length)return 'No heat period was detected in this seven-day historical replay. The customer’s recorded use and account history remain available below.';
+  if(high===null&&x.current_demo)return 'A current scenario estimate is unavailable: '+(x.estimates[0]?.reason??'required inputs are missing').replaceAll('_',' ')+'. Recorded account history remains visible below.';
   if(high===null)return (x.estimates.length===1?'No electricity-use estimate is available for this heat period.':'No electricity-use estimate is available for either upcoming event.')+' The customer’s recorded use and account history are shown below.';
   const e=x.estimates.find(e=>e.increase===high);
   const end=new Date(e.end+'T12:00:00Z').toLocaleDateString('en-AU',{day:'numeric',month:'short',timeZone:'UTC'});
   const window=windowLabel(e.start,e.end);
+  if(x.current_demo){
+    if(high===null)return 'A current scenario estimate is unavailable: '+(x.estimates[0]?.reason??'required inputs are missing').replaceAll('_',' ')+'. Recorded account history remains visible below.';
+    if(high===0)return `For this current-date synthetic scenario, estimated daily imports stay at the recent baseline during ${window}. The current-weather connection is unvalidated.`;
+    return `For this current-date synthetic scenario, the frozen model estimates ${Math.abs(Number(high.toFixed(1)))}% ${high<0?'less':'more'} grid electricity per day on average during ${window}. The current-weather connection is unvalidated.`;
+  }
   if(x.calculated){
     const value=Math.abs(Number(high.toFixed(1)));
     let text=high===0?`Daily electricity use from the grid is expected to stay at the recent level during ${window}.`:`We estimate ${value}% ${high>0?'more':'less'} electricity from the grid per day on average during ${window}.`;
-    if(x.threshold!==null)text+=` Grid use was ${Math.abs(Number(x.threshold.toFixed(1)))}% ${x.threshold<0?'lower':'higher'} during a past heat period when difficulty was recorded.`;
+    if(x.replay)text='In this simulated historical replay, '+text[0].toLowerCase()+text.slice(1);
+    if(x.threshold!==null)text+=x.replay?.denominator_policy==='common_review_B'?` Past daily grid use was ${Math.abs(Number(x.threshold.toFixed(1)))}% ${x.threshold<0?'lower':'higher'} than the current review baseline during a heat period when difficulty was recorded.`:` Grid use was ${Math.abs(Number(x.threshold.toFixed(1)))}% ${x.threshold<0?'lower':'higher'} during a past heat period when difficulty was recorded.`;
     else text+=' No comparable past heat period with recorded help or difficulty is available.';
     if(x.estimates.some(e=>e.increase===null))text+=' Another heat period has no estimate.';
     return text;
@@ -73,6 +80,12 @@ export function explanation(x){
 }
 export function csvCell(v){const s=String(v??'');return '"'+(/^[=+@\-\t\r]/.test(s)?"'"+s:s).replaceAll('"','""')+'"';}
 export function exportRows(rows){
+  if(rows.some(x=>x.replay||x.current_demo)){
+    if(rows.some(x=>(!x.replay&&!x.current_demo)||x.snapshot_id!==rows[0].snapshot_id))throw Error('Mixed replay snapshots');
+    const head=['customer_id','account_type','locality','event_id','event_start','event_end','event_days','expected_increase_percent','baseline_daily_import_kwh','estimated_daily_import_kwh','past_comparison_percent','method_id','batch_revision','batch_id','data_mode','provenance','estimated_event_import_kwh','S1_daily_import_kwh','S1_increase_percent','past_event_id','past_observed_daily_import_kwh','past_baseline_daily_import_kwh','percentage_policy','model_manifest_sha256','snapshot_id','availability_mode'];
+    if(rows[0].current_demo)head.push('application_received_at','inference_as_of','latest_reported_usage_date','reporting_lag_days','weather_retrieved_at','provider_issue_at','weather_snapshot_sha256','estimator_lane');
+    return [head,...rows.flatMap(x=>{const past=x.episodes.find(e=>e.increase_percent===x.threshold)??{};return x.estimates.map(e=>[x.customer.customer_id,x.customer.prepayment_meter==='True'?'Prepaid':'Billed',x.customer.locality,e.id,e.start,e.end,e.duration,e.increase,e.baseline,e.predicted,x.threshold,e.method_id,x.batch_revision,x.batch_id,x.data_mode,x.current_demo?'current-date synthetic demo; frozen M5/S1; external modelled weather; current accuracy unvalidated':'simulated historical replay; synthetic accounts; frozen M5 with S1 comparison; historical oracle weather; original availability unknown',e.event_total,e.comparison?.predicted,e.comparison?.increase,past.id,past.actual_mean,past.denominator,(x.current_demo??x.replay).denominator_policy,(x.current_demo??x.replay).model_manifest_sha256,x.snapshot_id,(x.current_demo??x.replay).mode,...(x.current_demo?[x.current_demo.business_received_at,x.current_demo.inference_as_of,x.row.latest_reported_usage_date,x.row.reporting_lag_days,x.current_demo.weather_retrieved_at,x.current_demo.provider_issue_at,x.current_demo.weather_snapshot_sha256,x.current_demo.estimator_lane]:[])]);})].map(r=>r.map(v=>typeof v==='number'?'"'+v+'"':csvCell(v)).join(',')).join('\r\n');
+  }
   if(rows.some(x=>x.calculated)){
     const head=['customer_id','account_type','locality','event_id','event_start','event_end','event_days','expected_increase_percent','baseline_daily_import_kwh','estimated_daily_import_kwh','past_comparison_percent','method_id','provenance'];
     return [head,...rows.flatMap(x=>x.estimates.map(e=>[x.customer.customer_id,x.customer.prepayment_meter==='True'?'Prepaid':'Billed',x.customer.locality,e.id,e.start,e.end,e.duration,e.increase,e.baseline,e.predicted,x.threshold,e.method_id,'calculated historical replay; synthetic business; unvalidated baseline; no live forecast']))].map(r=>r.map(csvCell).join(',')).join('\r\n');

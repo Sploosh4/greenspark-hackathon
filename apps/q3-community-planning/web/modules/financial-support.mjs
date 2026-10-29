@@ -3,9 +3,12 @@ const safe=v=>Number.isSafeInteger(v)&&v>=0;
 const hash=v=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v);
 const tables=['hardship_programs.csv.gz','hugs_grants.csv.gz','payment_arrangements.csv.gz','payments.csv.gz','support_arrangement_history.csv.gz'];
 const supportKeys=['areas','classification','cohortCustomerSha256','cohortUsageSha256','contract','coverage','definitions','historyEnd','historyStart','monthlyGrantLedger','reviewedManifestSha256','schemaVersion','snapshotDate','sourceHashes','state'];
+const syntheticKeys=supportKeys.filter(k=>k!=='reviewedManifestSha256').concat(['sourceManifestSha256','validation']).sort();
 const areaKeys=['activeAccountDenominator','activeAccountsInEitherSupport','activeHardshipProgramAccounts','activePaymentArrangementAccounts','paidGrantAmountCentsInPeriod','paidGrantCountInPeriod','paidGrantRecipientsActiveAtSnapshot','paidGrantRecipientsInPeriod','postcode','snapshotDate'];
 export function validateFinancialSupport(s,b){
- if(!s||Object.keys(s).sort().join(',')!==supportKeys.join(',')||s.schemaVersion!==2||s.contract!=='q3-financial-support-v2'||s.state!=='validated'||s.snapshotDate!==b.snapshotDate||s.historyStart!==b.historyStart||s.historyEnd!==b.historyEnd||s.cohortCustomerSha256!==b.customerSourceSha256||s.cohortUsageSha256!==b.usageSourceSha256||!hash(s.reviewedManifestSha256))throw Error('Financial cohort or snapshot contract');
+ const synthetic=s?.schemaVersion===3;
+ if(!s||Object.keys(s).sort().join(',')!==(synthetic?syntheticKeys:supportKeys).join(',')||(!synthetic&&s.schemaVersion!==2)||s.contract!==(synthetic?'q3-financial-support-v3':'q3-financial-support-v2')||s.state!=='validated'||s.snapshotDate!==b.snapshotDate||s.historyStart!==b.historyStart||s.historyEnd!==b.historyEnd||s.cohortCustomerSha256!==b.customerSourceSha256||s.cohortUsageSha256!==b.usageSourceSha256||!hash(s[synthetic?'sourceManifestSha256':'reviewedManifestSha256']))throw Error('Financial cohort or snapshot contract');
+ if(synthetic)validateSyntheticReceipt(s,b);
  const pcs=b.areas.map(a=>a.postcode).sort();
  if(JSON.stringify(s.coverage?.accountPostcodes)!==JSON.stringify(pcs)||JSON.stringify(s.coverage?.completeTables)!==JSON.stringify(tables)||!s.sourceHashes||Object.keys(s.sourceHashes).sort().join(',')!==tables.join(',')||Object.values(s.sourceHashes).some(v=>!hash(v))||!Array.isArray(s.areas)||s.areas.length!==pcs.length||s.areas.map(a=>a.postcode).join(',')!==pcs.join(','))throw Error('Financial coverage contract');
  const known=new Map(b.areas.map(a=>[a.postcode,a]));
@@ -23,6 +26,22 @@ export function validateFinancialSupport(s,b){
  }
  for(const a of s.areas)if(a.paidGrantCountInPeriod!==totals.get(a.postcode).count||a.paidGrantAmountCentsInPeriod!==totals.get(a.postcode).cents)throw Error('Grant period reconciliation');
  return s;
+}
+
+function validateSyntheticReceipt(s,b){
+ const v=s.validation,keys=['aggregateSha256','files','generator','geographyRegistrySha256','policy','synthetic'];
+ if(!s.coverage||Object.keys(s.coverage).sort().join(',')!=='accountPostcodes,completeTables,completeness'||s.classification!=='Validated synthetic source-table support context; no individual risk score'||s.coverage?.completeness!=='Declared complete synthetic source tables for this cohort and window; internally validated, not independent evidence of real-world completeness or complete daily usage.'||!v||Object.keys(v).sort().join(',')!==keys.join(',')||v.policy!=='q3-synthetic-financial-v1'||v.synthetic!==true||v.geographyRegistrySha256!==b.geographyRegistrySha256||!hash(v.aggregateSha256))throw Error('Synthetic financial receipt');
+ const g=v.generator,plain=x=>typeof x==='string'&&x.length>0&&x.length<=128&&!/[\u0000-\u001f\u007f]/.test(x);
+ if(!g||Object.keys(g).sort().join(',')!=='assertion,name,revision,seed,sourceSha256'||!plain(g.name)||!plain(g.revision)||!hash(g.sourceSha256)||typeof g.seed!=='string'||!/^(0|[1-9][0-9]{0,18})$/.test(g.seed)||BigInt(g.seed)>9223372036854775807n||g.assertion!=='Uploader-declared generator metadata; not authenticated origin or real customer observations')throw Error('Synthetic financial provenance');
+ const names=['consumption_daily.csv.gz','customers.csv',...tables].sort(),f=v.files;
+ if(!f||Object.keys(f).sort().join(',')!==names.join(','))throw Error('Synthetic financial source metrics');
+ let encoded=0,expanded=0,financialRows=0;
+ for(const name of names){
+  const m=f[name],limit=name==='customers.csv'?100000:['payment_arrangements.csv.gz','hardship_programs.csv.gz'].includes(name)?200000:name==='support_arrangement_history.csv.gz'?400000:1500000;
+  if(!m||Object.keys(m).sort().join(',')!=='encodedBytes,expandedBytes,rows'||!safe(m.rows)||m.rows>limit||(['customers.csv','consumption_daily.csv.gz'].includes(name)&&m.rows===0)||!safe(m.encodedBytes)||m.encodedBytes<1||m.encodedBytes>16777216||!safe(m.expandedBytes)||m.expandedBytes<1||m.expandedBytes>100663296)throw Error('Synthetic financial source metrics');
+  encoded+=m.encodedBytes;expanded+=m.expandedBytes;if(tables.includes(name))financialRows+=m.rows;
+ }
+ if(encoded>33554432||expanded>268435456||financialRows>2000000||f['customers.csv'].rows!==b.retainedTotalAccounts)throw Error('Synthetic financial resource bounds');
 }
 
 export function financialSummary(b,postcode=null,{retained=false}={}){

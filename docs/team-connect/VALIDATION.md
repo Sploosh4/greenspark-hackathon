@@ -1,16 +1,21 @@
-# Publication validation
+# Final local source-candidate validation
 
-Checks run on the imported branch on 29 October 2026:
+These checks ran on the consolidated portable candidate on 29 October 2026. Public 349b366 and prior local f38343b remain unchanged. No source/data service, account or scheduler was operated.
 
-| Check | Result and scope |
+| Check | Fresh candidate result |
 |---|---|
-| Q1 Python | 131 collected: 123 passed, 8 canonical-port HTTP tests skipped. The configured authorised synthetic input pack was read locally; the derived report is ignored and excluded. |
-| Q1 JavaScript | All 8 test files passed, including Sign out, failure/retry, expiry, delayed responses, protected-state cleanup and BFCache handling. |
-| Season Ahead Python | 157 passed. `test_history_archive.py` was excluded because its large matching external SILO layers are absent from this code publication. |
-| Season Ahead JavaScript | All 14 test files passed, including native-history client tests using metadata. |
-| Packaging | Restaging completed and 18 tests passed. Tests use temporary SQLite fixtures, actual identity/session classes and stubbed server creation without listening sockets. Missing identities, ambiguous modes and implicit previews fail before serving. |
-| Compose | Base/authenticated and base/authenticated/test combinations rendered through `docker compose config`. Checks passed for mode separation, external read-only identity volumes, loopback or removed host ports, separate users, read-only roots, dropped capabilities and input mount protections. No image was built or container started. |
-| Source integrity | Imported files matched the frozen owner manifests before the documented portability and whitespace edits. Published hashes are recorded in `SOURCE-PROVENANCE.json`. |
-| Publication boundary | Selected staged blobs were checked for excluded file types/paths, private laptop paths, common credential/token formats, private keys, credential-bearing URLs and long literal secret assignments. No matches were found. This is a scoped pattern and allowlist check, not proof that every possible secret format is detectable. |
+| Q1 Python | 197 collected: 189 passed, eight canonical socket-dependent tests skipped. Historical inputs/replay, five ignored integration fixtures and the explicit alternative-policy synthetic fixture were used. Frozen inference was mocked where applicable; no model binary was loaded. |
+| Q1 JavaScript | All ten test files passed, including current-client, replay and Sign out. File-level counts avoid inventing internal custom-harness case counts. |
+| Q3 Python | 198 passed, including generic financial-v1 row/handler/compatibility tests and matching external public history layers. |
+| Q3 JavaScript | All sixteen test files passed, including reusable intake and Perth-controller cases. |
+| Packaging | Fresh source-only staging and 23 tests passed. Two focused current-mode tests reject unauthenticated enablement and interpreter-only mode before server construction. No listener is opened. |
+| Compose | Three configurations rendered: authenticated/replay/history loopback; its no-host-port overlay; standalone current Q1 with no network/host ports and existing external identities/state. Mount protections, auth flags, read-only/non-root/resource bounds checked. |
+| Asset verification | 147 listed files across seven available groups matched: historical inputs/replay/history/business, current integration fixtures, selected Q1 twelve-file pack and selected Q3 eight-file pack. Tamper/symlink refusal passed. Original legacy financial sidecars were not rerun here; frozen model/wheel contents were not read or copied. Their exact supplied manifests remain metadata only. |
+| Delivery | Selected combined archive d67990 and ready-folder hashes verified; Q3 fresh manifest ff77c6 matches accepted delivery. Public download URL remains null pending strategy/content/rights approval. |
+| Documentation/source | Main setup/app/packaging links checked. Actual final source vectors and payload hashes are recorded separately from owner generation/runtime identifiers. |
 
-The Season Ahead results above are retained from its unchanged application source in the first local publication commit. The Q1 and packaging checks were rerun after the Sign out/authenticated-launcher update. No fresh Docker image build, container start, deployed service check, live password login, model accuracy benchmark or full managed security scan was run for this branch. Runtime-owner integration results apply to their own recorded snapshots. The original repository has no tracked GitHub Actions workflow at the publication base. No remote mutation or CI run was requested for this local package update.
+Regression runtime: existing bundled Python 3.12.14 with PDF libraries and bundled Node. Current inference runtime acceptance belongs to the owner's exact Python 3.12.16/model/image build, not this regression interpreter. No package install, model load/inference/training, reserved scorer access, fresh image build/container start, live browser/HTTP acceptance, cloud action, push or remote CI run occurred here.
+
+Owner evidence remains versioned: Q1 ea39 / current 6c4a passed actual 120-customer native/browser and network-disabled-container numerical/export/restart acceptance. Q3 04e13 passed two fresh-seed handler/browser replacements and negative cases in disposable state. Native active datasets were preserved. Earlier 19c 50k-summary performance is not relabelled as a current-date rerun. Portable path/config changes produce separate candidate fingerprints; the final candidate was not rebuilt into those accepted images.
+
+Final human workflow/claims review, required combined security disposition, approved public asset strategy and fresh complete-delivery verification remain gates. External HTTPS and DigitalOcean activation are separate. User-guide authoring is paused. The independently rechecked backup-hardening package remains separate and was not activated or duplicated here.

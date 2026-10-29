@@ -13,16 +13,19 @@ import socket
 import subprocess
 from tempfile import SpooledTemporaryFile
 import threading
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from prototype.review import build_review
-from prototype.inputs import InputError
+from prototype.inputs import InputError,DEFAULT_SOURCE
+from prototype.replay_snapshot import load_snapshot
 from prototype.uploads import UploadStore,UploadError,MAX_BODY,write_json
 from prototype.exports import csv_bytes,iter_csv_chunks,selected_rows,MAX_CSV_CUSTOMERS,MAX_CSV_BYTES
 from prototype.public_weather import PublicWeatherStore
 from prototype.public_source import PublicSourceStore
 from prototype.weather_job import DailyCacheJob,next_daily
-from prototype.public_weather import utc
+from prototype.public_weather import utc,instant
 from prototype.live import business_coverage
+from prototype.current_inputs import normalised_temperature_context,model_contract_gaps
+from prototype.current_calculation import CurrentCalculations
 from prototype.vendor.auth.local_auth import AUTH_PATHS,AuthError
 from prototype.jobs import UploadJobs
 
@@ -97,7 +100,13 @@ class Handler(SimpleHTTPRequestHandler):
         if set(fields)!= {'request_id','expected_revision'}:raise UploadError('Missing upload version fields')
         return parts,fields
     def review(self,mode,revision=None):
-        if mode=='upload':return self.server.uploads.view(revision)
+        if mode=='upload':
+            current=getattr(self.server,'current_calculations',None)
+            if current:
+                result=current.view(self.server.uploads.view())
+                if revision is not None and revision!=result['batch_revision']:raise UploadError('Uploaded data or forecast calculation changed. Reload before exporting.',409)
+                return result
+            return self.server.uploads.view(revision)
         if mode!='demo':raise UploadError('Unknown data mode')
         if self.server.review is None:raise UploadError('Preloaded inputs could not be validated',503)
         r=copy.deepcopy(self.server.review);r.update(data_mode='demo',batch_id='preloaded',batch_revision=self.server.demo_revision)
@@ -111,7 +120,9 @@ class Handler(SimpleHTTPRequestHandler):
         target=(ROOT/name).resolve()
         return target.is_relative_to(ROOT) and not (ROOT/name).is_symlink()
     def assert_revision(self,mode,revision):
-        if mode=='upload':return self.server.uploads.assert_revision(revision)
+        if mode=='upload':
+            if getattr(self.server,'current_calculations',None):self.review(mode,revision);return
+            return self.server.uploads.assert_revision(revision)
         if mode!='demo':raise UploadError('Unknown data mode')
         if self.server.review is None:raise UploadError('Preloaded inputs could not be validated',503)
         if revision!=self.server.demo_revision:raise UploadError('The preloaded review changed. Reload before exporting.',409)
@@ -132,17 +143,36 @@ class Handler(SimpleHTTPRequestHandler):
                 super().do_GET();return
             self.auth_guard('GET')
             if url.path=='/api/settings':self.json(200,{**self.server.settings,'instance':'q1','timezone':'Australia/Perth','schedule':self.server.weather_job.status()});return
-            if url.path=='/api/state':self.json(200,{**self.server.uploads.status(),'request_token':self.server.request_token,'demo_revision':self.server.demo_revision,'opening_mode':self.server.settings['opening_mode']});return
+            if url.path=='/api/state':
+                state=self.server.uploads.status();current=getattr(self.server,'current_calculations',None)
+                if current and state['active_batch']:state.update(review_revision=self.review('upload')['batch_revision'],current_calculation=current.status())
+                self.json(200,{**state,'request_token':self.server.request_token,'demo_revision':self.server.demo_revision,'opening_mode':self.server.settings['opening_mode']});return
             if url.path=='/api/uploads/status':self.json(200,self.server.upload_jobs.status(query.get('request_id',[None])[0]));return
             if url.path=='/api/review':self.json(200,self.review(query.get('mode',['demo'])[0],query.get('revision',[None])[0]));return
             if url.path=='/api/live-weather':
-                mode=query.get('mode',['demo'])[0];review=self.review(mode);now=self.server.clock();weather=self.server.public_weather.view(now)
+                mode=query.get('mode',['demo'])[0];review=self.review(mode);now=self.server.clock();context=self.server.public_weather.context_source()
+                scenario=review.get('current_demo')
+                weather=normalised_temperature_context(context['snapshot'],review_as_of=now.isoformat(),adapter_loaded_at=context['adapter_loaded_at'],source_last_error=context['last_error'],start_offset=0 if scenario else 1)
+                weather.update(weather_snapshot_sha256=context['snapshot_sha256'],model_admission=model_contract_gaps(review_as_of=now.isoformat()))
                 key=(mode,review['batch_revision'],weather['review_date'])
                 with self.server.live_coverage_lock:
                     coverage=self.server.live_coverage.get(key)
                     if coverage is None:
                         coverage=business_coverage(review['input_validation']['source_root'],now)
                         self.server.live_coverage={key:coverage}
+                if scenario:
+                    coverage=copy.deepcopy(coverage);scenario_rows={r['customer']['customer_id']:r for r in review['customers']};predictions={cid:r['predictions'][0] for cid,r in scenario_rows.items()}
+                    coverage['customers']=[c for c in coverage['customers'] if c['customer_id'] in scenario_rows]
+                    same_context=scenario['weather_snapshot_sha256']==context['snapshot_sha256'] and review['review_date']==weather['review_date']
+                    for c in coverage['customers']:
+                        p=predictions.get(c['customer_id'],{}) if same_context else {}
+                        row=scenario_rows.get(c['customer_id'],{})
+                        c.update(strict_original_recent_days=c['complete_recent_days'],complete_recent_days=row.get('reported_complete_days',0) if instant(scenario['business_received_at'])<=now else 0,availability_basis='actual_application_receipt_for_synthetic_demo',reporting_lag_days=row.get('reporting_lag_days'))
+                        c.update(estimated_daily_import_kwh=p.get('predicted'),expected_increase_percent=p.get('increase'),S1_daily_import_kwh=p.get('comparison',{}).get('predicted'),scenario_reason=p.get('reason') or (None if p.get('predicted') is not None else 'forecast_changed_or_calculation_pending'))
+                    if coverage.get('supplied_usage_end'):
+                        last=datetime.fromisoformat(coverage['supplied_usage_end']).date();coverage.update(required_usage_end=str(last),required_usage_start=str(last-timedelta(days=6)))
+                    weather['current_scenario']={'mode':'current_synthetic_demo','calculation_revision':review['batch_revision'],'available_customers':sum(c['estimated_daily_import_kwh'] is not None for c in coverage['customers']),'business_received_at':scenario['business_received_at'],'weather_retrieved_at':scenario.get('weather_retrieved_at'),'provider_issue_at':None,'reporting_lag_days':scenario['reporting_lag_days'],'source_consistent':same_context}
+                    weather.update(current_customer_estimates_available=weather['current_scenario']['available_customers']>0,current_estimates_mode='current_synthetic_demo',prediction_accuracy_validated=False)
                 self.json(200,{**weather,'business':coverage,'business_mode':mode,'business_revision':review['batch_revision'],'schedule':self.server.weather_job.status()});return
             if not self.static_allowed():raise UploadError('Not found',404)
             super().do_GET()
@@ -175,6 +205,11 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path=='/api/uploads/rollback':
                 if request.get('confirm_restore') is not True:raise UploadError('Explicit recovery confirmation is required')
                 self.json(200,self.server.uploads.rollback(request.get('request_id'),request.get('expected_revision')));return
+            if self.path=='/api/uploads/recalculate':
+                current=getattr(self.server,'current_calculations',None)
+                if current is None:raise UploadError('Current calculation is not enabled',404)
+                self.server.uploads.assert_revision(request.get('expected_revision'))
+                self.json(200,current.retry(self.server.uploads.view()));return
             if self.path=='/api/settings':
                 if set(request)!={'opening_mode','weather_time'} or request['opening_mode'] not in ('demo','upload'):raise UploadError('Invalid instance settings')
                 now=self.server.clock();next_daily(now,request['weather_time'])
@@ -230,15 +265,18 @@ class Handler(SimpleHTTPRequestHandler):
         except (BrokenPipeError,ConnectionError):pass
         except Exception:self.json(503,{'error':'The local operation could not finish. Existing batches were preserved; reload upload status before retrying.'})
 
-def make_server(port=8891,store_root=None,review=None,weather_time='06:00',auth=None,weather_source='cache'):
+def make_server(port=8891,store_root=None,review=None,weather_time='06:00',auth=None,weather_source='cache',replay_snapshot=None,replay_mode='strict',replay_source=DEFAULT_SOURCE,current_uploads=False,current_python=None):
     if auth is not None and (auth.instance!='q1' or port!=8891):raise ValueError('Authenticated Q1 uses its separate canonical port8891')
     error=None
+    if replay_snapshot is not None:
+        if review is not None:raise ValueError('Supply either review or replay snapshot')
+        review=load_snapshot(replay_snapshot,source_root=replay_source,availability_mode=replay_mode)
     if review is None:
         try:review=build_review()
         except Exception as e:error=str(e)
     server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
     server.review=review;server.review_error=error
-    server.demo_revision='demo-'+review['build']['id'] if review else 'demo-unavailable'
+    server.demo_revision=review.get('snapshot_id','demo-'+review['build']['id']) if review else 'demo-unavailable'
     server.request_token=secrets.token_urlsafe(32) # Ephemeral request protection, not a login credential.
     server.auth=auth # Inject only after an approved local account bootstrap; default demo stays usable.
     server.uploads=UploadStore(store_root or ROOT/'runtime/uploads')
@@ -246,6 +284,8 @@ def make_server(port=8891,store_root=None,review=None,weather_time='06:00',auth=
     if weather_source not in ('cache','public'):raise ValueError('Unsupported public weather source mode')
     weather_class=PublicSourceStore if weather_source=='public' else PublicWeatherStore
     server.public_weather=weather_class(Path(store_root)/'public-weather' if store_root else ROOT/'runtime/public-weather')
+    server.current_calculations=CurrentCalculations((Path(store_root) if store_root else ROOT/'runtime/uploads')/'current-results',server.public_weather,clock=lambda:server.clock(),model_python=current_python) if current_uploads else None
+    if server.current_calculations:server.uploads.builder=server.current_calculations
     server.settings_path=Path(store_root)/'instance-settings.json' if store_root else ROOT/'runtime/instance-settings.json'
     server.settings={'opening_mode':'demo','weather_time':weather_time};configured_schedule=None
     try:
@@ -253,7 +293,11 @@ def make_server(port=8891,store_root=None,review=None,weather_time='06:00',auth=
         if set(settings) in ({'opening_mode','weather_time'},{'opening_mode','weather_time','weather_schedule'}) and settings['opening_mode'] in ('demo','upload'):
             next_daily(datetime.now(timezone.utc),settings['weather_time']);server.settings={key:settings[key] for key in ('opening_mode','weather_time')};configured_schedule=settings.get('weather_schedule')
     except (OSError,ValueError,TypeError):pass
-    server.weather_job=DailyCacheJob(server.public_weather,server.settings['weather_time'],configured_state=configured_schedule);server.start_weather_updates=server.weather_job.start;server.stop_weather_updates=server.weather_job.stop;server.live_coverage={};server.live_coverage_lock=threading.RLock();server.clock=lambda:datetime.now(timezone.utc)
+    server.weather_job=DailyCacheJob(server.public_weather,server.settings['weather_time'],configured_state=configured_schedule,on_refresh=(lambda result:server.current_calculations.refresh_active(server.uploads)) if server.current_calculations else None);server.start_weather_updates=server.weather_job.start;server.stop_weather_updates=server.weather_job.stop;server.live_coverage={};server.live_coverage_lock=threading.RLock();server.clock=lambda:datetime.now(timezone.utc)
+    if server.current_calculations:
+        original_close=server.server_close
+        def close():server.current_calculations.close();original_close()
+        server.server_close=close
     return server
 
 if __name__=='__main__':

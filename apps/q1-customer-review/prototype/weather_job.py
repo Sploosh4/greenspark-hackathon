@@ -15,8 +15,8 @@ def next_daily(now,local_time):
     return result if result>now else result+timedelta(days=1)
 
 class DailyCacheJob:
-    def __init__(self,store,local_time='06:00',*,clock=None,poll_seconds=30,configured_state=None):
-        self.store=store;self.local_time=local_time;self.clock=clock or (lambda:datetime.now(timezone.utc));next_daily(self.clock(),local_time)
+    def __init__(self,store,local_time='06:00',*,clock=None,poll_seconds=30,configured_state=None,on_refresh=None):
+        self.store=store;self.local_time=local_time;self.clock=clock or (lambda:datetime.now(timezone.utc));self.on_refresh=on_refresh;next_daily(self.clock(),local_time)
         if not 0<poll_seconds<=30:raise ValueError('Weather polling interval outside bound')
         self.poll_seconds=poll_seconds;self.lock=threading.RLock();self.tick_lock=threading.Lock();self.lifecycle_lock=threading.Lock();self.state={};self.worker=None;self.stop_event=None;self.refresh_running=False;self.persistence_error=None;self.configuration_sync_warning=False
         try:
@@ -74,6 +74,9 @@ class DailyCacheJob:
                 self.refresh_running=True;configuration_id=self.state.get('configuration_id')
             try:result=self.store.refresh()
             except (OSError,ValueError,KeyError,TypeError):result={'succeeded':False,'error':'weather_refresh_failed'}
+            if self.on_refresh:
+                try:self.on_refresh(result)
+                except (OSError,ValueError,RuntimeError):pass
             with self.lock:
                 completed=now if explicit_now else self.clock()
                 changed=self.state.get('configuration_id')!=configuration_id

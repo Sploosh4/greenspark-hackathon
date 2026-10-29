@@ -39,6 +39,8 @@ def selected_q1_files(q1):
     selected = [Path(p) for p in ('serve.py', 'pdf_export.py', 'index.html', 'app.mjs', 'core.mjs',
                                   'LICENSE', 'assets/q1.css', 'docs/UPLOAD-VALIDATION-CONTRACT.json')]
     if (q1/'checks.html').is_file():selected.append(Path('checks.html'))
+    for tool in ['tools/build_replay_snapshot.py', 'tools/current_inference.py']:
+        if (q1/tool).is_file():selected.append(Path(tool))
     selected += [p for p in paths(q1, 'assets', {'.html', '.mjs', '.css', '.svg'}) if p not in selected]
     return selected + paths(q1, 'prototype', {'.py'}) + paths(q1, 'prototype/vendor', {'.json', '.md'})
 

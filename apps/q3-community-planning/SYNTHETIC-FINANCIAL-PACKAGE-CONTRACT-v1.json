@@ -1,0 +1,68 @@
+{
+  "contract": "q3-synthetic-financial-v1",
+  "status": "agreed implementation target; staging only until independent review",
+  "purpose": "Fresh synthetic demo financial data, not real financial-system intake or per-seed registry admission",
+  "endpoint": "POST /api/q3/financial/stage",
+  "role": "Q3 manager session, CSRF, exact origin; no role changes",
+  "csvSchemas": "Unchanged current HEADERS in server/financial_support.py and BUSINESS-UPLOAD-CONTRACT.json",
+  "fileFields": {
+    "customers": "customers.csv",
+    "usage": "consumption_daily.csv.gz",
+    "manifest": "manifest.json",
+    "arrangements": "payment_arrangements.csv.gz",
+    "hardship": "hardship_programs.csv.gz",
+    "grants": "hugs_grants.csv.gz",
+    "support": "support_arrangement_history.csv.gz",
+    "payments": "payments.csv.gz"
+  },
+  "textFields": {
+    "synthetic": "true",
+    "baseGeneration": "current active generation; exact source pair must already be active"
+  },
+  "newRequiredManifestFields": {
+    "synthetic_financial_contract": "q3-synthetic-financial-v1",
+    "financial_coverage": {
+      "accountPostcodes": "sorted unique postcodes actually in customers.csv, exactly matching active business retained-area coverage",
+      "historyStart": "same actual first usage date and parameters.start",
+      "historyEnd": "same actual final usage date and parameters.end/snapshot",
+      "declaration": "complete-synthetic-source-tables"
+    }
+  },
+  "existingRequiredManifestFields": {
+    "synthetic": true,
+    "generator": "nonempty identifier <=128 characters; declared provenance only",
+    "generator_source_sha256": "64 lowercase hex; declared provenance, never authorises uploaded code",
+    "geography_sha256": "exact pinned server geography hash",
+    "parameters": {
+      "profile": "season-ahead",
+      "count": "exact retained customer count, integer 1..100000",
+      "seed": "integer 0..9223372036854775807; metadata only",
+      "start": "YYYY-MM-DD, actual first usage date",
+      "end": "YYYY-MM-DD, actual latest usage date, not future"
+    },
+    "files": "seven exact source tables, each sha256/headers/rows/bytes/expandedBytes; optional coverage.csv QA metadata only, never uploaded"
+  },
+  "limits": {
+    "multipartRequestBytes": 33554432,
+    "manifestBytes": 2097152,
+    "encodedBytesPerCsv": 16777216,
+    "expandedBytesPerCsv": 100663296,
+    "expandedBytesAllSevenCsvs": 268435456,
+    "customers": 100000,
+    "usageRows": 1500000,
+    "financialRowsPerFile": 1500000,
+    "financialRowsTotal": 2000000,
+    "parentRowsEach": 200000,
+    "supportHistoryRows": 400000
+  },
+  "semantics": [
+    "Exact existing ordered headers; finite nonnegative money in ordinary decimal cents, no exponents; identifiers unique and bounded; source metadata counts/hashes/size checked against actual bytes/rows.",
+    "All customer/parent/history/grant/payment joins, recorded-date windows and known account lifecycle boundaries validated. Unknown opening stays unknown, never inferred active.",
+    "Payment plan amount = instalment * positive n_instalments. Active/terminal parent state and history agree; every begun parent has one complete active interval and ended parents have one terminal event.",
+    "Grant paid amount <= declared application debt and cap, paid date >= application and within accepted hardship interval; paid grants match exactly one cleared P_<grant_id> payment.",
+    "Complete synthetic source tables is an uploader declaration plus internal consistency checks, not independently proven real-world completeness. No missing financial input counts as zero.",
+    "No complete-daily-usage requirement or bill/debt reconciliation claim for sparse Q3 data. No individual risk or future account prediction."
+  ],
+  "workflow": "Existing stage -> status -> review -> explicit Replace; atomic last-good retention/restart and stale-generation rejection. All four old pinned packages stay accepted unchanged.",
+  "generatorAction": "Add only the two new manifest fields; keep existing CSV schemas, deterministic gzip and measured size validation. Supply at least two distinct fresh seeds for consumer tests. No live replacement."
+}

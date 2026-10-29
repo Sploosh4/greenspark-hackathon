@@ -260,7 +260,7 @@ class SnapshotStore:
             candidate['inputs']['business']=canonical(business).decode()
             require(len(candidate['inputs']['business'].encode())<=MAX_BYTES,'financial_aggregate_size_limit')
             manifest=candidate['manifest'];manifest['files']['business']['sha256']=digest(candidate['inputs']['business'].encode())
-            manifest['provenance']['financial_support_upload']={'replaced_at':self.clock().isoformat(),'snapshot_date':support['snapshotDate'],'reviewed_manifest_sha256':support['reviewedManifestSha256'],'aggregate_sha256':digest(canonical(support)),'coverage_areas':len(support['areas']),'raw_rows_persisted':False}
+            manifest['provenance']['financial_support_upload']={'replaced_at':self.clock().isoformat(),'snapshot_date':support['snapshotDate'],**({'source_manifest_sha256':support['sourceManifestSha256'],'validation_policy':support['validation']['policy']} if support['schemaVersion']==3 else {'reviewed_manifest_sha256':support['reviewedManifestSha256']}),'aggregate_sha256':digest(canonical(support)),'coverage_areas':len(support['areas']),'raw_rows_persisted':False}
             manifest['provenance'].pop('financial_support_invalidated',None)
             candidate['data'],candidate['generation']=records(manifest,candidate['inputs']);candidate['business_override']=True;candidate['validated_at']=self.clock().isoformat()
             self._persist(candidate);self.good=candidate

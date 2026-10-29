@@ -1,0 +1,38 @@
+# Q1-only acceptance. No host port, real identity bind, Q3 service or duplicate native scheduler.
+name: ${Q1_CURRENT_PROJECT_NAME:-team-connect-current-local}
+services:
+  q1:
+    image: team-connect-q1:current-candidate
+    pull_policy: never
+    platform: linux/amd64
+    build: {context: ./build/q1-current-candidate}
+    user: '10001:10001'
+    command: [python, /opt/runtime/q1_launcher.py, --app-root, /app, --source-root, /inputs/q1, --runtime-dir, /state/uploads, --listen, 0.0.0.0, --port, '8891', --auth-store, /identity/auth.sqlite3, --replay-snapshot, /replay/cohort.json, --replay-mode, simulated_historical_replay, --current-uploads, --current-python, /usr/local/bin/python]
+    volumes:
+      - {type: volume, source: q1_state, target: /state}
+      - {type: volume, source: q1_identity, target: /identity, read_only: true}
+      - type: bind
+        source: ${Q1_SOURCE_DIR:?Set the approved historical input source}
+        target: /inputs/q1
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${Q1_REPLAY_SNAPSHOT:?Set the reviewed historical replay JSON}
+        target: /replay/cohort.json
+        read_only: true
+        bind: {create_host_path: false}
+    network_mode: none
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    init: true
+    cpus: 1.0
+    mem_limit: 1g
+    pids_limit: 96
+    restart: 'no'
+    stop_grace_period: 45s
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+volumes:
+  q1_identity: {external: true, name: '${Q1_CURRENT_IDENTITY_VOLUME:?Set the separately approved private identity volume}'}
+  q1_state: {external: true, name: '${Q1_CURRENT_STATE_VOLUME:?Set the separately approved private state volume}'}

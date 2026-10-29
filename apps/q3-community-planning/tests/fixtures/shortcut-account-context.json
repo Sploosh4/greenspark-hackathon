@@ -1,0 +1,23 @@
+{
+  "classification": "Synthetic reviewed aggregate regression fixture, not production data",
+  "snapshotDate": "2025-06-30",
+  "sourceSnapshotSha256": "e2fc66a2d6012186413ce8439ecc7dbed01ac48753bf4a5db461805c76261e72",
+  "areas": [
+    {
+      "postcode": "6000",
+      "name": "Perth",
+      "accountCount": 1720
+    },
+    {
+      "postcode": "6001",
+      "name": "Perth",
+      "accountCount": 1722
+    },
+    {
+      "postcode": "6037",
+      "name": "Two Rocks",
+      "accountCount": 31
+    }
+  ],
+  "absentNamedArea": "6765"
+}

@@ -11,6 +11,9 @@ AREA_KEYS={'postcode','snapshotDate','activeAccountDenominator','activePaymentAr
 SUPPORT_KEYS={'schemaVersion','contract','historyStart','historyEnd','coverage','state','snapshotDate','classification','cohortCustomerSha256','cohortUsageSha256','reviewedManifestSha256','sourceHashes','areas','monthlyGrantLedger','definitions'}
 
 def validate_attachment(s,business,entry=None):
+    if type(s) is dict and s.get('schemaVersion')==3:
+        from synthetic_financial import validate_synthetic_attachment
+        return validate_synthetic_attachment(s,business)
     require(type(s) is dict and set(s)==SUPPORT_KEYS and type(s.get('schemaVersion')) is int and s['schemaVersion']==2 and s.get('contract')=='q3-financial-support-v2' and s.get('state')=='validated','financial_attachment_contract')
     entry=entry or reviewed_entry(s.get('reviewedManifestSha256'))
     require(s.get('snapshotDate')==business['snapshotDate']==entry['snapshotDate'] and s.get('historyStart')==business['historyStart']==entry['historyStart'] and s.get('historyEnd')==business['historyEnd']==entry['historyEnd'],'financial_snapshot_mismatch')
@@ -44,21 +47,29 @@ class FinancialStages:
         require(len(files['manifest'])<=2*1024*1024,'financial_manifest_size')
         current=self.store.read();require(current['data'] is not None and not current['status']['last_refresh_error'],'current_source_unavailable')
         require(current['generation']==expected_generation,'active_snapshot_changed_restage_required')
-        business=current['data']['business'];entry=self.lookup(digest(files['manifest']))
-        try:metadata=parse(files['manifest'].decode('utf-8'))
-        except UnicodeError:raise SourceError('financial_manifest_encoding') from None
-        parameters=metadata.get('parameters',{})
-        require(parameters.get('start')==entry['historyStart']==business['historyStart'] and parameters.get('end')==entry['historyEnd']==business['historyEnd'] and type(parameters.get('count')) is int and parameters['count']==business['retainedTotalAccounts']==entry['retainedAccounts'],'financial_manifest_window_or_cohort')
-        require(entry['customerSourceSha256']==digest(files['customers'])==business['customerSourceSha256'] and entry['usageSourceSha256']==digest(files['usage'])==business['usageSourceSha256'],'financial_cohort_mismatch')
+        business=current['data']['business'];manifest_hash=digest(files['manifest'])
+        try:entry=self.lookup(manifest_hash)
+        except SourceError as error:
+            if str(error)!='unreviewed_financial_manifest':raise
+            entry=None
         sidecars={PART_FILES[k]:v for k,v in files.items() if k not in {'customers','usage','manifest'}}
-        support=derive_support_context(files['customers'],files['usage'],True,self.trusted,self.clock().date(),business,sidecars,files['manifest'],digest(files['manifest']))
+        if entry is None:
+            from synthetic_financial import derive_synthetic_context
+            support=derive_synthetic_context(files['customers'],files['usage'],self.trusted,self.clock().date(),business,sidecars,files['manifest'])
+        else:
+            try:metadata=parse(files['manifest'].decode('utf-8'))
+            except UnicodeError:raise SourceError('financial_manifest_encoding') from None
+            parameters=metadata.get('parameters',{})
+            require(parameters.get('start')==entry['historyStart']==business['historyStart'] and parameters.get('end')==entry['historyEnd']==business['historyEnd'] and type(parameters.get('count')) is int and parameters['count']==business['retainedTotalAccounts']==entry['retainedAccounts'],'financial_manifest_window_or_cohort')
+            require(entry['customerSourceSha256']==digest(files['customers'])==business['customerSourceSha256'] and entry['usageSourceSha256']==digest(files['usage'])==business['usageSourceSha256'],'financial_cohort_mismatch')
+            support=derive_support_context(files['customers'],files['usage'],True,self.trusted,self.clock().date(),business,sidecars,files['manifest'],manifest_hash)
         validate_attachment(support,business,entry)
         # A concurrent business or climate commit invalidates the reviewed proposal.
         require(self.store.read()['generation']==current['generation'],'active_snapshot_changed_restage_required')
         with self.lock:
             self._expire();require(len(self.stages)<4,'too_many_staged_uploads')
             token=secrets.token_urlsafe(24);expires=self.clock()+timedelta(minutes=30)
-            public={'stageId':token,'baseGeneration':current['generation'],'expiresAt':expires.isoformat(),'proposedSupport':support,'snapshotDate':support['snapshotDate'],'areaCount':len(support['areas']),'validation':{'rawRowsPersisted':False,'reviewedManifestSha256':support['reviewedManifestSha256'],'allRequiredTablesValidated':True,'accountCoverageMatched':True}}
+            public={'stageId':token,'baseGeneration':current['generation'],'expiresAt':expires.isoformat(),'proposedSupport':support,'snapshotDate':support['snapshotDate'],'areaCount':len(support['areas']),'validation':{'rawRowsPersisted':False,**({'sourceManifestSha256':support['sourceManifestSha256'],'policy':support['validation']['policy']} if support['schemaVersion']==3 else {'reviewedManifestSha256':support['reviewedManifestSha256']}),'allRequiredTablesValidated':True,'accountCoverageMatched':True}}
             self.stages[token]={'public':public,'expires':expires,'base':current['generation'],'support':support}
             return copy.deepcopy(public)
     def replace(self,token,generation):

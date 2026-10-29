@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from urllib.parse import urlsplit,parse_qs
-import hashlib,json,math,os,re,threading,uuid
+import hashlib,json,math,os,re,threading,uuid,copy
 from .uploads import write_json
 
 PERTH=ZoneInfo('Australia/Perth')
@@ -47,6 +47,8 @@ def normalise(raw):
     if not isinstance(forecast,dict):raise WeatherError('Invalid forecast object')
     if location.get('name')!='Fitzroy Crossing' or (location.get('latitude'),location.get('longitude'))!=(LAT,LON):raise WeatherError('Town identity does not match the reviewed coordinate contract')
     if forecast.get('timezone')!='Australia/Perth' or forecast.get('utc_offset_seconds')!=28800:raise WeatherError('Forecast must use Australia/Perth')
+    elevation=forecast.get('elevation')
+    if elevation is not None and (type(elevation) not in (int,float) or not math.isfinite(elevation)):raise WeatherError('Invalid provider elevation')
     coordinates=[forecast.get('latitude'),forecast.get('longitude')]
     if any(type(v) not in (int,float) or not math.isfinite(v) for v in coordinates):raise WeatherError('Invalid provider grid')
     a,b=map(math.radians,(LAT,coordinates[0]));delta=math.sin((b-a)/2)**2+math.cos(a)*math.cos(b)*math.sin(math.radians(coordinates[1]-LON)/2)**2
@@ -82,7 +84,7 @@ def normalise(raw):
     for sample in samples:
         sample['kind']='archived_model_forecast' if instant(sample['valid_at']).date()<requested.astimezone(PERTH).date() else 'model_forecast'
         sample['available_to_app_at']=utc(retrieved)
-    return {'schema_version':'q1-public-weather/v1','source_contract':PUBLIC_CONTRACT if extended else 'existing-public-cache/v1','provider':'Open-Meteo','classification':'public_weather_forecast','postcode':'6765','locality':'Fitzroy Crossing','town_coordinates':[LAT,LON],'provider_grid':coordinates,'requested_at':utc(requested),'retrieved_at':utc(retrieved),'model_issued_at':None if issue is None else utc(instant(issue)),'model_issue_note':'Not exposed by the generic response; retrieval is not model issue time.','valid_from':start.isoformat(),'valid_until_exclusive':end.isoformat(),'timezone':'Australia/Perth','hourly':samples,'warmup_kind':'archived_model_forecast' if extended else 'not_supplied','observed_warmup_available':False,'calibration_compatible':False,'daily_aggregation':'max/min of 24 hourly samples in each Perth calendar day; approximate extrema, not EHF windows','attribution':'Weather data by Open-Meteo; town location from GeoNames via Open-Meteo','attribution_url':'https://open-meteo.com/','licence_url':'https://open-meteo.com/en/licence','source_url':raw.get('source_url'),'heat_classification':{'status':'unavailable','reason':'forecast_grid_and_warmup_not_calibrated','official_bom_category':None}}
+    return {'schema_version':'q1-public-weather/v1','source_contract':PUBLIC_CONTRACT if extended else 'existing-public-cache/v1','provider':'Open-Meteo','classification':'public_weather_forecast','postcode':'6765','locality':'Fitzroy Crossing','town_coordinates':[LAT,LON],'provider_grid':coordinates,'provider_elevation_m':forecast.get('elevation'),'requested_at':utc(requested),'retrieved_at':utc(retrieved),'model_issued_at':None if issue is None else utc(instant(issue)),'model_issue_note':'Not exposed by the generic response; retrieval is not model issue time.','valid_from':start.isoformat(),'valid_until_exclusive':end.isoformat(),'timezone':'Australia/Perth','hourly':samples,'warmup_kind':'archived_model_forecast' if extended else 'not_supplied','observed_warmup_available':False,'calibration_compatible':False,'daily_aggregation':'max/min of 24 hourly samples in each Perth calendar day; approximate extrema, not EHF windows','attribution':'Weather data by Open-Meteo; town location from GeoNames via Open-Meteo','attribution_url':'https://open-meteo.com/','licence_url':'https://open-meteo.com/en/licence','source_url':raw.get('source_url'),'heat_classification':{'status':'unavailable','reason':'forecast_grid_and_warmup_not_calibrated','official_bom_category':None}}
 
 def window(snapshot,now,last_error=None):
     if now.tzinfo is None:raise WeatherError('Review time needs a UTC offset')
@@ -110,14 +112,16 @@ def window(snapshot,now,last_error=None):
     return {'review_date':review.isoformat(),'horizon_start':first.isoformat(),'horizon_end':last.isoformat(),'days':days,'status':{'state':'fresh' if reason=='fresh' else 'unavailable' if snapshot is None else 'stale','reason':reason,'age_hours':age,'complete_target_days':sum(d['status']=='available' for d in days),'last_error':last_error},'context_coverage':context,'source':{k:v for k,v in snapshot.items() if k!='hourly'} if snapshot else None,'current_customer_estimates_available':False}
 
 class PublicWeatherStore:
-    def __init__(self,root,source_cache=SHARED_CACHE):
+    def __init__(self,root,source_cache=SHARED_CACHE,*,clock=None):
+        self.context_clock=clock or (lambda:datetime.now(timezone.utc));self.snapshot_loaded_at=None;self.snapshot_sha256=None
         self.root=Path(root);self.root.mkdir(parents=True,exist_ok=True);self.source_cache=Path(source_cache);self.lock=threading.RLock();self.last_error=None;self.snapshot=None
         try:
             state=json.loads((self.root/'latest.json').read_text())
             if not re.fullmatch('[a-f0-9]{64}',state['sha256']):raise WeatherError('Invalid saved snapshot identity')
             raw=(self.root/'snapshots'/state['sha256']).read_bytes()
             if hashlib.sha256(raw).hexdigest()!=state['sha256']:raise WeatherError('Stored public snapshot hash mismatch')
-            self.snapshot=normalise(json.loads(raw))
+            snapshot=normalise(json.loads(raw));loaded_at=self._loaded_at()
+            self.snapshot=snapshot;self.snapshot_loaded_at=loaded_at;self.snapshot_sha256=state['sha256']
         except (OSError,ValueError,KeyError,TypeError):pass
         try:self.last_error=json.loads((self.root/'attempt.json').read_text()).get('error')
         except (OSError,ValueError,AttributeError):pass
@@ -130,7 +134,7 @@ class PublicWeatherStore:
                 if source_cache.stat().st_size>MAX_BYTES:raise WeatherError('Public cache exceeds 4 MiB')
                 raw=source_cache.read_bytes()
                 if len(raw)>MAX_BYTES:raise WeatherError('Public cache exceeds 4 MiB')
-                snapshot=normalise(json.loads(raw));sha=hashlib.sha256(raw).hexdigest()
+                snapshot=normalise(json.loads(raw));loaded_at=self._loaded_at();sha=hashlib.sha256(raw).hexdigest()
                 (self.root/'snapshots').mkdir(exist_ok=True);target=self.root/'snapshots'/sha
                 if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()!=sha:raise WeatherError('Saved snapshot integrity check failed')
                 if not target.exists():
@@ -153,7 +157,7 @@ class PublicWeatherStore:
                 except (OSError,ValueError,AttributeError):pass
                 write_json(self.root/'latest.json',{'sha256':sha})
                 write_json(self.root/'attempt.json',{'succeeded':True,'error':upstream_error})
-                self.snapshot=snapshot;self.last_error=upstream_error
+                self.snapshot=snapshot;self.last_error=upstream_error;self.snapshot_loaded_at=loaded_at;self.snapshot_sha256=sha
                 return {'succeeded':True,'sha256':sha,'retrieved_at':snapshot['retrieved_at']}
             except (OSError,ValueError,KeyError,TypeError):
                 self.last_error='public_cache_missing_or_invalid'
@@ -162,3 +166,10 @@ class PublicWeatherStore:
                 return {'succeeded':False,'error':self.last_error}
     def view(self,now=None):
         with self.lock:return window(self.snapshot,now or datetime.now(timezone.utc),self.last_error)
+
+    def _loaded_at(self):
+        now=self.context_clock()
+        if now.tzinfo is None:raise WeatherError('Adapter load clock needs a UTC offset')
+        return utc(now)
+    def context_source(self):
+        with self.lock:return {'snapshot':copy.deepcopy(self.snapshot),'adapter_loaded_at':self.snapshot_loaded_at,'last_error':self.last_error,'snapshot_sha256':self.snapshot_sha256}
