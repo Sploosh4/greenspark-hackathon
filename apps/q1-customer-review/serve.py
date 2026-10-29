@@ -1,4 +1,5 @@
 """Loopback-only synthetic Q1 app: controlled local replacement and recovery."""
+from prototype.history_context import attach_history
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs,unquote
@@ -105,7 +106,7 @@ class Handler(SimpleHTTPRequestHandler):
             if current:
                 result=current.view(self.server.uploads.view())
                 if revision is not None and revision!=result['batch_revision']:raise UploadError('Uploaded data or forecast calculation changed. Reload before exporting.',409)
-                return result
+                return attach_history(result)
             return self.server.uploads.view(revision)
         if mode!='demo':raise UploadError('Unknown data mode')
         if self.server.review is None:raise UploadError('Preloaded inputs could not be validated',503)

@@ -12,6 +12,9 @@ Q1 = HERE.parents[1] / 'apps/q1-customer-review'
 Q3 = HERE.parents[1] / 'apps/q3-community-planning'
 FONT = Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
 FONT_HASH = 'b4c632e3cdf9acc7f28758fb5a323c8524d7fc6660d46904d9b6cbe2809c419c'
+Q1_HISTORY = Path('prototype/data/silo-6765-history.json')
+Q3_STATISTICAL = tuple(Path('data/statistical') / name for name in (
+    'ml_outlook_layer.json', 'upstream-provenance.json', 'LICENSE'))
 
 
 def sha(raw):
@@ -39,6 +42,7 @@ def selected_q1_files(q1):
     selected = [Path(p) for p in ('serve.py', 'pdf_export.py', 'index.html', 'app.mjs', 'core.mjs',
                                   'LICENSE', 'assets/q1.css', 'docs/UPLOAD-VALIDATION-CONTRACT.json')]
     if (q1/'checks.html').is_file():selected.append(Path('checks.html'))
+    if (q1/Q1_HISTORY).is_file():selected.append(Q1_HISTORY)
     for tool in ['tools/build_replay_snapshot.py', 'tools/current_inference.py']:
         if (q1/tool).is_file():selected.append(Path(tool))
     selected += [p for p in paths(q1, 'assets', {'.html', '.mjs', '.css', '.svg'}) if p not in selected]
@@ -97,6 +101,7 @@ def stage_q3_receipt(receipt_path, output):
                        or p.parts[0] == 'server' and p.suffix == '.py'
                        or p.parts[0] == 'web' and p.suffix in {'.html', '.mjs', '.css', '.js', '.txt', '.svg', '.geojson'}
                        or p.parts[:2] in {('data', 'inputs'), ('data', 'geography'), ('data', 'financial')} and p.suffix == '.json'
+                       or p in Q3_STATISTICAL
                        or p.parts[:2] == ('data', 'history') and p.suffix in {'.png', '.json', '.gz'})
             if not allowed:
                 continue
@@ -134,6 +139,7 @@ def stage(q1=Q1, q3=Q3, output=HERE / 'build'):
         q3_files = [Path('run.py'), Path('BUSINESS-UPLOAD-CONTRACT.json'), Path('data/PROVENANCE.md')] + paths(q3, 'server', {'.py'})
         q3_files += paths(q3, 'web', {'.html', '.mjs', '.css', '.js', '.txt', '.svg', '.geojson'})
         q3_files += paths(q3, 'data/inputs', {'.json'}) + paths(q3, 'data/geography', {'.json'}) + paths(q3, 'data/financial', {'.json'})
+        q3_files += [p for p in Q3_STATISTICAL if (q3/p).is_file()]
         for name, root, selected in [('q1', q1, q1_files), ('q3', q3, q3_files)]:
             context = temp / name
             for relative in selected:

@@ -267,6 +267,9 @@
   },
   "delivery_status": "Selected local delivery hash-verified. No public asset release or download URL approved; private delivery links are not reproduced here.",
   "demonstrated_state_identity_only": {
+    "q1_chart_integration_preserved_uploaded_recovery_files": 47,
+    "q1_historical_replay_retained_customers": 37,
+    "q1_latest_owner_active_customers": 120,
     "q3_business_generation": "4f59a0536e5584c5d6d8dc341648e86eaaea05f485fca5b2be6759fb0559ad11",
     "q3_saved_snapshot_sha256": "e2fc66a2d6012186413ce8439ecc7dbed01ac48753bf4a5db461805c76261e72",
     "saved_runtime_state_in_git": false
@@ -281,6 +284,43 @@
     "personal files",
     "model binaries"
   ],
+  "included_git_weather_assets": {
+    "files": {
+      "apps/q1-customer-review/prototype/data/silo-6765-history.json": {
+        "bytes": 499619,
+        "sha256": "aa37fb09627b5ec31d3447d75a8f957da7c90d735751e72e6447619773167a45"
+      },
+      "apps/q3-community-planning/data/statistical/LICENSE": {
+        "bytes": 1065,
+        "sha256": "b6610de7a629350f2cbeed566fd83730b7690b0416829f56c167037168078c26"
+      },
+      "apps/q3-community-planning/data/statistical/ml_outlook_layer.json": {
+        "bytes": 144733,
+        "sha256": "909904199eafcefcfaaa8844ae8bf7a4b53ca55326df3a2973290f294e7dc247"
+      },
+      "apps/q3-community-planning/data/statistical/upstream-provenance.json": {
+        "bytes": 1078,
+        "sha256": "63c1ed738dc5f8b79683886dd0a7fa74e4409cd1d9dd715a953d35918851a8e3"
+      }
+    },
+    "public_status": "Local candidate only; exact new code/data publication approval pending",
+    "q1_derivative": {
+      "all_rows_values_dates_and_other_metadata_identical": true,
+      "candidate_bytes": 499619,
+      "candidate_sha256": "aa37fb09627b5ec31d3447d75a8f957da7c90d735751e72e6447619773167a45",
+      "independent_derivative_review": "pending",
+      "model_and_current_calculation_sources_unchanged": true,
+      "new_history_loader_pin": "aa37fb09627b5ec31d3447d75a8f957da7c90d735751e72e6447619773167a45",
+      "original_bytes": 506712,
+      "original_runtime_and_original_asset_untouched": true,
+      "original_sha256": "186197de4a10181bb4721b112e8e95a5e070aac2b4af63c418d6f2274167b757",
+      "removed_private_source_path_fields": 61,
+      "rows": 1854,
+      "source_names_and_hashes_preserved": true
+    },
+    "q3_original_export_mit_notice_retained": true,
+    "raw_climate_archives_and_model_binaries_included": false
+  },
   "model_delivery": {
     "aggregate_zip_sha256": "ed73b54196a5461866b5a209d57412878831f6913621dbd574d841e524dafa35",
     "file_manifest": "FROZEN-MODEL-FILE-MANIFEST.json",
@@ -304,8 +344,8 @@
     "archive_bytes": 15460740,
     "archive_filename": "FINAL_DEMO_PACKAGE.zip",
     "archive_sha256": "d67990f338af7eb205b6f6d080c8e663931742e47068221fcfaa2a78a5deefaf",
+    "generator_delivery_verification_activated_native_data": false,
     "local_ready_files_hash_checked": true,
-    "native_active_dataset_replaced": false,
     "public_download_url": null,
     "q1_current_contract": "current-synthetic-demo/v1.0.1",
     "q1_review_day": "2026-10-29",

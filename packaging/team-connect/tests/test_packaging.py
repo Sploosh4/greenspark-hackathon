@@ -78,6 +78,31 @@ class PackagingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 module.copy_file(root / 'link', root / 'out', {})
 
+    def test_statistical_receipt_keeps_export_not_unlisted_state(self):
+        import hashlib
+        spec=importlib.util.spec_from_file_location('statistical_stage',ROOT/'stage.py')
+        stage=importlib.util.module_from_spec(spec);spec.loader.exec_module(stage)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);version='b'*64;source=root/('season-ahead-frozen-'+version[:12])
+            files={'data/statistical/ml_outlook_layer.json':b'{"fixture":true}',
+                   'data/statistical/upstream-provenance.json':b'{"source":"fixture"}',
+                   'data/statistical/LICENSE':b'fixture licence',
+                   'data/statistical/private-state.json':b'{"private":"fixture"}'}
+            for name,raw in files.items():
+                p=source/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+            receipt=root/'receipt.json';receipt.write_text(json.dumps({'codeVersionSha256':version,'frozenSnapshot':str(source),'runtimeFilesSha256':{name:hashlib.sha256(raw).hexdigest() for name,raw in files.items()}}))
+            output=root/'context';stage.stage_q3_receipt(receipt,output)
+            for name,raw in files.items():
+                if name.endswith('private-state.json'):self.assertFalse((output/'app'/name).exists())
+                else:self.assertEqual((output/'app'/name).read_bytes(),raw)
+
+    def test_staged_history_and_statistical_bytes_match_source(self):
+        for app,paths in [('q1',['prototype/data/silo-6765-history.json']),
+                          ('q3',['data/statistical/ml_outlook_layer.json','data/statistical/upstream-provenance.json','data/statistical/LICENSE'])]:
+            source=ROOT.parents[1]/'apps'/('q1-customer-review' if app=='q1' else 'q3-community-planning')
+            for name in paths:
+                self.assertEqual((ROOT/'build'/app/'app'/name).read_bytes(),(source/name).read_bytes())
+
     def test_snapshots_exclude_secrets_and_runtime(self):
         for name in ['q1', 'q3']:
             context = ROOT / 'build' / name

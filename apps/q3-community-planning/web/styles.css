@@ -24,3 +24,5 @@
 .support-context{border-top:1px solid #dce5d8;margin-top:18px;padding-top:16px}.support-context p{font-size:11px;line-height:1.6;color:#526e52;margin:10px 0}.support-counts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.support-counts div{min-width:0}.support-counts dt{font-size:10px;color:#617b58;line-height:1.5}.support-counts dd{margin:4px 0 0;font-size:24px;color:#355745}.support-context #support-grant-amount{display:block;font-size:19px;margin:8px 0}.support-context small{margin-top:10px}
 
 .local-town-label{font:500 11px/1.15 system-ui,sans-serif;color:#334a40;text-shadow:0 1px 2px #fff,1px 0 2px #fff,-1px 0 2px #fff;white-space:nowrap;pointer-events:none}
+
+.forecast-source-controls{display:grid;gap:5px;margin:14px 0 8px}.forecast-source-controls label{font-size:11px;color:#52655b}.forecast-source-controls select{width:100%;min-width:0;padding:8px;background:#fff;border:1px solid #d9dfdb;border-radius:6px;color:#243e31;font:inherit;font-size:12px}.forecast-source-controls small{font-size:11px;line-height:1.45;color:#52655b}#statistical-cell-details{margin:10px 0;line-height:1.55}[hidden]{display:none!important}

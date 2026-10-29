@@ -19,8 +19,10 @@ from history_archive import HistoryArchive
 from financial_intake import FinancialStages,FinancialJobs,MAX_FINANCIAL_UPLOAD,PART_FILES
 from local_auth import AuthService,AuthError,AUTH_PATHS,header
 from account_lookup import ReadOnlyAccounts
+from statistical_outlook import StatisticalOutlook
 
 ROOT=Path(__file__).resolve().parent
+STATISTICAL=StatisticalOutlook(ROOT/'data/statistical/ml_outlook_layer.json')
 class Q3Handler(Handler):
     def reply(self,payload,content_type,status=200,cache=False,extra_headers=(),csp=None):
         self.send_response(status)
@@ -96,6 +98,10 @@ class Q3Handler(Handler):
                 else:self.json_reply({'error':'history_route_not_allowed'},404)
             except (OSError,ValueError,KeyError,TypeError):self.json_reply({'error':'historical_layer_unavailable'},503)
             return
+        if parsed.path=='/api/q3/statistical-outlook':
+            if host not in {'127.0.0.1','localhost'} or self.headers.get('Sec-Fetch-Site')=='cross-site':
+                self.json_reply({'error':'same_origin_loopback_required'},403);return
+            self.json_reply(getattr(self.server,'statistical_outlook',STATISTICAL).read());return
         if parsed.path=='/api/q3/snapshot':
             if host not in {'127.0.0.1','localhost'} or self.headers.get('Sec-Fetch-Site')=='cross-site':
                 self.json_reply({'error':'Same-origin loopback request required'},403);return

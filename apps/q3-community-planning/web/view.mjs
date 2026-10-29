@@ -1,3 +1,4 @@
+import {MEASURES,measureReading,readStatistical,projectStatistical,statisticalCell} from './modules/statistical-outlook.mjs';
 import {renderFinancialSupport} from './modules/financial-support.mjs';
 import {localStyle,createBasemap,labelCandidates} from './modules/local-basemap.mjs';
 import {PERF,painted} from './modules/performance.mjs';
@@ -12,6 +13,9 @@ import {historicalFeatures,addHistoricalLayer,setHistoricalVisibility} from './m
 const $=s=>document.querySelector(s);
 let history,business,anomaly,filterPolicy=null,selectedAreaCode='6765',nativeHistory=null,selectedHistoryCoordinate=[125.55,-18.2],selectedHistoryName='Fitzroy Crossing';
 let supportSourceRetained=false;
+let ecmwfMean,ecmwfAnomaly,lastSnapshot,statisticalPacket=null,forecastSource='ecmwf',statisticalIssue='2026-10',measureMode='temperature';
+const activeBaseline=()=>forecastSource==='namash'?'1991–2020 NASA POWER / MERRA-2':'1993–2016 ECMWF model hindcast';
+const displaySeries=()=>measureMode==='anomaly'?selectedSeries(anomaly,selected,'valuesAnomalyC'):selectedSeries(data,selected,measureMode==='probability'?'probability':'valuesC');
 let selectionSequence=0,warmPaint=null;
 let basemapReady=false,basemapState='loading';
 let cameraMode='wa', overview=true,mapReady=false,currentGeneration=null,lastHistoricalUpdate=Promise.resolve(),historyRendered=false,initialMeasured=false,appMeasured=false,mapDelayed=false;
@@ -31,7 +35,7 @@ const boundary=await boundaryResponse.json();
 const map=new maplibregl.Map({container:'map',style:localStyle(boundary),center:[120.8,-25],zoom:4.05,minZoom:3,maxZoom:12,dragPan:true,dragRotate:false,pitchWithRotate:false,cooperativeGestures:true,attributionControl:false});
 map.addControl(new maplibregl.ScaleControl({maxWidth:80,unit:'metric'}),'bottom-left');
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
-map.addControl(new maplibregl.AttributionControl({compact:false,customAttribution:'Climate: Copernicus C3S / ECMWF; history: SILO / BoM | Basemap: <a href="https://www.maptiler.com/copyright/">© MapTiler</a> / <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>'}),'bottom-right');
+map.addControl(new maplibregl.AttributionControl({compact:false,customAttribution:'Climate: Copernicus C3S / ECMWF; statistical outlook: Namash / NASA POWER / NOAA; history: SILO / BoM | Basemap: <a href="https://www.maptiler.com/copyright/">© MapTiler</a> / <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>'}),'bottom-right');
 let localLabels=[];
 function updateLocalLabels(){
  for(const marker of localLabels)marker.remove();localLabels=[];
@@ -55,20 +59,21 @@ $('#retry-basemap').onclick=()=>basemap.retry();
 map.on('sourcedata',measureReady);
 const firstLabel=()=>map.getStyle().layers.find(l=>l.type==='symbol')?.id;
 const colour=['interpolate',['linear'],['get','valueC'],14,'#679fc8',20,'#c0d9d6',26,'#f6dea2',32,'#e77645',36,'#b51f36'];
-function nativeGrid(){return nativeMeanGrid(data,fieldIndex);}
+function nativeGrid(){const source=measureMode==='anomaly'?{...anomaly,fields:anomaly.fields.map(f=>({...f,valuesC:f.valuesAnomalyC}))}:measureMode==='probability'?{...data,fields:data.fields.map(f=>({...f,valuesC:f.probability}))}:data;return nativeMeanGrid(source,fieldIndex);}
 function nearestCell(lon,lat){return nearestNativeCell(data,lon,lat);}
-function updateCell(feature,title){feature=cell(Number(feature.properties.lon),Number(feature.properties.lat));selected=feature;selectedTitle=title||`Cell at ${Math.abs(feature.properties.lat)}°S, ${feature.properties.lon}°E`;const {lon,lat}=feature.properties;const d=dimensions(lat);$('#cell-title').textContent=selectedTitle;$('#width').textContent=`${d.width} km`;$('#height').textContent=`${d.height} km`;$('#bounds').textContent=`${Math.abs(lat+.5)}–${Math.abs(lat-.5)}°S · ${lon-.5}–${lon+.5}°E`;if(data){const y=data.latitudes.indexOf(Number(lat)),x=data.longitudes.indexOf(Number(lon));const v=data.fields[fieldIndex].valuesC[y]?.[x];$('#cell-value').textContent=Number.isFinite(v)?`${v.toFixed(1)} °C`:'No data';}map.getSource('selected-cell')?.setData({type:'FeatureCollection',features:data&&!overview?[selected]:[]});updateAreaContext();updateHistory();renderChart();updateWarmReadout();}
+function updateCell(feature,title){feature=cell(Number(feature.properties.lon),Number(feature.properties.lat));selected=feature;selectedTitle=title||`Cell at ${Math.abs(feature.properties.lat)}°S, ${feature.properties.lon}°E`;const {lon,lat}=feature.properties;const d=dimensions(lat);$('#cell-title').textContent=selectedTitle;$('#width').textContent=`${d.width} km`;$('#height').textContent=`${d.height} km`;$('#bounds').textContent=`${Math.abs(lat+.5)}–${Math.abs(lat-.5)}°S · ${lon-.5}–${lon+.5}°E`;if(data){const y=data.latitudes.indexOf(Number(lat)),x=data.longitudes.indexOf(Number(lon));const v=displaySeries()[fieldIndex];$('#cell-value').textContent=measureReading(v,measureMode);$('#cell-value').title=`${MEASURES[measureMode].label}; ${forecastSource==='namash'?'experimental Namash statistical source':'ECMWF monthly ensemble mean'}; native 1° source cell`;updateStatisticalCell();}map.getSource('selected-cell')?.setData({type:'FeatureCollection',features:data&&!overview?[selected]:[]});updateAreaContext();updateHistory();renderChart();updateWarmReadout();}
 function renderChart(){
+  updateStatisticalCell();
   $('#cell-panel').hidden=overview;$('#monthly-chart').hidden=overview||!data;$('#overview-summary').hidden=!overview||!data;
   $('#rail-title').textContent=overview?'Western Australia':(GEOGRAPHY.areas.find(a=>a.postcode===selectedAreaCode)?.name||'Selected location');
   $('#rail-intro').textContent=overview?'Explore six months of forecast temperature. Select a town or land cell for local context.':'Forecast, historical context and accounts for this location.';
   document.querySelectorAll('.month-chip').forEach((b,i)=>b.setAttribute('aria-pressed',String(i===fieldIndex)));
   if(overview||!data)return;
-  const series=selectedSeries(data,selected);
-  $('#chart-bars').replaceChildren(...data.fields.map((f,i)=>{const v=series[i];const bar=document.createElement('div');bar.className='chart-bar'+(i===fieldIndex?' active':'');const value=document.createElement('strong');value.textContent=Number.isFinite(v)?v.toFixed(1):'—';const stem=document.createElement('i');stem.style.height=Number.isFinite(v)?`${Math.max(2,(v-14)/22*52)}px`:'0px';const label=document.createElement('span');label.textContent=monthText(f.validMonth).slice(0,3);bar.append(value,stem,label);return bar;}));
+  const series=displaySeries();
+  $('#chart-bars').replaceChildren(...data.fields.map((f,i)=>{const v=series[i];const bar=document.createElement('div');bar.className='chart-bar'+(i===fieldIndex?' active':'');const value=document.createElement('strong');value.textContent=Number.isFinite(v)?measureMode==='probability'?`${Math.round(v*100)}%`:v.toFixed(1):'—';const stem=document.createElement('i');stem.style.height=Number.isFinite(v)?`${Math.max(2,(v-MEASURES[measureMode].domain[0])/(MEASURES[measureMode].domain[1]-MEASURES[measureMode].domain[0])*52)}px`:'0px';const label=document.createElement('span');label.textContent=monthText(f.validMonth).slice(0,3);bar.append(value,stem,label);return bar;}));
 }
 function buildMonthChips(){ $('#time-rail').hidden=false; $('#warm-months').replaceChildren(...data.fields.map(f=>{const label=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.value=f.validMonth;input.setAttribute('aria-label',`Include ${monthText(f.validMonth)} in warm-month filter`);label.append(input,document.createTextNode(monthText(f.validMonth).slice(0,3)));return label;})); $('#month-chips').replaceChildren(...data.fields.map((f,i)=>{const b=document.createElement('button');b.className='month-chip';b.type='button';b.setAttribute('aria-label',monthText(f.validMonth));b.setAttribute('aria-pressed',String(i===fieldIndex));const name=new Date(`${f.validMonth}-01T12:00:00Z`).toLocaleDateString('en-AU',{month:'short',timeZone:'UTC'});b.append(document.createTextNode(name));const year=document.createElement('small');year.textContent=f.validMonth.slice(0,4);b.append(year);b.onclick=()=>{fieldIndex=i;$('#month').value=String(i);setMonth();};return b;}));}
-function setMonth(){const started=performance.now();map.getSource('seasonal-grid')?.setData(nativeGrid());$('#valid-month').textContent=monthText(data.fields[fieldIndex].validMonth);$('#coverage-note').textContent=`${monthText(data.fields[fieldIndex].validMonth)} · Monthly mean`;updateCell(selected,selectedTitle);painted('forecast-month',started);}
+function setMonth(){const started=performance.now();updateMeasureLegend();map.getSource('seasonal-grid')?.setData(nativeGrid());$('#valid-month').textContent=monthText(data.fields[fieldIndex].validMonth);$('#coverage-note').textContent=`${monthText(data.fields[fieldIndex].validMonth)} · ${MEASURES[measureMode].label}`;updateCell(selected,selectedTitle);painted('forecast-month',started);}
 function fitWA(){
   cameraMode='wa';overview=true;selectedAreaCode='';selectedAreaMarker?.remove();
   map.fitBounds([[112.8,-35.5],[129,-13.5]],{padding:{top:83,bottom:125,left:35,right:35},duration:0});
@@ -201,7 +206,7 @@ function chosenFilterPolicy(){
   if(threshold===''||minimum==='')throw Error('Choose months, Δ°C and X.');
   return validatePolicy(selectedFilterIndices(),Number(threshold),Number(minimum));
 }
-function clearFilterLayer(){warmPaint?.cancel();warmPaint=null;filterPolicy=null;if(anomaly)$('#warm-availability').textContent='Ready';map.getSource('warm-highlight')?.setData({type:'FeatureCollection',features:[]});$('#filter-legend').hidden=true;$('#warm-result').hidden=true;}
+function clearFilterLayer(){$('#clear-active-filter').hidden=true;$('#open-warm-filter').textContent='Warm months';warmPaint?.cancel();warmPaint=null;filterPolicy=null;if(anomaly)$('#warm-availability').textContent='Ready';map.getSource('warm-highlight')?.setData({type:'FeatureCollection',features:[]});$('#filter-legend').hidden=true;$('#warm-result').hidden=true;}
 function filterInputChanged({periodChanged=false}={}){
   clearFilterLayer();const n=selectedFilterIndices().length;const input=$('#warm-count');input.max=String(n);input.min=n?'1':'0';input.disabled=n===0;
   let adjustment='';
@@ -226,14 +231,14 @@ function updateWarmReadout(){
   const values=selectedSeries(anomaly,selected,'valuesAnomalyC');
   const result=countMonths(values,filterPolicy.indices,filterPolicy.threshold,filterPolicy.minimum);
   $('#warm-result-reading').textContent=result.count===null?'Count unavailable: missing selected month':`${result.count} of ${result.required} months · ${result.meets?'Matches filter':'Below chosen count'}`;
-  $('#warm-result-period').textContent=`At least +${filterPolicy.threshold}°C · X = ${filterPolicy.minimum} · 1993–2016 model average`;
-  $('#warm-result-values').replaceChildren(...filterPolicy.indices.map(i=>{const el=document.createElement('span'),v=values[i];el.textContent=`${monthText(anomaly.fields[i].validMonth).slice(0,3)} ${v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}°`}`;el.title=v===null?'Missing anomaly':`${monthText(anomaly.fields[i].validMonth)}: ${v}°C anomaly (unrounded source value)`;return el;}));
+  $('#warm-result-period').textContent=`At least +${filterPolicy.threshold}°C · X = ${filterPolicy.minimum} · ${activeBaseline()}`;
+  $('#warm-result-values').replaceChildren(...filterPolicy.indices.map(i=>{const el=document.createElement('span'),v=values[i];el.textContent=`${monthText(anomaly.fields[i].validMonth).slice(0,3)} ${v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}°`}`;el.title=v===null?'Missing anomaly':`${monthText(anomaly.fields[i].validMonth)}: ${v}°C anomaly (${forecastSource==='namash'?'export rounded to 0.01°C':'unrounded source value'})`;return el;}));
 }
 $('#warm-months').onchange=()=>filterInputChanged({periodChanged:true});
 $('#warm-threshold').oninput=()=>filterInputChanged();$('#warm-count').oninput=()=>filterInputChanged();
 $('#warm-all').onclick=()=>{$('#warm-months').querySelectorAll('input').forEach(el=>el.checked=true);filterInputChanged({periodChanged:true});};
 $('#warm-reset').onclick=resetWarmDefaults;
-$('#warm-apply').onclick=()=>{const started=performance.now();warmPaint?.cancel();warmPaint=PERF?afterSourcePaint(map,'warm-highlight',()=>!!filterPolicy,()=>painted('warm-filter',started)):null;try{if(!anomaly)throw Error('Compatible anomaly data unavailable');filterPolicy=chosenFilterPolicy();$('#warm-availability').textContent='Active';const results=countGrid(anomaly,filterPolicy);map.getSource('warm-highlight')?.setData(outlineMatches(results));$('#filter-legend').textContent=`Filter outline: ≥ +${filterPolicy.threshold}°C in ≥ ${filterPolicy.minimum}/${filterPolicy.indices.length} months`;$('#filter-legend').hidden=false;$('#warm-status').textContent='Filter applied. Outlines mark matching native cells; temperature colours are unchanged.';updateWarmReadout();warmPaint?.check();}catch(error){clearFilterLayer();$('#warm-status').textContent=error.message;}};
+$('#warm-apply').onclick=()=>{const started=performance.now();warmPaint?.cancel();warmPaint=PERF?afterSourcePaint(map,'warm-highlight',()=>!!filterPolicy,()=>painted('warm-filter',started)):null;try{if(!anomaly)throw Error('Compatible anomaly data unavailable');filterPolicy=chosenFilterPolicy();$('#warm-availability').textContent='Active';$('#clear-active-filter').hidden=false;$('#open-warm-filter').textContent='Warm months · active';const results=countGrid(anomaly,filterPolicy);map.getSource('warm-highlight')?.setData(outlineMatches(results));$('#filter-legend').textContent=`Filter outline: ≥ +${filterPolicy.threshold}°C in ≥ ${filterPolicy.minimum}/${filterPolicy.indices.length} months`;$('#filter-legend').hidden=false;$('#warm-status').textContent='Filter applied. Outlines mark matching native cells; selected measure colours are unchanged.';updateWarmReadout();warmPaint?.check();}catch(error){clearFilterLayer();$('#warm-status').textContent=error.message;}};
 
 function installDataLayers(){
  if(!mapReady||!data)return;
@@ -251,21 +256,27 @@ function renderSourceStatus(packet){
  $('#source-version').textContent=packet.generation?`Bundle ${packet.generation.slice(0,12)} · Forecast issue ${s.climate_issue_date} · Accounts ${s.business_snapshot_date} · Checked ${new Date(s.checked_at).toLocaleString('en-AU',{timeZone:'UTC'})} UTC`:'No validated source bundle loaded.';
  $('#data-status').textContent=!packet.data?'Source data unavailable':refreshError?'Last validated data · refresh failed':s.earlier_forecast_issue?'Validated data · earlier forecast issue':'Genuine CDS data · local download';
  $('#data-status').dataset.state=s.state;
+ if(forecastSource==='namash')updateForecastStatus();
 }
 function installSnapshot(packet){
  const initialLoad=currentGeneration===null;
  const oldIssue=data?.issueDate,oldValidMonth=data?.fields[fieldIndex]?.validMonth;
  const oldSelectedIndices=new Set([...$('#warm-months').querySelectorAll('input')].flatMap((el,i)=>el.checked?[i]:[]));
  const oldPeriod=new Set([...$('#warm-months').querySelectorAll('input:checked')].map(el=>el.value));
- ({mean:data,anomaly,history,business}=packet.data);
+ lastSnapshot=packet;({mean:ecmwfMean,anomaly:ecmwfAnomaly,history,business}=packet.data);
+ data=forecastSource==='namash'?projectStatistical(statisticalPacket,statisticalIssue):ecmwfMean;
+ anomaly=forecastSource==='namash'?data:ecmwfAnomaly;
  const issueChanged=!!oldIssue&&oldIssue!==data.issueDate;
  if(issueChanged){fieldIndex=Math.max(0,data.fields.findIndex(f=>f.validMonth===oldValidMonth));clearFilterLayer();}
- $('.header-period').textContent=`Seasonal outlook · ${monthText(data.issueDate.slice(0,7))} issue`;
+ $('.header-period').textContent=`${forecastSource==='namash'?'Namash ML':'ECMWF'} · ${monthText(data.issueDate.slice(0,7))} issue`;
+ $('#forecast-issue').hidden=$('#forecast-issue-label').hidden=forecastSource!=='namash';
+ $('#forecast-measure option[value=probability]').disabled=forecastSource!=='namash';
+ updateForecastStatus();
  $('#overview-summary p').textContent=`${monthText(data.fields[0].validMonth)} – ${monthText(data.fields.at(-1).validMonth)}`;
  $('#area').replaceChildren(new Option('Choose a town…',''),...GEOGRAPHY.areas.slice().sort((a,b)=>a.name.localeCompare(b.name)||a.postcode.localeCompare(b.postcode)).map(a=>new Option(`${a.name} · ${a.postcode}`,a.postcode)));$('#area').disabled=false;
- $('#month').replaceChildren(...data.fields.map((f,i)=>new Option(monthText(f.validMonth),i)));$('#month').disabled=false;$('#month').value=String(fieldIndex);buildMonthChips();
+ $('#month').replaceChildren(...data.fields.map((f,i)=>new Option(monthText(f.validMonth),i)));$('#month').disabled=false;$('#forecast-measure').disabled=false;$('#month').value=String(fieldIndex);buildMonthChips();
  $('#warm-months').querySelectorAll('input').forEach((el,i)=>el.checked=initialLoad||(issueChanged?oldSelectedIndices.has(i):oldPeriod.has(el.value)));$('#warm-controls').disabled=false;$('#warm-availability').textContent=filterPolicy?'Active':'Ready';
- $('#issue-date').textContent=new Date(`${data.issueDate}T12:00:00Z`).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+ $('#issue-date').textContent=forecastSource==='namash'?`${monthText(statisticalIssue)}${data.partial?' · advance / partial inputs':''}`:new Date(`${data.issueDate}T12:00:00Z`).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
  $('#legend').hidden=false;$('#overview-summary').hidden=!overview;
  installDataLayers();setMonth();
  if(initialLoad)resetWarmDefaults();else if(!filterPolicy)filterInputChanged({periodChanged:true});
@@ -294,3 +305,50 @@ nativeHistory=createNativeHistory({map,onRendered:()=>{historyRendered=true;meas
 nativeHistory.load();
 
 installSessionControl();
+
+function updateMeasureLegend(){
+ const m=MEASURES[measureMode];$('#measure-legend').textContent=`${m.label} · ${m.unit}`;
+ const stops=[];for(let i=0;i<m.stops.length;i+=2)stops.push(`${m.stops[i+1]} ${(m.stops[i]-m.domain[0])/(m.domain[1]-m.domain[0])*100}%`);
+ $('.colour-bar').style.background=`linear-gradient(to right,${stops.join(',')})`;
+ $('.ticks').replaceChildren(...m.ticks.map(t=>{const el=document.createElement('span');el.textContent=t;return el;}));
+ $('#forecast-grid-note').textContent=`Native 1° · Fixed scale · No data: unfilled${measureMode==='anomaly'?' · '+activeBaseline():''}`;
+ $('#measure-chart-heading').textContent=`${m.label} · ${m.unit}`;$('#monthly-chart').setAttribute('aria-label',`${m.label} by forecast month, ${m.unit}`);
+ if(map.getLayer('temperature-fill'))map.setPaintProperty('temperature-fill','fill-color',['interpolate',['linear'],['get','valueC'],...m.stops]);
+}
+function updateStatisticalCell(){
+ const el=$('#statistical-cell-details');el.hidden=forecastSource!=='namash'||overview;
+ if(el.hidden)return;
+ const r=statisticalCell(statisticalPacket,statisticalIssue,selected.properties.lon,selected.properties.lat,fieldIndex);
+ if(!r){el.textContent='No Namash forecast cell covers this location. Account and historical context remain separate.';return;}
+ const range=r.low===null||r.high===null?'80% model range unavailable':`80% model range ${r.low.toFixed(1)}–${r.high.toFixed(1)}°C`;
+ const skill=r.skill===null?'Hindcast skill unavailable':`Hindcast MSE skill ${r.skill.toFixed(2)}${r.skill<.05?' (little or no skill)':''}`;
+ el.textContent=`Experimental: ${measureReading(r.anomaly,'anomaly')} relative to 1991–2020; chance warmer ${measureReading(r.probability,'probability')}. ${range}. ${skill}.`;
+}
+function updateForecastStatus(){
+ const ml=forecastSource==='namash';$('#forecast-source-link').href=ml?'https://github.com/Sploosh4/greenspark-hackathon/tree/e8143867c295cac0071f6e6f90ee5e0295960a95/q3-seasonal-ml':'https://cds.climate.copernicus.eu/datasets/seasonal-monthly-single-levels?tab=overview';
+ $('#forecast-source-link').textContent=ml?'Namash statistical source / method ↗':'Copernicus C3S / ECMWF source ↗';
+ $('#forecast-source-note').textContent=ml?`Experimental Ridge + LightGBM · ${activeBaseline()}${data.partial?' · Partial October / carried indices':''}`:`ECMWF system 51 · ${activeBaseline()} reference`;
+ const details=$('#statistical-method-details');details.hidden=!ml;
+ if(ml){
+  const state=statisticalPacket.status.issues[statisticalIssue].state;
+  $('#data-status').textContent=`Frozen Namash outlook · experimental${state==='advance'?' · advance issue':state==='stale'?' · expired outlook':''}${statisticalPacket.status.last_good_retained?' · last validated export retained':''}`;
+  $('#data-status').dataset.state=statisticalPacket.status.state;
+  details.textContent=`Namash frozen export 909904199eaf, commit e8143867c295. NASA POWER / MERRA-2 monthly mean T2M; anomaly and probability reference: matching 1991–2020 calendar month. Training through September 2026. ${data.partial?'November is an advance issue using October 1–21 temperature inputs and September Niño 3.4/SAM carried into October.':'October uses complete inputs through September 2026.'} Probability is the model estimate of a warmer-than-average month, not heatwave probability. Final isotonic calibration has not been independently held-out verified. The 80% model range is a Gaussian error estimate from hindcasts, not daily temperature extremes. Published cell skill is the uncorrected ensemble MSE skill vs climatology for 2006–2025, not current-issue confidence. Export values are rounded (temperature/range/normal 0.1°C; anomaly/probability 0.01). Missing cells stay unfilled. ECMWF details below describe the separate available source. No automated refresh runs this ML pipeline.`;
+ }
+}
+function switchForecast(){
+ if(!lastSnapshot)return;
+ if(forecastSource==='namash'&&!statisticalPacket?.data){$('#forecast-source').value='ecmwf';forecastSource='ecmwf';return;}
+ clearFilterLayer();if(forecastSource!=='namash'&&measureMode==='probability'){measureMode='temperature';$('#forecast-measure').value=measureMode;}
+ installSnapshot(lastSnapshot);renderSourceStatus(lastSnapshot);
+ $('#warm-status').textContent='Source or issue changed. Review selected months and apply the filter again.';
+}
+$('#forecast-source').onchange=e=>{forecastSource=e.target.value;switchForecast();};
+$('#forecast-issue').onchange=e=>{statisticalIssue=e.target.value;switchForecast();};
+$('#forecast-measure').onchange=e=>{if(!data)return;measureMode=e.target.value;setMonth();};
+readStatistical().then(packet=>{
+ statisticalPacket=packet;const option=$('#forecast-source option[value=namash]');option.disabled=!packet.data;option.textContent=packet.data?'Namash ML · experimental':'Namash ML · unavailable';
+ if(!packet.data)option.title='The frozen statistical export is unavailable or failed validation.';
+}).catch(()=>{const option=$('#forecast-source option[value=namash]');option.disabled=true;option.textContent='Namash ML · unavailable';option.title='Statistical export request or validation failed; ECMWF remains available.';});
+
+$('#clear-active-filter').onclick=()=>filterInputChanged();

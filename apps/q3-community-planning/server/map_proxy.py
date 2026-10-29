@@ -12,7 +12,7 @@ from urllib.parse import parse_qsl, unquote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1] / 'web'
-FILES = {'modules/local-basemap.mjs','wa-boundary.geojson','financial-intake.mjs','modules/financial-support.mjs','modules/climate-contract.mjs','modules/upload-validation.mjs','business.html','business.css','business.mjs','modules/historical-layer.mjs','modules/native-history.mjs','modules/geography-reference.mjs','modules/session.mjs','modules/performance.mjs','index.html','styles.css','view.mjs','grid.mjs','warm-filter.mjs','modules/source-adapter.mjs','modules/planning-calculations.mjs','vendor/maplibre-gl.js','vendor/maplibre-gl.css','vendor/maplibre-LICENSE.txt','vendor/maptiler-logo.svg'}
+FILES = {'modules/statistical-outlook.mjs','modules/local-basemap.mjs','wa-boundary.geojson','financial-intake.mjs','modules/financial-support.mjs','modules/climate-contract.mjs','modules/upload-validation.mjs','business.html','business.css','business.mjs','modules/historical-layer.mjs','modules/native-history.mjs','modules/geography-reference.mjs','modules/session.mjs','modules/performance.mjs','index.html','styles.css','view.mjs','grid.mjs','warm-filter.mjs','modules/source-adapter.mjs','modules/planning-calculations.mjs','vendor/maplibre-gl.js','vendor/maplibre-gl.css','vendor/maplibre-LICENSE.txt','vendor/maptiler-logo.svg'}
 MAP_ROOTS = {'maps', 'tiles', 'fonts', 'sprites', 'resources'}
 MAX_RESOURCE_BYTES = 16 * 1024 * 1024
 

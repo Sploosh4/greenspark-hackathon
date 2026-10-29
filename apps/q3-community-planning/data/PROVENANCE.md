@@ -11,3 +11,9 @@ These are the unchanged normalised inputs approved in the local Q3 preview on 28
 MapLibre GL JS and its licence are bundled unchanged from the reviewed demo. MapTiler Streets v4 resources remain proxied at runtime; MapTiler/OpenStreetMap credits and logo stay visible. Real provider water polygons visually mask the native source grid at coastlines. No finer forecast precision, interpolation, fictitious service polygon or customer point is introduced.
 
 No CDS token is present in these files or requested by this application. The source retrieval/GRIB decoder remains a separate preparation step. C3S data credits and source links remain in the interface and these notes; the source pack records CC BY 4.0 and the additional licence for non-European contributions. No new licence acceptance occurred in this integration task.
+
+## Namash statistical source
+
+The separately pinned export is described in [NAMASH-OUTLOOK.md](../NAMASH-OUTLOOK.md). Original source/export repository commit `e8143867c295cac0071f6e6f90ee5e0295960a95` and export SHA256 `909904199eafcefcfaaa8844ae8bf7a4b53ca55326df3a2973290f294e7dc247` are retained with the MIT notice under `statistical/`. Acknowledge Namash / GreenSpark, NASA Langley Research Center POWER Project (MERRA-2), and NOAA CPC Niño 3.4/AAO indices. The original provenance also lists a Natural Earth outline; that outline is not imported or used here. The app keeps its existing ABS WA boundary and SILO credits. Upstream provenance is a historical source record, not a promise that every upstream repository file is bundled.
+
+The statistical product uses NASA POWER/MERRA-2 1991–2020 monthly climatology. Do not relabel it as the ECMWF hindcast baseline, SILO daily extremes or validated heatwave probability. No new upstream retrieval, training or licence acceptance occurs in this local source update.

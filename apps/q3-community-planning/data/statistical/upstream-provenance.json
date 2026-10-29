@@ -1,0 +1,21 @@
+{
+ "product": "Experimental ML seasonal temperature outlook (monthly mean, 1-degree WA cells)",
+ "status": "Research prototype. Not a Copernicus C3S or Bureau of Meteorology product. Monthly means only; no heatwave counts or dates.",
+ "issues": [
+  "Oct 2026",
+  "Nov 2026"
+ ],
+ "training_through": "2026-09",
+ "model": "Mean of ridge and LightGBM on anomalies from per-cell climatology + linear trend",
+ "inputs": [
+  "NASA POWER (MERRA-2) T2M monthly 1981-2026 and daily Oct 2026, NASA Langley Research Center POWER Project",
+  "NOAA CPC Nino 3.4 (ERSSTv5) and Antarctic Oscillation monthly indices",
+  "Natural Earth 1:50m admin-1 outline (public domain)"
+ ],
+ "evaluation": "Rolling-origin hindcast 2006-2025; see q3-seasonal-ml/REPORT.md in this repository",
+ "relationship_to_demo_scenario": "Independent of the synthetic 2025 Q1 account scenario and its As-of date.",
+ "files": {
+  "ml_outlook_layer.json": "909904199eafcefcfaaa8844ae8bf7a4b53ca55326df3a2973290f294e7dc247",
+  "wa_outline.geojson": "5f5b0f2aa7a17459acf3c6977cce66f1a37b352af5821ce90df78d845238be68"
+ }
+}

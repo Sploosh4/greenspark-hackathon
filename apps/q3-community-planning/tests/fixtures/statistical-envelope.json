@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "contract": "season-ahead-statistical-outlook-v1",
+  "source_id": "namash-ridge-lightgbm-v1",
+  "provenance": {
+    "sourceId": "namash-ridge-lightgbm-v1",
+    "commit": "e8143867c295cac0071f6e6f90ee5e0295960a95",
+    "exportSha256": "909904199eafcefcfaaa8844ae8bf7a4b53ca55326df3a2973290f294e7dc247",
+    "baseline": {
+      "period": "1991-2020",
+      "dataset": "NASA POWER / MERRA-2 T2M",
+      "statistic": "calendar-month mean"
+    },
+    "units": {
+      "temperature": "degC",
+      "anomaly": "degC_difference",
+      "probability": "fraction",
+      "range": "degC",
+      "skill": "MSE skill vs climatology"
+    },
+    "probabilityEvent": "Monthly mean temperature above the matching 1991-2020 calendar-month mean",
+    "probabilityStatus": "experimental; final isotonic calibration not independently held-out verified",
+    "rangeDefinition": "Published model 10th\u201390th percentile estimate: predicted mean \u00b11.2816 \u00d7 hindcast error standard deviation by lead; not daily extremes",
+    "skillDefinition": "MSE skill vs climatology per lead, ensemble, hindcast 2006-2025",
+    "inputLimitations": {
+      "2026-10": "Complete monthly temperature and index inputs through September 2026",
+      "2026-11": "Advance issue using October 1\u201321 temperatures and September Ni\u00f1o 3.4/SAM carried forward"
+    },
+    "publicationDate": null,
+    "issueDatePrecision": "month only",
+    "attribution": "Namash / GreenSpark; NASA Langley Research Center POWER Project (MERRA-2); NOAA CPC indices",
+    "codeLicense": "MIT, copyright 2026 Sploosh4; retained in data/statistical/LICENSE",
+    "sourceUrl": "https://github.com/Sploosh4/greenspark-hackathon/tree/e8143867c295cac0071f6e6f90ee5e0295960a95/q3-seasonal-ml"
+  },
+  "status": {
+    "state": "ready",
+    "last_good_retained": false,
+    "error": null,
+    "checked_at": "2026-10-29T06:08:06.092442+00:00",
+    "issues": {
+      "2026-10": {
+        "state": "available",
+        "uses_partial_month": false
+      },
+      "2026-11": {
+        "state": "advance",
+        "uses_partial_month": true
+      }
+    }
+  }
+}
